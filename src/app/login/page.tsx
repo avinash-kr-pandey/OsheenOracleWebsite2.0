@@ -1,6 +1,5 @@
 "use client";
 
-
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { FaApple, FaArrowLeft } from "react-icons/fa";
@@ -17,7 +16,11 @@ import {
 import PolicyModal from "@/components/Modals/PolicyModal";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import { googleLogin } from "@/services/auth/googleAuth";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import {
+  GoogleOAuthProvider,
+  GoogleLogin,
+  CredentialResponse,
+} from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
 interface ErrorResponse {
@@ -31,87 +34,92 @@ interface ErrorResponse {
   message?: string;
 }
 
-// Google Login Component
+// Google Login Component - Updated to match Apple button style
 const GoogleLoginButton = () => {
   const { login } = useAuth();
   const router = useRouter();
 
-  return (
-    <GoogleLogin
-      onSuccess={async (credentialResponse) => {
-        const toastId = toast.loading("Signing in with Google...");
+  const handleGoogleLogin = async (credentialResponse: CredentialResponse) => {
+    const toastId = toast.loading("Signing in with Google...");
 
-        try {
-          if (!credentialResponse.credential) {
-            throw new Error("No credential received");
-          }
+    try {
+      const token = credentialResponse.credential;
 
-          // Decode JWT token to get user info
-          const decoded: any = jwtDecode(credentialResponse.credential);
+      if (!token) {
+        throw new Error("No token received from Google");
+      }
 
-          // ✅ SEND TOKEN TO BACKEND
-          const googleData = {
-            token: credentialResponse.credential, // Add token field
-            email: decoded.email || "",
-            name: decoded.name || "",
-            picture: decoded.picture || "",
-            googleId: decoded.sub || "",
+      // Decode the JWT to get user info
+      const decodedToken = jwtDecode<{
+        email: string;
+        name: string;
+        picture: string;
+        sub: string;
+      }>(token);
+
+      // Prepare data for backend
+      const googleData = {
+        token: token,
+        email: decodedToken.email,
+        name: decodedToken.name,
+        picture: decodedToken.picture,
+        googleId: decodedToken.sub,
+      };
+
+      console.log("Google user data with token:", googleData);
+
+      // Call your backend API
+      const userData = await googleLogin(googleData);
+
+      if (userData) {
+        const authToken = localStorage.getItem("token");
+        if (authToken && login) {
+          // Create complete user object
+          const authUserData: UserData = {
+            id: userData._id || userData.id || "",
+            name: userData.name || decodedToken.name || "",
+            email: userData.email || decodedToken.email || "",
+            type: userData.type || "user",
+            avatar:
+              userData.avatar ||
+              userData.picture ||
+              decodedToken.picture ||
+              undefined,
+            _id: userData._id,
+            picture: userData.picture,
+            phone: userData.phone,
+            createdAt: userData.createdAt,
+            updatedAt: userData.updatedAt,
           };
 
-          console.log("Google user data with token:", googleData);
+          // Update auth context
+          login(authToken, authUserData);
+          toast.success("Google login successful!", { id: toastId });
 
-          // Call your backend API
-          const userData = await googleLogin(googleData);
-
-          if (userData) {
-            const token = localStorage.getItem("token");
-            if (token && login) {
-              // Create complete user object
-              const authUserData: UserData = {
-                id: userData._id || userData.id || "",
-                name: userData.name || decoded.name || "",
-                email: userData.email || decoded.email || "",
-                type: userData.type || "user",
-                avatar:
-                  userData.avatar ||
-                  userData.picture ||
-                  decoded.picture ||
-                  undefined,
-                _id: userData._id,
-                picture: userData.picture,
-                phone: userData.phone,
-                createdAt: userData.createdAt,
-                updatedAt: userData.updatedAt,
-              };
-
-              // Update auth context
-              login(token, authUserData);
-              toast.success("Google login successful!", { id: toastId });
-
-              // Redirect to home
-              setTimeout(() => {
-                router.push("/");
-              }, 1000);
-            }
-          }
-        } catch (error: unknown) {
-          console.error("Google login error:", error);
-          const errorMessage =
-            error instanceof Error ? error.message : "Google login failed";
-          toast.error(errorMessage, {
-            id: toastId,
-            duration: 4000,
-          });
+          // Redirect to home
+          setTimeout(() => {
+            router.push("/");
+          }, 1000);
         }
-      }}
+      }
+    } catch (error: unknown) {
+      console.error("Google login error:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Google login failed";
+      toast.error(errorMessage, {
+        id: toastId,
+        duration: 4000,
+      });
+    }
+  };
+
+  return (
+    <GoogleLogin
+      onSuccess={handleGoogleLogin}
       onError={() => {
-        toast.error("Google login failed. Please try again.");
+        toast.error("Google login failed");
       }}
       text="signin_with"
-      shape="rectangular"
-      size="large"
-      width="100%"
-      useOneTap={false}
     />
   );
 };
@@ -894,7 +902,7 @@ const Login = () => {
 
         <div className="flex flex-col sm:flex-row justify-between gap-3">
           {/* Google Login Button */}
-          <div className="w-full">
+          <div className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 text-sm md:text-base font-medium cursor-pointer">
             <GoogleLoginButton />
           </div>
 
@@ -1217,7 +1225,7 @@ const Login = () => {
 
         <div className="flex flex-col sm:flex-row justify-between gap-3">
           {/* Google Login Button */}
-          <div className="w-full">
+          <div className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 text-sm md:text-base font-medium cursor-pointer">
             <GoogleLoginButton />
           </div>
 
@@ -1278,7 +1286,7 @@ const Login = () => {
       <Toaster
         position="top-right"
         toastOptions={{
-          duration: 4000,
+          duration: 4000, // Default duration 4 seconds
           style: {
             background: "#363636",
             color: "#fff",
@@ -1286,27 +1294,16 @@ const Login = () => {
             padding: "16px",
           },
           success: {
-            duration: 3000,
-            style: {
-              background: "#10B981",
-            },
-            iconTheme: {
-              primary: "#fff",
-              secondary: "#10B981",
-            },
+            duration: 3000, // Success toast 3 seconds
           },
           error: {
-            duration: 4000,
-            style: {
-              background: "#EF4444",
-            },
+            duration: 4000, // Error toast 4 seconds
           },
           loading: {
-            duration: 30000,
+            duration: 30000, // Loading toast 30 seconds (timeout)
           },
         }}
       />
-
       {/* Logo */}
       <div
         className="absolute top-4 left-4 md:top-6 md:left-6 z-20 cursor-pointer"
@@ -1321,7 +1318,6 @@ const Login = () => {
           priority
         />
       </div>
-
       {/* Main Section */}
       <div className="w-full flex flex-col lg:flex-row justify-between items-center px-4 sm:px-8 md:px-16 py-6 md:py-10 gap-8 md:gap-0 md:pt-0 pt-30">
         {/* Background circular image */}
@@ -1408,13 +1404,11 @@ const Login = () => {
           </div>
         </div>
       </div>
-
       <PolicyModal
         isOpen={openModal === "privacy"}
         onClose={() => setOpenModal(null)}
         defaultTab="privacy"
       />
-
       <PolicyModal
         isOpen={openModal === "terms"}
         onClose={() => setOpenModal(null)}
