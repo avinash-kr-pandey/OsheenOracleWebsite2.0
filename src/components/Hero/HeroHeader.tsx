@@ -194,8 +194,25 @@ const navigateToWishlist = () => {
     }
   };
 
+  // const handleProfileNavigation = (href: string) => {
+  //   setProfileDropdownOpen(false);
+  //   if (isAuthenticated) {
+  //     router.push(href);
+  //   } else {
+  //     toast.error("Please login to access this page");
+  //     router.push("/login");
+  //   }
+  // };
+
+
   const handleProfileNavigation = (href: string) => {
     setProfileDropdownOpen(false);
+
+    if (href === "/login") {
+      router.push("/login");
+      return;
+    }
+
     if (isAuthenticated) {
       router.push(href);
     } else {
@@ -203,7 +220,6 @@ const navigateToWishlist = () => {
       router.push("/login");
     }
   };
-
   // Desktop Services dropdown handlers
   const handleServicesMouseEnter = () => {
     if (window.innerWidth >= 768) {
