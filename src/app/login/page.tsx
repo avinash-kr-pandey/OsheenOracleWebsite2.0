@@ -94,7 +94,10 @@ const GoogleLoginButton = () => {
 
           // Update auth context
           login(authToken, authUserData);
-          toast.success("Google login successful!", { id: toastId });
+          toast.success("Google login successful!", {
+            id: toastId,
+            duration: 2000, 
+          });
 
           // Redirect to home
           setTimeout(() => {
