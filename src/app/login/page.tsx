@@ -96,7 +96,7 @@ const GoogleLoginButton = () => {
           login(authToken, authUserData);
           toast.success("Google login successful!", {
             id: toastId,
-            duration: 2000, 
+            duration: 2000,
           });
 
           // Redirect to home
@@ -317,7 +317,7 @@ const Login = () => {
           {
             id: toastId,
             duration: 3000,
-          }
+          },
         );
 
         // Clear form and switch to login
@@ -438,6 +438,111 @@ const Login = () => {
   };
 
   // Handle OTP Verification
+  // const handleOtpSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   const enteredOtp = otp.join("");
+
+  //   if (enteredOtp.length !== 6) {
+  //     toast.error("Please enter a 6-digit OTP");
+  //     return;
+  //   }
+
+  //   setIsLoading(true);
+  //   const toastId = toast.loading("Verifying OTP...");
+
+  //   try {
+  //     let response: AuthResponse;
+
+  //     if (authStep === "reset") {
+  //       // For password reset OTP verification
+  //       response = await postData<AuthResponse>("/auth/verify-reset-otp", {
+  //         email,
+  //         otp: enteredOtp,
+  //         otpId: otpId || undefined,
+  //       });
+  //     } else {
+  //       // For login OTP verification
+  //       response = await postData<AuthResponse>("/auth/verify-otp", {
+  //         email,
+  //         otp: enteredOtp,
+  //         otpId: otpId || undefined,
+  //       });
+  //     }
+
+  //     console.log("OTP verification response:", response);
+
+  //     if (response.verified || response.success) {
+  //       toast.success("OTP verified successfully!", {
+  //         id: toastId,
+  //         duration: 3000,
+  //       });
+
+  //       // Proceed based on context
+  //       if (authStep === "reset") {
+  //         // Store reset token if provided
+  //         if (response.resetToken) {
+  //           setResetToken(response.resetToken);
+  //         }
+  //         setAuthStep("newPassword");
+  //       } else if (authStep === "otp") {
+  //         // If OTP is for login, try to login again
+  //         try {
+  //           const loginResponse = await postData<AuthResponse>("/auth/login", {
+  //             email,
+  //             password,
+  //           });
+
+  //           if (loginResponse.token && loginResponse.user) {
+  //             const userDataForContext = {
+  //               ...loginResponse.user,
+  //               id: loginResponse.user._id || loginResponse.user.id || "",
+  //             };
+
+  //             login(loginResponse.token, userDataForContext);
+  //             toast.success("Login successful!");
+
+  //             setTimeout(() => {
+  //               router.push("/");
+  //             }, 500);
+  //           }
+  //         } catch (loginError) {
+  //           console.error("Auto-login after OTP failed:", loginError);
+  //           toast.error("Please try logging in again");
+  //           setAuthStep("login");
+  //         }
+  //       }
+  //     } else {
+  //       toast.error("Invalid OTP. Please try again.", {
+  //         id: toastId,
+  //         duration: 3000,
+  //       });
+  //       setOtp(["", "", "", "", "", ""]);
+  //       // Focus first OTP input
+  //       const firstOtpInput = document.querySelector(
+  //         'input[type="text"]'
+  //       ) as HTMLInputElement;
+  //       if (firstOtpInput) firstOtpInput.focus();
+  //     }
+  //   } catch (error: unknown) {
+  //     const err = error as ErrorResponse;
+  //     console.error("OTP verification error:", err);
+
+  //     const errorMessage =
+  //       err.response?.data?.message ||
+  //       err.message ||
+  //       "Invalid OTP. Please try again.";
+
+  //     toast.error(errorMessage, {
+  //       id: toastId,
+  //       duration: 3000,
+  //     });
+  //     setOtp(["", "", "", "", "", ""]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -454,15 +559,14 @@ const Login = () => {
     try {
       let response: AuthResponse;
 
+      // 🔹 Step 1: Verify OTP
       if (authStep === "reset") {
-        // For password reset OTP verification
         response = await postData<AuthResponse>("/auth/verify-reset-otp", {
           email,
           otp: enteredOtp,
           otpId: otpId || undefined,
         });
       } else {
-        // For login OTP verification
         response = await postData<AuthResponse>("/auth/verify-otp", {
           email,
           otp: enteredOtp,
@@ -472,57 +576,51 @@ const Login = () => {
 
       console.log("OTP verification response:", response);
 
-      if (response.verified || response.success) {
-        toast.success("OTP verified successfully!", {
-          id: toastId,
-          duration: 3000,
-        });
+      if (!response?.verified && !response?.success) {
+        throw new Error("Invalid OTP");
+      }
 
-        // Proceed based on context
-        if (authStep === "reset") {
-          // Store reset token if provided
-          if (response.resetToken) {
-            setResetToken(response.resetToken);
-          }
-          setAuthStep("newPassword");
-        } else if (authStep === "otp") {
-          // If OTP is for login, try to login again
-          try {
-            const loginResponse = await postData<AuthResponse>("/auth/login", {
-              email,
-              password,
-            });
+      toast.success("OTP verified successfully!", {
+        id: toastId,
+        duration: 3000,
+      });
 
-            if (loginResponse.token && loginResponse.user) {
-              const userDataForContext = {
-                ...loginResponse.user,
-                id: loginResponse.user._id || loginResponse.user.id || "",
-              };
-
-              login(loginResponse.token, userDataForContext);
-              toast.success("Login successful!");
-
-              setTimeout(() => {
-                router.push("/");
-              }, 500);
-            }
-          } catch (loginError) {
-            console.error("Auto-login after OTP failed:", loginError);
-            toast.error("Please try logging in again");
-            setAuthStep("login");
-          }
+      // 🔹 Step 2: Handle flows
+      if (authStep === "reset") {
+        // ✅ Reset password flow
+        if (response.resetToken) {
+          setResetToken(response.resetToken);
         }
-      } else {
-        toast.error("Invalid OTP. Please try again.", {
-          id: toastId,
-          duration: 3000,
+        setAuthStep("newPassword");
+        return;
+      }
+
+      // 🔹 Step 3: Auto login (Login + Register both)
+      try {
+        const loginResponse = await postData<AuthResponse>("/auth/login", {
+          email,
+          password,
         });
-        setOtp(["", "", "", "", "", ""]);
-        // Focus first OTP input
-        const firstOtpInput = document.querySelector(
-          'input[type="text"]'
-        ) as HTMLInputElement;
-        if (firstOtpInput) firstOtpInput.focus();
+
+        if (loginResponse.token && loginResponse.user) {
+          const userDataForContext = {
+            ...loginResponse.user,
+            id: loginResponse.user._id || loginResponse.user.id || "",
+          };
+
+          login(loginResponse.token, userDataForContext);
+          toast.success("Login successful!");
+
+          setTimeout(() => {
+            router.push("/"); // ✅ SAME redirect for login & register
+          }, 500);
+        } else {
+          throw new Error("Login failed");
+        }
+      } catch (loginError) {
+        console.error("Auto-login failed:", loginError);
+        toast.error("Please login again");
+        setAuthStep("login");
       }
     } catch (error: unknown) {
       const err = error as ErrorResponse;
@@ -537,6 +635,7 @@ const Login = () => {
         id: toastId,
         duration: 3000,
       });
+
       setOtp(["", "", "", "", "", ""]);
     } finally {
       setIsLoading(false);
@@ -589,13 +688,13 @@ const Login = () => {
         // Use reset token endpoint
         response = await postData<AuthResponse>(
           `/auth/reset-password/${resetToken}`,
-          requestData
+          requestData,
         );
       } else {
         // Use email-based reset endpoint
         response = await postData<AuthResponse>(
           "/auth/reset-password",
-          requestData
+          requestData,
         );
       }
 
@@ -663,7 +762,7 @@ const Login = () => {
         // For password reset
         const response = await postData<AuthResponse>(
           "/auth/resend-reset-otp",
-          { email }
+          { email },
         );
         if (response.success) {
           toast.success("OTP resent to your email!", { id: toastId });
@@ -685,7 +784,7 @@ const Login = () => {
       const err = error as ErrorResponse;
       toast.error(
         err.response?.data?.message || err.message || "Failed to resend OTP",
-        { id: toastId }
+        { id: toastId },
       );
     }
   };
@@ -770,7 +869,7 @@ const Login = () => {
               if (e.key === "Backspace" && !data && index > 0) {
                 // Move focus to previous input on backspace
                 const prevInput = document.getElementById(
-                  `otp-${index - 1}`
+                  `otp-${index - 1}`,
                 ) as HTMLInputElement;
                 if (prevInput) prevInput.focus();
               }
@@ -922,19 +1021,19 @@ const Login = () => {
         <p className="text-xs text-gray-500 text-center mt-4 md:mt-6 leading-5">
           Protected by reCAPTCHA and subject to the{" "}
           <button
+            type="button"
             onClick={() => setOpenModal("privacy")}
             className="underline text-black hover:text-gray-700 transition-colors font-medium"
           >
             Privacy Policy
-          </button>{" "}
-          and{" "}
+          </button>
           <button
+            type="button"
             onClick={() => setOpenModal("terms")}
             className="underline text-black hover:text-gray-700 transition-colors font-medium"
           >
             Terms of Service
           </button>
-          .
         </p>
       </div>
     </form>
@@ -1245,13 +1344,14 @@ const Login = () => {
         <p className="text-xs text-gray-500 text-center mt-4 md:mt-6 leading-5">
           Protected by reCAPTCHA and subject to the{" "}
           <button
+            type="button"
             onClick={() => setOpenModal("privacy")}
             className="underline text-black hover:text-gray-700 transition-colors font-medium"
           >
             Privacy Policy
-          </button>{" "}
-          and{" "}
+          </button>
           <button
+            type="button"
             onClick={() => setOpenModal("terms")}
             className="underline text-black hover:text-gray-700 transition-colors font-medium"
           >

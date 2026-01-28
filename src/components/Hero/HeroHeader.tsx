@@ -593,7 +593,7 @@ const navigateToWishlist = () => {
                       <p className="font-semibold text-gray-800">
                         {getUserName()}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 break-all">
                         {user?.email || "User Account"}
                       </p>
                     </div>
