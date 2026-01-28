@@ -1266,6 +1266,7 @@ const Login = () => {
             htmlFor="terms"
             className="text-xs md:text-sm text-gray-600 leading-relaxed"
           >
+            
             I agree to the{" "}
             <button
               type="button"
