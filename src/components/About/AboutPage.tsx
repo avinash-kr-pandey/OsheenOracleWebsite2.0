@@ -1,8 +1,36 @@
 "use client";
 
+import { aboutAPI, AboutDataType } from "@/utils/api/about.api";
 import Image from "next/image";
+import React, { useEffect } from "react";
 
 export default function AboutPage() {
+  const [aboutData, setAboutData] = React.useState<AboutDataType | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        setLoading(true);
+
+
+        // ✅ Token automatically attach hoga agar user logged in hai
+        // ❌ Agar logged out hai to bina token ke request jayegi
+        const data = await aboutAPI.getAbout();
+
+        console.log("📦 About data received ddffadfa:", data);
+        setAboutData(data);
+      } catch (error) {
+        console.error("❌ Error fetching about data:", error);
+        // Error silent handle - UI show hoga with API data agar available hai
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAboutData();
+  }, []);
+
   return (
     <div
       className="min-h-screen "
@@ -13,14 +41,15 @@ export default function AboutPage() {
     >
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
-        <div className=""
+        <div
+          className=""
           style={{
             background:
               "linear-gradient(to bottom, #FBB5E7 0%, #FBB5E7 20%, #C4F9FF 100%)",
-          }}>
-          <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center py-16 md:py-24"
-
-          >
+          }}
+        >
+          {/* Hero Section */}
+          <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center py-16 md:py-24">
             <div className="absolute inset-0 bg-[url('/images/aboutround.png')] bg-no-repeat bg-right-top bg-contain opacity-30 pointer-events-none"></div>
 
             <div className="relative z-10 container mx-auto flex flex-col md:flex-row items-center justify-between gap-8 px-4">
@@ -40,27 +69,10 @@ export default function AboutPage() {
               {/* Right Text Section */}
               <div className="w-full md:w-1/2 space-y-6 animate-fade-in-up">
                 <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 text-center md:text-left">
-                  About Us
+                  {aboutData?.heroTitle || "About Us"}
                 </h2>
                 <p className="text-gray-700 leading-relaxed text-justify text-[15px] md:text-base">
-                  We are highly delighted to see you here at Osheen Oracle, which
-                  is twice awarded as No.1 tarot reading platform in India. Osheen
-                  Oracle is one stop solution for a comprehensive healing journey
-                  where you will find guidance to heal your life in all aspects of
-                  love, relationship, mental well-being, career success, business
-                  success and for every issue you must be facing today alone as we
-                  are here to help you out and take you on a Spiritually uplifting
-                  journey towards finding your best life.
-                </p>
-                <p className="text-gray-700 leading-relaxed text-justify text-[15px] md:text-base">
-                  If we have reached this page then it is no coincidence as in the
-                  spectrum of the Universe there are no coincidences. If you have
-                  reached us, it means we are meant to be. You are now at a phase
-                  in your life which requires a soul upgrade where you leave all
-                  the negativity behind and embark a glorious journey to heal your
-                  life with powerful healing spells, Tarot guidance and magically
-                  enchanted Crystals in form of jars, bracelet and energized
-                  ancient Yantras.
+                  {aboutData?.heroDescription}
                 </p>
               </div>
             </div>
@@ -68,129 +80,84 @@ export default function AboutPage() {
         </div>
 
         {/* Osheen Ma'am's Story Section */}
-        <section className="relative mx-auto min-h-auto overflow-hidden flex items-center justify-center md:pt-0 pt-16 md:py-24">
-          <div className="relative z-10 container mx-auto flex flex-col md:flex-row items-center justify-between gap-8 px-4">
-            {/* Text Section */}
-            <div className="w-full md:w-1/2 space-y-6 animate-fade-in-up md:pl-8 order-2 md:order-1">
-              <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 text-center md:text-left">
-                Amarpreet Osheen Kaur
-              </h2>
-              <p className="text-gray-700 leading-relaxed text-justify text-[15px] md:text-base">
-                Amarpreet Osheen Kaur, fondly called Osheen ma is a Spiritual
-                Mentor, Healer, Tarot reader, aura reader, relationship
-                counselor, motivational speaker, astrologer, Reiki master and
-                white healing spells caster with an experience of more than 15
-                years in the study of field of Divination, spirituality,
-                alternative healing modalities and creating magic. She has been
-                given the title of No.1 tarot reader in India.
-              </p>
-              <p className="text-gray-700 leading-relaxed text-justify text-[15px] md:text-base">
-                Amarpreet Osheen ma&rsquo;am was working as an English
-                literature professor in Panjab University, Chandigarh and was
-                brilliant at her job but she always use to feel for other and
-                often due to a natural gift of face reading and aura readings
-                she use to sense pain and sufferings of those around her and
-                would often heal them with her words. Since a child she had the
-                ability to connect with people on a deep emotional level and
-                also had visions about the future in her dreams.
-              </p>
-              <p className="text-gray-700 leading-relaxed text-justify text-[15px] md:text-base">
-                She is deeply connected and concerned about animals, trees and
-                mother nature in all forms. Born to a father who worked as an
-                I.F.S officer, she spent most of her childhood watching her
-                father saving nature and hence got emotionally attached to
-                mother nature. Osheen Ma loves to spend her time in meditation
-                in nature and is actively working to protect nature at all cost.
-              </p>
-            </div>
+        {aboutData?.sections?.map((section, index) => (
+          <section
+            key={section._id || index}
+            className={`relative min-h-auto overflow-hidden flex items-center justify-center ${
+              index === 0 ? "pt-16 md:pt-24" : "py-16"
+            }`}
+          >
+            <div
+              className={`relative z-10 container mx-auto flex flex-col ${
+                index % 2 === 0
+                  ? "md:flex-row" // Even index: image left, text right
+                  : "md:flex-row-reverse" // Odd index: image right, text left
+              } items-center justify-between gap-8 px-4`}
+            >
+              {/* Text Section */}
+              <div className="w-full md:w-1/2 space-y-6 animate-fade-in-up md:pl-8">
+                <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 text-center md:text-left">
+                  {section.title}
+                </h2>
+                {/* Handle content that might be plain text or need paragraph splitting */}
+                {section.content.split("\n").map((paragraph, i) => (
+                  <p
+                    key={i}
+                    className="text-gray-700 leading-relaxed text-justify text-[15px] md:text-base"
+                  >
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
 
-            {/* Image Section */}
-            <div className="relative w-full md:w-1/2 flex justify-center md:py-24 py-12 order-1 md:order-2">
-              <div className="relative overflow-hidden">
-                <Image
-                  src="/images/withcandle.png"
-                  alt="Osheen Ma with candle"
-                  width={700}
-                  height={500}
-                  className="object-cover rounded-2xl w-full h-auto"
-                />
+              {/* Image Section - Now Dynamic */}
+              <div className="relative w-full md:w-1/2 flex justify-center md:py-24 py-12">
+                <div className="relative overflow-hidden max-w-auto">
+                  {section.image ? (
+                    <Image
+                      src={section.image}
+                      alt={section.title}
+                      width={index % 2 === 0 ? 700 : 500}
+                      height={500}
+                      className="object-contain w-full h-auto"
+                      unoptimized={section.image.startsWith("data:image")}
+                    />
+                  ) : (
+                    // Agar image nahi hai to default static image dikhao (pehle wala)
+                    <Image
+                      src={
+                        index % 2 === 0
+                          ? "/images/withcandle.png"
+                          : "/images/resize3.jpg"
+                      }
+                      alt={section.title}
+                      width={index % 2 === 0 ? 700 : 500}
+                      height={500}
+                      className="object-cover rounded-2xl w-full h-auto"
+                    />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Spiritual Awakening Section */}
-        <section className="relative min-h-auto overflow-hidden flex items-center justify-center py-16 ">
-          <div className="relative z-10 container mx-auto flex flex-col md:flex-row items-center justify-between gap-8 px-4">
-            {/* Image Section */}
-            <div className="relative w-full md:w-1/2 flex justify-center">
-              <div className="relative overflow-hidden">
-                <Image
-                  src="/images/resize3.jpg"
-                  alt="Spiritual Awakening"
-                  width={500}
-                  height={500}
-                  className="object-cover rounded-2xl w-full h-auto"
-                />
-              </div>
-            </div>
-
-            {/* Text Section */}
-            <div className="w-full md:w-1/2 space-y-6">
-              <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 text-center md:text-left">
-                The Spiritual Awakening
-              </h2>
-              <p className="text-gray-700 leading-relaxed text-justify text-[15px] md:text-base">
-                One incident that changed the career path of Osheen ma was when
-                the soul of her grandfather visited her in her dream before
-                departing for his heavenly abode. In that dream her grandfather
-                told her that her true purpose was to heal people and live a
-                life dedicated to providing relief and encouragement to people
-                who have lost all hope. He asked her to be the light for those
-                standing in darkness.
-              </p>
-              <p className="text-gray-700 leading-relaxed text-justify text-[15px] md:text-base">
-                After that dream when she woke up, she heard from her mom that
-                her grandfather has passed away leaving behind a legacy of
-                spirituality of which Osheen ma will be the beacon. After that
-                day her life took a turn where she dedicated herself into the
-                realm of magic and spirituality and hence was born Osheen which
-                means light and Oracle which mean a mentor acting as a medium
-                through whom advice or prophecy was sought from gods.
-              </p>
-            </div>
-          </div>
-        </section>
-
+          </section>
+        ))}
         {/* Stats Section */}
+
         <div className="flex justify-center items-center py-16">
-          <div className="flex flex-col md:flex-row bg-[#4F4742] rounded-2xl overflow-hidden text-[#F5CDB0] shadow-lg divide-y md:divide-y-0 md:divide-x divide-[#6B615A] w-full max-w-4xl mx-4">
-            <div className="flex items-center justify-center gap-3 sm:gap-4 px-8 sm:px-12 py-6 sm:py-10 flex-1">
-              <h2 className="text-3xl sm:text-4xl font-serif font-medium">
-                32k+
-              </h2>
-              <p className="text-xs sm:text-sm text-gray-200 text-center sm:text-left">
-                Trusted clients
-              </p>
-            </div>
-
-            <div className="flex items-center justify-center gap-3 sm:gap-4 px-8 sm:px-12 py-6 sm:py-10 flex-1">
-              <h2 className="text-3xl sm:text-4xl font-serif font-medium">
-                15+
-              </h2>
-              <p className="text-xs sm:text-sm text-gray-200 text-center sm:text-left">
-                Years Experience
-              </p>
-            </div>
-
-            <div className="flex items-center justify-center gap-3 sm:gap-4 px-8 sm:px-12 py-6 sm:py-10 flex-1">
-              <h2 className="text-3xl sm:text-4xl font-serif font-medium">
-                4.8/5
-              </h2>
-              <p className="text-xs sm:text-sm text-gray-200 text-center sm:text-left">
-                Top rated
-              </p>
-            </div>
+          <div className="flex flex-col md:flex-row bg-[#4F4742] rounded-2xl overflow-hidden text-[#F5CDB0] shadow-lg divide-y md:divide-y-0 md:divide-x divide-[#6B615A] w-full max-w-5xl mx-4">
+            {aboutData?.stats?.map((stat, index) => (
+              <div
+                key={stat._id || index}
+                className="flex items-center justify-center gap-3 sm:gap-4 px-8 sm:px-12 py-6 sm:py-10 flex-1"
+              >
+                <h2 className="text-3xl sm:text-4xl font-serif font-medium">
+                  {stat.value}
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-200 text-center sm:text-left">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 

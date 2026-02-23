@@ -1,4 +1,5 @@
-// src/utils/api/api.ts - FINAL VERSION (Type-Safe)
+// src/utils/api/api.ts - UPDATED VERSION
+
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { Product, Review, isProduct, normalizeProduct } from "@/types/product";
 import {
@@ -8,19 +9,18 @@ import {
 } from "@/contexts/AuthContext";
 
 // const API_BASE_URL = "https://osheenoraclebackend02.onrender.com/api";
-const API_BASE_URL = "https://osheenoraclebackend02-1.onrender.com/api";
-// const API_BASE_URL = "http://localhost:5000/api";
+// const API_BASE_URL = "https://osheenoraclebackend02-1.onrender.com/api";
+const API_BASE_URL = "http://localhost:5000/api";
 
-// Add this function to your api.ts file (at the end before export default api)
+// Google Auth API object
 export const googleAuthApi = {
-  // Login with Google
   loginWithGoogle: async (
-    googleUserData: GoogleUserData
+    googleUserData: GoogleUserData,
   ): Promise<GoogleAuthResponse> => {
     try {
       const response = await postData<GoogleAuthResponse>(
         "/auth/google",
-        googleUserData
+        googleUserData,
       );
       return response;
     } catch (error) {
@@ -28,13 +28,11 @@ export const googleAuthApi = {
       throw error;
     }
   },
-
-  // Verify Google token on backend
   verifyGoogleToken: async (token: string): Promise<GoogleTokenResponse> => {
     try {
       const response = await postData<GoogleTokenResponse>(
         "/auth/verify-google-token",
-        { token }
+        { token },
       );
       return response;
     } catch (error) {
@@ -44,7 +42,7 @@ export const googleAuthApi = {
   },
 };
 
-// Generic API response type for unknown structures
+// Generic API response type
 interface ApiResponse<T = unknown> {
   data?: T;
   products?: T[];
@@ -61,6 +59,8 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  // ✅ IMPORTANT: withCredentials ko false rakhein agar backend CORS allow nahi karta
+  withCredentials: false,
 });
 
 // Request interceptor for adding auth token
@@ -73,25 +73,32 @@ api.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+
+    // ✅ FIX: GET requests ke liye cache-control headers hatao
+    if (config.method?.toLowerCase() === "get") {
+      // Inhe hatao kyunki backend inhe allow nahi kar raha
+      delete config.headers["Cache-Control"];
+      delete config.headers["Pragma"];
+      delete config.headers["Expires"];
+    }
+
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
-// Response interceptor for handling errors globally
+// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     const status = error.response?.status;
-
     if (status === 401 && typeof window !== "undefined") {
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
       window.location.href = "/login";
     }
-
     return Promise.reject(error);
-  }
+  },
 );
 
 // Set token dynamically
@@ -104,32 +111,33 @@ export const setAuthToken = (token: string | null) => {
 };
 
 /* =======================
-   GET
+   GET - MODIFIED VERSION
 ======================= */
 export const fetchData = async <T = unknown>(
   endpoint: string,
   params?: Record<string, unknown>,
-  noCache: boolean = true
+  noCache: boolean = false, // ✅ Default false kar diya
 ): Promise<T> => {
   try {
-    const headers = noCache
-      ? {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        }
-      : undefined;
+    // ✅ Headers sirf tab add karo jab zaroori ho aur backend support karta ho
+    const headers: Record<string, string> = {};
+
+    // Agar noCache true hai to ek simple header use karo
+    if (noCache) {
+      headers["Cache-Control"] = "no-cache"; // Sirf basic header
+      // Pragma aur Expires hata diye
+    }
 
     const response: AxiosResponse<T> = await api.get(endpoint, {
       params,
-      headers,
+      headers: Object.keys(headers).length ? headers : undefined,
     });
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
     console.error(
       `GET Error (${endpoint}):`,
-      err.response?.data || err.message
+      err.response?.data || err.message,
     );
     throw err;
   }
@@ -140,13 +148,14 @@ export const fetchData = async <T = unknown>(
 ======================= */
 export const postData = async <T = unknown>(
   endpoint: string,
-  data: Record<string, unknown> | FormData
+  data: Record<string, unknown> | FormData,
 ): Promise<T> => {
   try {
-    const headers =
-      data instanceof FormData
-        ? { "Content-Type": "multipart/form-data" }
-        : undefined;
+    const headers: Record<string, string> = {};
+
+    if (data instanceof FormData) {
+      headers["Content-Type"] = "multipart/form-data";
+    }
 
     const response: AxiosResponse<T> = await api.post(endpoint, data, {
       headers,
@@ -156,7 +165,7 @@ export const postData = async <T = unknown>(
     const err = error as AxiosError;
     console.error(
       `POST Error (${endpoint}):`,
-      err.response?.data || err.message
+      err.response?.data || err.message,
     );
     throw err;
   }
@@ -167,7 +176,7 @@ export const postData = async <T = unknown>(
 ======================= */
 export const putData = async <T = unknown>(
   endpoint: string,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ): Promise<T> => {
   try {
     const response: AxiosResponse<T> = await api.put(endpoint, data);
@@ -176,7 +185,7 @@ export const putData = async <T = unknown>(
     const err = error as AxiosError;
     console.error(
       `PUT Error (${endpoint}):`,
-      err.response?.data || err.message
+      err.response?.data || err.message,
     );
     throw err;
   }
@@ -193,7 +202,7 @@ export const deleteData = async <T = unknown>(endpoint: string): Promise<T> => {
     const err = error as AxiosError;
     console.error(
       `DELETE Error (${endpoint}):`,
-      err.response?.data || err.message
+      err.response?.data || err.message,
     );
     throw err;
   }
@@ -207,18 +216,18 @@ export const apiRequest = async <T = unknown>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   data?: Record<string, unknown> | FormData,
   params?: Record<string, unknown>,
-  noCache: boolean = true
+  noCache: boolean = false, // ✅ Default false
 ): Promise<T> => {
   try {
     const headers: Record<string, string> = {};
 
-    if (method === "GET" && noCache) {
-      headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-      headers["Pragma"] = "no-cache";
-      headers["Expires"] = "0";
-    }
-
-    if (data instanceof FormData) {
+    // ✅ GET requests ke liye cache headers hatao
+    if (method === "GET") {
+      // Cache headers mat bhejo
+      if (data instanceof FormData) {
+        headers["Content-Type"] = "multipart/form-data";
+      }
+    } else if (data instanceof FormData) {
       headers["Content-Type"] = "multipart/form-data";
     }
 
@@ -234,7 +243,7 @@ export const apiRequest = async <T = unknown>(
     const err = error as AxiosError;
     console.error(
       `${method} Error on ${endpoint}:`,
-      err.response?.data || err.message
+      err.response?.data || err.message,
     );
     throw err;
   }
@@ -293,7 +302,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
 
 // Fetch product by ID
 export const fetchProductById = async (
-  id: number | string
+  id: number | string,
 ): Promise<Product> => {
   try {
     const _id = typeof id === "string" ? id : id.toString();
@@ -390,7 +399,7 @@ export const searchProducts = async (query: string): Promise<Product[]> => {
 
 // Get products by category
 export const fetchProductsByCategory = async (
-  category: string
+  category: string,
 ): Promise<Product[]> => {
   try {
     const response = await fetchData<ApiResponse>("/products/category", {
@@ -420,7 +429,7 @@ export const fetchProductsByCategory = async (
 
 // Get products by brand
 export const fetchProductsByBrand = async (
-  brand: string
+  brand: string,
 ): Promise<Product[]> => {
   try {
     const response = await fetchData<ApiResponse>("/products/brand", { brand });
@@ -446,7 +455,7 @@ export const fetchProductsByBrand = async (
 
 // Get featured products
 export const fetchFeaturedProducts = async (
-  limit: number = 10
+  limit: number = 10,
 ): Promise<Product[]> => {
   try {
     const response = await fetchData<ApiResponse>("/products/featured", {
@@ -474,7 +483,7 @@ export const fetchFeaturedProducts = async (
 
 // Get new arrivals
 export const fetchNewArrivals = async (
-  limit: number = 10
+  limit: number = 10,
 ): Promise<Product[]> => {
   try {
     const response = await fetchData<ApiResponse>("/products/new", { limit });
@@ -501,7 +510,7 @@ export const fetchNewArrivals = async (
 // Get products by price range
 export const fetchProductsByPriceRange = async (
   minPrice: number,
-  maxPrice: number
+  maxPrice: number,
 ): Promise<Product[]> => {
   try {
     const response = await fetchData<ApiResponse>("/products/price-range", {
@@ -523,7 +532,7 @@ export const fetchProductsByPriceRange = async (
   } catch (error) {
     console.error(
       `Error fetching products in price range ${minPrice}-${maxPrice}:`,
-      error
+      error,
     );
     throw error;
   }
@@ -531,7 +540,7 @@ export const fetchProductsByPriceRange = async (
 
 // Create new product (admin only)
 export const createProduct = async (
-  productData: Partial<Product>
+  productData: Partial<Product>,
 ): Promise<Product> => {
   try {
     const response = await postData<ApiResponse>("/products", productData);
@@ -563,7 +572,7 @@ export const createProduct = async (
 // Update product (admin only)
 export const updateProduct = async (
   id: number | string,
-  productData: Partial<Product>
+  productData: Partial<Product>,
 ): Promise<Product> => {
   try {
     const response = await putData<ApiResponse>(`/products/${id}`, productData);
@@ -610,12 +619,12 @@ export const addProductReview = async (
     comment: string;
     rating: number;
     avatar?: string;
-  }
+  },
 ): Promise<Product> => {
   try {
     const response = await postData<ApiResponse>(
       `/products/${productId}/reviews`,
-      reviewData
+      reviewData,
     );
 
     let updatedProduct: unknown;
