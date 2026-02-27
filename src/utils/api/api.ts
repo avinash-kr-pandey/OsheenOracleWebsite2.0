@@ -9,8 +9,8 @@ import {
 } from "@/contexts/AuthContext";
 
 // const API_BASE_URL = "https://osheenoraclebackend02.onrender.com/api";
-// const API_BASE_URL = "https://osheenoraclebackend02-1.onrender.com/api";
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "https://osheenoraclebackend02-4oz7.onrender.com/api";
+// const API_BASE_URL = "http://localhost:5000/api";
 
 // Google Auth API object
 export const googleAuthApi = {
