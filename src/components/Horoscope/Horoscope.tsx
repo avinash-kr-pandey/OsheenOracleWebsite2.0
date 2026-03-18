@@ -1,14 +1,11 @@
+// app/horoscope/page.tsx
 "use client";
 
-import {
-  horoscopeData,
-  zodiacSigns,
-  HoroscopeItem,
-  ZodiacSign,
-  Rishi,
-  rishis,
-} from "@/utils/HoroscopeData";
+import { horoscopeAPI, HoroscopePrediction } from "@/utils/api/horoscope.api";
+import { Rishi, rishiAPI } from "@/utils/api/rishi.api";
+import { Zodiac, zodiacAPI } from "@/utils/api/zodiac.api";
 import React, { useState, useEffect } from "react";
+
 
 type TimeFrame = "daily" | "weekly" | "monthly" | "yearly";
 type Language = "english" | "hindi";
@@ -18,62 +15,100 @@ const Horoscope = () => {
   const [selectedTimeFrame, setSelectedTimeFrame] =
     useState<TimeFrame>("daily");
   const [language, setLanguage] = useState<Language>("english");
-  const [selectedZodiac, setSelectedZodiac] = useState<ZodiacSign | null>(null);
-  const [selectedRishi, setSelectedRishi] = useState<number>(1);
+  const [selectedZodiac, setSelectedZodiac] = useState<Zodiac | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<ViewMode>("zodiacs");
 
+  // Real data states
+  const [zodiacs, setZodiacs] = useState<Zodiac[]>([]);
+  const [predictions, setPredictions] = useState<HoroscopePrediction[]>([]);
+  const [rishis, setRishis] = useState<Rishi[]>([]);
+  const [loading, setLoading] = useState({
+    zodiacs: false,
+    predictions: false,
+    rishis: false,
+  });
+
   useEffect(() => {
     setIsVisible(true);
+    fetchAllData();
   }, []);
 
-  // Filter predictions based on selected zodiac and timeframe
-  const filteredPredictions = horoscopeData.filter(
-    (item: HoroscopeItem) =>
-      item.zodiacSign === selectedZodiac?.name &&
-      item.timeFrame === selectedTimeFrame
-  );
+  const fetchAllData = async () => {
+    // Fetch zodiacs
+    setLoading((prev) => ({ ...prev, zodiacs: true }));
+    try {
+      const zodiacData = await zodiacAPI.getAll();
+      setZodiacs(Array.isArray(zodiacData) ? zodiacData : []);
+    } catch (err) {
+      console.error("Error fetching zodiacs:", err);
+    } finally {
+      setLoading((prev) => ({ ...prev, zodiacs: false }));
+    }
 
-  const currentRishi: Rishi | undefined = rishis.find(
-    (rishi: Rishi) => rishi.id === selectedRishi
-  );
-  const currentPredictions = filteredPredictions.filter(
-    (item: HoroscopeItem) =>
-      item.id === selectedRishi || item.id === selectedRishi + 1
-  );
+    // Fetch rishis
+    setLoading((prev) => ({ ...prev, rishis: true }));
+    try {
+      const rishiData = await rishiAPI.getAll();
+      setRishis(Array.isArray(rishiData) ? rishiData : []);
+    } catch (err) {
+      console.error("Error fetching rishis:", err);
+    } finally {
+      setLoading((prev) => ({ ...prev, rishis: false }));
+    }
+  };
 
-  const timeFrames: { key: TimeFrame; en: string; hi: string }[] = [
+  // Fetch predictions when zodiac or timeframe changes
+  useEffect(() => {
+    if (selectedZodiac) {
+      fetchPredictions();
+    }
+  }, [selectedZodiac, selectedTimeFrame]);
+
+  const fetchPredictions = async () => {
+    if (!selectedZodiac) return;
+
+    setLoading((prev) => ({ ...prev, predictions: true }));
+    try {
+      // Pehle specific time frame ka prediction try karo
+      const specificData = await horoscopeAPI.getBySignAndTime(
+        selectedZodiac.name,
+        selectedTimeFrame,
+      );
+
+      if (specificData && !Array.isArray(specificData)) {
+        setPredictions([specificData]);
+      } else {
+        // Agar nahi mila to saare predictions le lo
+        const allData = await horoscopeAPI.getBySign(selectedZodiac.name);
+        setPredictions(Array.isArray(allData) ? allData : []);
+      }
+    } catch (err) {
+      console.error("Error fetching predictions:", err);
+      setPredictions([]);
+    } finally {
+      setLoading((prev) => ({ ...prev, predictions: false }));
+    }
+  };
+
+  const timeFrames = [
     { key: "daily", en: "Daily", hi: "दैनिक" },
     { key: "weekly", en: "Weekly", hi: "साप्ताहिक" },
     { key: "monthly", en: "Monthly", hi: "मासिक" },
     { key: "yearly", en: "Yearly", hi: "वार्षिक" },
   ];
 
-  const handleTimeFrameChange = (timeFrame: TimeFrame): void => {
-    setSelectedTimeFrame(timeFrame);
-  };
+  // Match predictions with rishis
+  const predictionsWithRishis = predictions.map((pred) => ({
+    ...pred,
+    rishiDetails: rishis.find(
+      (r) => r.name.toLowerCase() === pred.rishiName?.toLowerCase(),
+    ),
+  }));
 
-  const handleLanguageChange = (lang: Language): void => {
-    setLanguage(lang);
-  };
-
-  const handleRishiSelect = (rishiId: number): void => {
-    setSelectedRishi(rishiId);
-  };
-
-  const handleZodiacSelect = (zodiac: ZodiacSign): void => {
-    setSelectedZodiac(zodiac);
-    setViewMode("predictions");
-  };
-
-  const handleBackToZodiacs = (): void => {
-    setViewMode("zodiacs");
-    setSelectedZodiac(null);
-  };
-
-  // Element colors based on zodiac element
+  // Get element color class
   const getElementColor = (element: string): string => {
-    switch (element.toLowerCase()) {
+    switch (element?.toLowerCase()) {
       case "fire":
         return "from-red-500 to-orange-400";
       case "earth":
@@ -84,6 +119,38 @@ const Horoscope = () => {
         return "from-purple-500 to-blue-400";
       default:
         return "from-gray-500 to-gray-400";
+    }
+  };
+
+  // Get element badge color
+  const getElementBadgeColor = (element: string): string => {
+    switch (element?.toLowerCase()) {
+      case "fire":
+        return "bg-red-100 text-red-700";
+      case "earth":
+        return "bg-green-100 text-green-700";
+      case "air":
+        return "bg-blue-100 text-blue-700";
+      case "water":
+        return "bg-purple-100 text-purple-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  // Get icon color
+  const getIconColor = (element: string): string => {
+    switch (element?.toLowerCase()) {
+      case "fire":
+        return "text-red-500";
+      case "earth":
+        return "text-green-500";
+      case "air":
+        return "text-blue-500";
+      case "water":
+        return "text-purple-500";
+      default:
+        return "text-gray-500";
     }
   };
 
@@ -118,7 +185,7 @@ const Horoscope = () => {
         <div className="flex justify-center mb-8">
           <div className="bg-white rounded-full p-1 shadow-lg">
             <button
-              onClick={() => handleLanguageChange("english")}
+              onClick={() => setLanguage("english")}
               className={`px-6 py-2 rounded-full transition-all duration-300 ${
                 language === "english"
                   ? "bg-purple-600 text-white shadow-md"
@@ -128,7 +195,7 @@ const Horoscope = () => {
               English
             </button>
             <button
-              onClick={() => handleLanguageChange("hindi")}
+              onClick={() => setLanguage("hindi")}
               className={`px-6 py-2 rounded-full transition-all duration-300 ${
                 language === "hindi"
                   ? "bg-purple-600 text-white shadow-md"
@@ -141,7 +208,7 @@ const Horoscope = () => {
         </div>
 
         {viewMode === "zodiacs" ? (
-          /* Zodiac Signs Grid */
+          /* Zodiac Signs Grid - from API */
           <>
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-purple-700 mb-4">
@@ -156,66 +223,59 @@ const Horoscope = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {zodiacSigns?.map((zodiac: ZodiacSign, index: number) => (
-                <div
-                  key={zodiac.id}
-                  onClick={() => handleZodiacSelect(zodiac)}
-                  className="group cursor-pointer transform transition-all duration-500 "
-                  style={{
-                    animationDelay: `${index * 100}ms`,
-                  }}
-                >
-                  <div className="bg-transparent rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 group-hover:border-purple-300">
-                    {/* Zodiac Icon (no background, visible color) */}
-                    <div
-                      className={`text-5xl mb-3 text-center ${
-                        zodiac.element.toLowerCase() === "fire"
-                          ? "text-red-500"
-                          : zodiac.element.toLowerCase() === "earth"
-                          ? "text-green-500"
-                          : zodiac.element.toLowerCase() === "air"
-                          ? "text-blue-500"
-                          : "text-purple-500"
-                      }`}
-                    >
-                      {zodiac.icon}
-                    </div>
-
-                    {/* Zodiac Name */}
-                    <h3 className="text-lg font-bold text-center text-gray-800 mb-2 cursor-pointer group-hover:text-purple-600 transition-colors duration-300 ">
-                      {language === "english" ? zodiac.name : zodiac.nameHindi}
-                    </h3>
-
-                    {/* Dates */}
-                    <p className="text-xs text-center text-gray-600 mb-2 cursor-pointer">
-                      {language === "english"
-                        ? zodiac.dates
-                        : zodiac.datesHindi}
-                    </p>
-
-                    {/* Element */}
-                    <div className="text-center">
-                      <span
-                        className={`inline-block px-2 py-1 rounded-full text-xs font-medium cursor-pointer ${
-                          zodiac.element.toLowerCase() === "fire"
-                            ? "bg-red-100 text-red-700"
-                            : zodiac.element.toLowerCase() === "earth"
-                            ? "bg-green-100 text-green-700"
-                            : zodiac.element.toLowerCase() === "air"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-purple-100 text-purple-700"
-                        }`}
+            {loading.zodiacs ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                {zodiacs.map((zodiac, index) => (
+                  <div
+                    key={zodiac._id}
+                    onClick={() => {
+                      setSelectedZodiac(zodiac);
+                      setViewMode("predictions");
+                    }}
+                    className="group cursor-pointer transform transition-all duration-500"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <div className="bg-transparent rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 group-hover:border-purple-300">
+                      {/* Zodiac Icon */}
+                      <div
+                        className={`text-5xl mb-3 text-center ${getIconColor(zodiac.element)}`}
                       >
+                        {zodiac.icon}
+                      </div>
+
+                      {/* Zodiac Name */}
+                      <h3 className="text-lg font-bold text-center text-gray-800 mb-2 cursor-pointer group-hover:text-purple-600 transition-colors duration-300">
                         {language === "english"
-                          ? zodiac.element
-                          : zodiac.elementHindi}
-                      </span>
+                          ? zodiac.name
+                          : zodiac.nameHindi}
+                      </h3>
+
+                      {/* Dates */}
+                      <p className="text-xs text-center text-gray-600 mb-2 cursor-pointer">
+                        {language === "english"
+                          ? zodiac.dates
+                          : zodiac.datesHindi}
+                      </p>
+
+                      {/* Element */}
+                      <div className="text-center">
+                        <span
+                          className={`inline-block px-2 py-1 rounded-full text-xs font-medium cursor-pointer ${getElementBadgeColor(zodiac.element)}`}
+                        >
+                          {language === "english"
+                            ? zodiac.element
+                            : zodiac.elementHindi}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </>
         ) : (
           /* Predictions View */
@@ -223,7 +283,7 @@ const Horoscope = () => {
             {/* Back Button */}
             <div className="mb-8">
               <button
-                onClick={handleBackToZodiacs}
+                onClick={() => setViewMode("zodiacs")}
                 className="flex items-center text-purple-600 hover:text-purple-800 transition-colors duration-300 font-semibold cursor-pointer"
               >
                 <svg
@@ -252,8 +312,8 @@ const Horoscope = () => {
                   <div className="flex items-center justify-center mb-4">
                     <div
                       className={`text-6xl mr-4 bg-gradient-to-br ${getElementColor(
-                        selectedZodiac.element
-                      )} bg-clip-text `}
+                        selectedZodiac.element,
+                      )} bg-clip-text`}
                     >
                       {selectedZodiac.icon}
                     </div>
@@ -269,15 +329,7 @@ const Horoscope = () => {
                           : selectedZodiac.datesHindi}
                       </p>
                       <span
-                        className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium ${
-                          selectedZodiac.element.toLowerCase() === "fire"
-                            ? "bg-red-100 text-red-700"
-                            : selectedZodiac.element.toLowerCase() === "earth"
-                            ? "bg-green-100 text-green-700"
-                            : selectedZodiac.element.toLowerCase() === "air"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-purple-100 text-purple-700"
-                        }`}
+                        className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium ${getElementBadgeColor(selectedZodiac.element)}`}
                       >
                         {language === "english"
                           ? selectedZodiac.element
@@ -294,8 +346,10 @@ const Horoscope = () => {
               {timeFrames.map((timeFrame) => (
                 <button
                   key={timeFrame.key}
-                  onClick={() => handleTimeFrameChange(timeFrame.key)}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-500 transform  ${
+                  onClick={() =>
+                    setSelectedTimeFrame(timeFrame.key as TimeFrame)
+                  }
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-500 transform ${
                     selectedTimeFrame === timeFrame.key
                       ? "bg-purple-600 text-white shadow-lg scale-105"
                       : "bg-white text-purple-600 shadow-md hover:shadow-lg"
@@ -306,83 +360,73 @@ const Horoscope = () => {
               ))}
             </div>
 
-            {/* Rishi Selection */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-              {rishis.map((rishi: Rishi) => (
+            {/* Loading State */}
+            {loading.predictions && (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700"></div>
+              </div>
+            )}
+
+            {/* No Data State */}
+            {!loading.predictions && predictions.length === 0 && (
+              <div className="text-center py-12 bg-white/80 rounded-2xl">
+                <p className="text-gray-600 text-lg">
+                  {language === "english"
+                    ? `No predictions available for ${selectedZodiac?.name} yet.`
+                    : `${selectedZodiac?.nameHindi} के लिए अभी कोई भविष्यवाणी उपलब्ध नहीं है।`}
+                </p>
+              </div>
+            )}
+
+            {/* Predictions Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {predictionsWithRishis.map((prediction, index) => (
                 <div
-                  key={rishi.id}
-                  onClick={() => handleRishiSelect(rishi.id)}
-                  className={`p-6 rounded-2xl cursor-pointer transition-all duration-500 transform  ${
-                    selectedRishi === rishi.id
-                      ? "bg-white shadow-2xl scale-105 border-2 border-purple-400"
-                      : "bg-white/80 shadow-lg hover:shadow-xl"
-                  }`}
+                  key={prediction._id || index}
+                  className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl hover:shadow-2xl transition-all duration-700 transform"
+                  style={{ animationDelay: `${index * 200}ms` }}
                 >
-                  <h3 className="text-2xl font-bold text-purple-700 mb-2">
-                    {language === "english" ? rishi.name : rishi.nameHindi}
-                  </h3>
-                  <p className="text-gray-600">
-                    {language === "english"
-                      ? rishi.description
-                      : rishi.descriptionHindi}
-                  </p>
+                  <div className="flex items-center mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                      {index + 1}
+                    </div>
+                    <h3 className="text-2xl font-bold text-purple-800">
+                      {language === "english"
+                        ? prediction.rishiName || "Ancient Sage"
+                        : prediction.rishiNameHindi || "प्राचीन ऋषि"}
+                    </h3>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-400">
+                    <p className="text-lg leading-relaxed text-gray-700">
+                      {language === "english"
+                        ? prediction.prediction
+                        : prediction.predictionHindi || prediction.prediction}
+                    </p>
+                  </div>
+
+                  {/* Decorative Elements */}
+                  <div className="flex justify-between items-center mt-6">
+                    <div className="flex space-x-2">
+                      <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse"></div>
+                      <div
+                        className="w-3 h-3 bg-pink-400 rounded-full animate-pulse"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
+                      <div
+                        className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"
+                        style={{ animationDelay: "0.4s" }}
+                      ></div>
+                    </div>
+                    <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                      {language === "english"
+                        ? selectedTimeFrame
+                        : timeFrames.find((t) => t.key === selectedTimeFrame)
+                            ?.hi}
+                    </span>
+                  </div>
                 </div>
               ))}
-            </div>
-
-            {/* Predictions */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {currentPredictions.map(
-                (prediction: HoroscopeItem, index: number) => (
-                  <div
-                    key={prediction.id}
-                    className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl hover:shadow-2xl transition-all duration-700 transform "
-                    style={{
-                      animationDelay: `${index * 200}ms`,
-                    }}
-                  >
-                    <div className="flex items-center mb-6">
-                      <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
-                        {prediction.id}
-                      </div>
-                      <h3 className="text-2xl font-bold text-purple-800">
-                        {language === "english"
-                          ? prediction.rishiName
-                          : prediction.rishiNameHindi}
-                      </h3>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-400">
-                      <p className="text-lg leading-relaxed text-gray-700">
-                        {language === "english"
-                          ? prediction.prediction
-                          : prediction.predictionHindi}
-                      </p>
-                    </div>
-
-                    {/* Decorative Elements */}
-                    <div className="flex justify-between items-center mt-6">
-                      <div className="flex space-x-2">
-                        <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse"></div>
-                        <div
-                          className="w-3 h-3 bg-pink-400 rounded-full animate-pulse"
-                          style={{ animationDelay: "0.2s" }}
-                        ></div>
-                        <div
-                          className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"
-                          style={{ animationDelay: "0.4s" }}
-                        ></div>
-                      </div>
-                      <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                        {language === "english"
-                          ? selectedTimeFrame
-                          : timeFrames.find((t) => t.key === selectedTimeFrame)
-                              ?.hi}
-                      </span>
-                    </div>
-                  </div>
-                )
-              )}
             </div>
           </>
         )}
