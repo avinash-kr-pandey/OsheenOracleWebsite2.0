@@ -313,8 +313,8 @@ const WelcomeOsheenOracle = () => {
         <div className="flex justify-center relative pt-12 md:pt-32">
           <div className="group relative w-60 h-80 sm:w-72 sm:h-96 md:w-[350px] md:h-[520px] lg:w-[400px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl border-4 border-white transition-all duration-700 ease-out">
             <Image
-              src={currentData.image}
-              alt={currentData.title}
+              src={currentData?.image || defaultOracleText?.image}
+              alt={currentData?.title}
               fill
               className="object-cover scale-100 group-hover:scale-110 brightness-75 group-hover:brightness-100 transition-all duration-700 ease-in-out"
               priority

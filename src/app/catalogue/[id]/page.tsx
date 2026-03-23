@@ -6,12 +6,10 @@ import {
   Clock,
   Users,
   CheckCircle,
-  ArrowLeft,
   Sparkles,
   Shield,
   Heart,
   TrendingUp,
-  Calendar,
   MessageCircle,
   Zap,
   Target,
@@ -21,6 +19,62 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import CommonPageHeader from "@/components/CommonPages/CommonPageHeader";
 import homeAPI, { CatalogueItem, ExpertGuide } from "@/utils/api/home.api";
+import { zodiacData } from "@/utils/AstroData";
+
+// Define the zodiac data type
+interface ZodiacDataType {
+  id: number;
+  name: string;
+  price: string;
+  rating: number;
+  date: string;
+  image: string;
+  description: string;
+  traits: string[];
+  element: string;
+  planet: string;
+  symbol: string;
+  luckyColor: string;
+  luckyNumber: number;
+  compatibility: string[];
+  benefits: string[];
+  readingIncludes: string[];
+  strengths: string[];
+  challenges: string[];
+}
+
+// Map zodiacData to CatalogueItem format
+const mapZodiacToCatalogue = (data: ZodiacDataType[]): CatalogueItem[] => {
+  return data.map(
+    (item): CatalogueItem => ({
+      _id: item.id.toString(),
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      rating: item.rating,
+      image: item.image,
+      traits: item.traits || [],
+      date: item.date || "",
+      order: item.id,
+      isActive: true,
+      element: item.element,
+      planet: item.planet,
+      symbol: item.symbol,
+      luckyColor: item.luckyColor,
+      luckyNumber: item.luckyNumber,
+      compatibility: item.compatibility,
+      benefits: item.benefits,
+      readingIncludes: item.readingIncludes,
+      strengths: item.strengths,
+      challenges: item.challenges,
+    }),
+  );
+};
+
+const staticCatalogueItems: CatalogueItem[] = mapZodiacToCatalogue(
+  zodiacData as ZodiacDataType[],
+);
 
 const ZodiacDetails = () => {
   const params = useParams();
@@ -35,6 +89,8 @@ const ZodiacDetails = () => {
   const [expertGuides, setExpertGuides] = useState<ExpertGuide[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
+  const [usingStaticData, setUsingStaticData] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -43,13 +99,55 @@ const ZodiacDetails = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      // Fetch catalogue item by ID
-      const item = await homeAPI.getCatalogueById(id);
-      setCatalogueItem(item);
+      console.log("🔍 Looking for item with ID:", id);
 
-      // Fetch expert guides
-      const guides = await homeAPI.getExpertGuides();
-      setExpertGuides(guides);
+      let item: CatalogueItem | null = null;
+
+      // Try to get from API first
+      try {
+        item = await homeAPI.getCatalogueById(id);
+        console.log("📡 API response:", item);
+      } catch (apiErr) {
+        console.error("❌ API call failed:", apiErr);
+      }
+
+      // If API returned valid data, use it
+      if (item && item.id) {
+        console.log("✅ Using API data for item");
+        setCatalogueItem(item);
+        setUsingStaticData(false);
+      } else {
+        // Find from static data (convert both to string for comparison)
+        console.log("🔍 Searching in static catalogue...");
+        const staticItem = staticCatalogueItems.find(
+          (staticItem) =>
+            String(staticItem.id) === String(id) || staticItem._id === id,
+        );
+
+        console.log("📦 Static item found:", staticItem?.name);
+
+        if (staticItem) {
+          setCatalogueItem(staticItem);
+          setUsingStaticData(true);
+        } else {
+          console.error("❌ No item found for ID:", id);
+          setError("Item not found");
+          setCatalogueItem(null);
+        }
+      }
+
+      // Fetch expert guides with fallback
+      try {
+        const guides = await homeAPI.getExpertGuides();
+        if (guides && guides.length > 0) {
+          setExpertGuides(guides);
+        } else {
+          setExpertGuides(homeAPI.DEFAULT_EXPERT_GUIDES);
+        }
+      } catch (guidesErr) {
+        console.error("Error fetching expert guides:", guidesErr);
+        setExpertGuides(homeAPI.DEFAULT_EXPERT_GUIDES);
+      }
 
       setError(null);
     } catch (err) {
@@ -62,10 +160,15 @@ const ZodiacDetails = () => {
 
   const handleWhatsAppBooking = (guide: ExpertGuide) => {
     const message = `Hello ${guide.name}, I would like to book a ${catalogueItem?.name} reading session.`;
-    const whatsappUrl = `https://wa.me/1234567890?text=${encodeURIComponent(
-      message,
-    )}`;
+    const whatsappUrl = `https://wa.me/1234567890?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
+  };
+
+  const getDisplayImage = () => {
+    if (imageError || !catalogueItem?.image) {
+      return "/images/default.jpg";
+    }
+    return catalogueItem.image;
   };
 
   if (loading) {
@@ -79,7 +182,7 @@ const ZodiacDetails = () => {
   if (error || !catalogueItem) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex items-center justify-center p-4">
-        <div className="text-center max-w-7xl mx-auto">
+        <div className="text-center max-w-2xl mx-auto">
           <div className="w-24 h-24 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-6">
             <Sparkles className="w-12 h-12 text-white" />
           </div>
@@ -87,14 +190,24 @@ const ZodiacDetails = () => {
             Reading Not Found
           </h2>
           <p className="text-gray-600 mb-6">
-            The reading you&rsquo;re looking for doesn&rsquo;t exist.
+            The reading you&apos;re looking for doesn&apos;t exist.
+            <br />
+            <span className="text-sm text-gray-400">ID: {id}</span>
           </p>
-          <button
-            onClick={() => router.push("/")}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all transform hover:-translate-y-1"
-          >
-            Back to Catalogue
-          </button>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={() => router.back()}
+              className="bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-semibold hover:bg-gray-300 transition"
+            >
+              Go Back
+            </button>
+            <button
+              onClick={() => router.push("/")}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition"
+            >
+              Browse Catalogue
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -103,14 +216,16 @@ const ZodiacDetails = () => {
   return (
     <div>
       <CommonPageHeader title="Book Your Reading" subtitle="Home - Booking" />
-      {/* Header with Back Button */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        ></motion.div>
-      </div>
+
+      {/* {usingStaticData && (
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
+            <p className="text-yellow-700 text-sm">
+              ⚡ Showing sample reading • Connect to internet for live readings
+            </p>
+          </div>
+        </div>
+      )} */}
 
       {/* Zodiac Hero Section */}
       <section className="container w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -121,14 +236,16 @@ const ZodiacDetails = () => {
           className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-gray-100"
         >
           <div className="flex flex-col lg:flex-row items-stretch">
-            {/* 🪐 Image Section */}
+            {/* Image Section */}
             <div className="relative w-full lg:w-1/2 h-[380px] sm:h-[450px] lg:h-auto">
               <Image
-                src={catalogueItem.image || "/images/default.jpg"}
+                src={getDisplayImage()}
                 alt={catalogueItem.name}
                 fill
                 className="object-contain lg:object-cover w-full h-full transition-transform duration-700 group-hover:scale-105 rounded-t-3xl lg:rounded-l-3xl"
                 priority
+                onError={() => setImageError(true)}
+                unoptimized={process.env.NODE_ENV === "production"}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent lg:rounded-l-3xl" />
               <div className="absolute bottom-6 left-6 text-white">
@@ -151,7 +268,7 @@ const ZodiacDetails = () => {
               </div>
             </div>
 
-            {/* 🌟 Content Section */}
+            {/* Content Section */}
             <div className="flex flex-col justify-center p-6 sm:p-10 lg:p-12 lg:w-1/2 space-y-6">
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
@@ -166,7 +283,6 @@ const ZodiacDetails = () => {
                 </p>
               </motion.div>
 
-              {/* ✴️ Info Cards */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -198,7 +314,6 @@ const ZodiacDetails = () => {
                 </div>
               </motion.div>
 
-              {/* 🪄 Traits Section */}
               {catalogueItem.traits && catalogueItem.traits.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
@@ -230,7 +345,7 @@ const ZodiacDetails = () => {
 
       {/* Benefits Section */}
       {catalogueItem.benefits && catalogueItem.benefits.length > 0 && (
-        <section className="container w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="container w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -290,7 +405,7 @@ const ZodiacDetails = () => {
       {/* Reading Includes Section */}
       {catalogueItem.readingIncludes &&
         catalogueItem.readingIncludes.length > 0 && (
-          <section className="container w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <section className="container w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -346,7 +461,7 @@ const ZodiacDetails = () => {
         )}
 
       {/* Astrologers Section */}
-      <section className="container w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="container w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -374,7 +489,7 @@ const ZodiacDetails = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
             {expertGuides.map((guide, index) => (
               <motion.div
-                key={guide._id}
+                key={guide._id || index}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 + index * 0.1 }}
@@ -385,12 +500,21 @@ const ZodiacDetails = () => {
                     : "border-white hover:border-purple-200"
                 }`}
               >
-                {/* Astrologer Header */}
                 <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 p-6 sm:p-8 text-white relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12"></div>
                   <div className="flex items-center gap-4 sm:gap-6 relative z-10">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30">
-                      <Users className="w-8 h-8 sm:w-10 sm:h-10" />
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30 overflow-hidden">
+                      {guide.image ? (
+                        <Image
+                          src={guide.image}
+                          alt={guide.name}
+                          width={80}
+                          height={80}
+                          className="object-cover"
+                        />
+                      ) : (
+                        <Users className="w-8 h-8 sm:w-10 sm:h-10" />
+                      )}
                     </div>
                     <div>
                       <h3 className="text-xl sm:text-2xl font-bold mb-1">
@@ -403,7 +527,6 @@ const ZodiacDetails = () => {
                   </div>
                 </div>
 
-                {/* Astrologer Details */}
                 <div className="p-6 sm:p-8 flex flex-col flex-grow justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-6">
@@ -426,7 +549,7 @@ const ZodiacDetails = () => {
                       </div>
                     </div>
 
-                    <p className="text-gray-600 text-sm sm:text-base mb-6 leading-relaxed">
+                    <p className="text-gray-600 text-sm sm:text-base mb-6 leading-relaxed line-clamp-3">
                       {guide.expertise}
                     </p>
 
@@ -467,7 +590,6 @@ const ZodiacDetails = () => {
                       </div>
                     </div>
 
-                    {/* Badges */}
                     <div className="flex items-center gap-4 mb-6 text-xs text-gray-500">
                       {guide.isVerified && (
                         <div className="flex items-center gap-2 bg-green-50 px-3 py-2 rounded-lg">
@@ -482,7 +604,6 @@ const ZodiacDetails = () => {
                     </div>
                   </div>
 
-                  {/* ✅ Fixed button always at bottom */}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -501,7 +622,7 @@ const ZodiacDetails = () => {
       </section>
 
       {/* Final CTA Section */}
-      <section className="container w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="container w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
