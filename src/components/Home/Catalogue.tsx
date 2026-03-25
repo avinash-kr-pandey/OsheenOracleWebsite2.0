@@ -360,14 +360,14 @@ const Catalogue = () => {
           and help you achieve your goals.
         </p>
 
-        {usingStaticData && (
+        {/* {usingStaticData && (
           <div className="mt-4 inline-block bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2">
             <p className="text-yellow-700 text-sm">
               ⚡ Showing sample catalogue • Connect to internet for live
               readings
             </p>
           </div>
-        )}
+        )} */}
       </div>
 
       {catalogueItems.length > 0 && <SliderRow rowData={catalogueItems} />}

@@ -136,6 +136,7 @@ const BecomeAMember: React.FC = () => {
   };
 
   const handlePlanSelect = (planId: string): void => {
+    console.log("Selected plan ID:", planId); // Debug log
     setFormData((prev: MembershipFormData) => ({ ...prev, plan: planId }));
     if (errors.plan) {
       setErrors((prev: FormErrors) => ({ ...prev, plan: undefined }));
@@ -375,9 +376,9 @@ const BecomeAMember: React.FC = () => {
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div
-                    onClick={() => handlePlanSelect(plan.id)}
+                    onClick={() => handlePlanSelect(plan._id || plan.id)}
                     className={`p-6 border-2 rounded-2xl cursor-pointer transition-all duration-300 h-full flex flex-col transform hover:-translate-y-2 hover:shadow-xl ${
-                      formData.plan === plan.id
+                      formData.plan === (plan._id || plan.id)
                         ? "border-purple-500 bg-white/90 backdrop-blur-sm shadow-lg"
                         : "border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-300"
                     }`}
@@ -419,23 +420,23 @@ const BecomeAMember: React.FC = () => {
                     <div className="space-y-3 mt-auto">
                       <button
                         type="button"
-                        onClick={() => handlePlanSelect(plan.id)}
+                        onClick={() => handlePlanSelect(plan._id || plan.id)}
                         className={`w-full py-3 px-4 rounded-xl font-semibold text-base transition-all duration-300 transform hover:scale-[1.02] ${
-                          formData.plan === plan.id
+                          formData.plan === (plan._id || plan.id)
                             ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg"
                             : plan.popular
                               ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 shadow-lg"
                               : "bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 shadow-md"
                         }`}
                       >
-                        {formData.plan === plan.id
+                        {formData.plan === (plan._id || plan.id)
                           ? "✓ Selected"
                           : "Select Plan"}
                       </button>
 
                       <button
                         type="button"
-                        onClick={() => handlePlanDetails(plan.id)}
+                        onClick={() => handlePlanDetails(plan._id || plan.id)}
                         className="w-full py-2.5 px-4 border border-purple-300 text-purple-600 rounded-xl font-medium text-sm hover:bg-purple-50/50 transition-all duration-300 hover:border-purple-400"
                       >
                         View Details →
@@ -551,6 +552,9 @@ const BecomeAMember: React.FC = () => {
                       {addOn.price}
                     </span>
                   </div>
+                  <div className="text-gray-700 mb-6 italic text-sm leading-relaxed">
+                    {addOn.description}
+                  </div>
                 </div>
               ))
             ) : (
@@ -601,14 +605,17 @@ const BecomeAMember: React.FC = () => {
                     {testimonial.avatar}
                   </div>
                   <p className="text-gray-700 mb-6 italic text-sm leading-relaxed">
-                    {testimonial.content}
+                    {testimonial.comment}
                   </p>
                   <div>
                     <div className="font-bold text-gray-900 text-base">
                       {testimonial.name}
                     </div>
                     <div className="text-gray-600 text-sm">
-                      {testimonial.role}
+                      {testimonial.zodiac}
+                    </div>
+                    <div className="text-gray-600 text-sm">
+                      {testimonial.date}
                     </div>
                   </div>
                 </div>
@@ -800,9 +807,9 @@ const BecomeAMember: React.FC = () => {
                   {membershipPlans.map((plan) => (
                     <div
                       key={plan._id || plan.id}
-                      onClick={() => handlePlanSelect(plan.id)}
+                      onClick={() => handlePlanSelect(plan._id || plan.id)}
                       className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 h-full transform hover:scale-[1.02] ${
-                        formData.plan === plan.id
+                        formData.plan === (plan._id || plan.id)
                           ? "border-purple-500 bg-purple-50/50 shadow-md"
                           : "border-gray-300 bg-white/80 hover:border-purple-300"
                       }`}

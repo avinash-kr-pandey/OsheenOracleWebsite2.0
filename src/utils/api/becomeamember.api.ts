@@ -44,9 +44,12 @@ export interface Stat {
 export interface Testimonial {
   _id?: string;
   avatar: string;
-  content: string;
+  content?: string; // Make optional
+  comment?: string; // Add comment field for API response
   name: string;
-  role: string;
+  role?: string; // Make optional
+  zodiac?: string; // Add zodiac field
+  date?: string; // Add date field
   rating?: number;
   isActive?: boolean;
   isFeatured?: boolean;
