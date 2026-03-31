@@ -9,7 +9,7 @@ import {
 } from "@/contexts/AuthContext";
 
 // const API_BASE_URL = "https://osheenoraclebackend02.onrender.com/api";
-const API_BASE_URL = "http://31.97.239.126:5000/api";
+const API_BASE_URL = "http://api.osheenoracle.com/api";
 
 // const API_BASE_URL = "http://localhost:5000/api";
 
