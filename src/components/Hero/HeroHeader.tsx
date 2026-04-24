@@ -30,6 +30,7 @@ const navLinks = [
 ];
 
 const servicesLinks = [
+  {name: "Our Packages", href: "/services/ourpackages"},
   { name: "Spells", href: "/services/spells" },
   { name: "Reading", href: "/services/reading" },
 ];

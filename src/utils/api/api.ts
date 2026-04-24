@@ -1,4 +1,4 @@
-// src/utils/api/api.ts - UPDATED VERSION
+// src/utils/api/api.ts - COMPLETE UPDATED VERSION
 
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { Product, Review, isProduct, normalizeProduct } from "@/types/product";
@@ -60,7 +60,6 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  // ✅ IMPORTANT: withCredentials ko false rakhein agar backend CORS allow nahi karta
   withCredentials: false,
 });
 
@@ -75,9 +74,7 @@ api.interceptors.request.use(
       }
     }
 
-    // ✅ FIX: GET requests ke liye cache-control headers hatao
     if (config.method?.toLowerCase() === "get") {
-      // Inhe hatao kyunki backend inhe allow nahi kar raha
       delete config.headers["Cache-Control"];
       delete config.headers["Pragma"];
       delete config.headers["Expires"];
@@ -112,21 +109,18 @@ export const setAuthToken = (token: string | null) => {
 };
 
 /* =======================
-   GET - MODIFIED VERSION
+   GET
 ======================= */
 export const fetchData = async <T = unknown>(
   endpoint: string,
   params?: Record<string, unknown>,
-  noCache: boolean = false, // ✅ Default false kar diya
+  noCache: boolean = false,
 ): Promise<T> => {
   try {
-    // ✅ Headers sirf tab add karo jab zaroori ho aur backend support karta ho
     const headers: Record<string, string> = {};
 
-    // Agar noCache true hai to ek simple header use karo
     if (noCache) {
-      headers["Cache-Control"] = "no-cache"; // Sirf basic header
-      // Pragma aur Expires hata diye
+      headers["Cache-Control"] = "no-cache";
     }
 
     const response: AxiosResponse<T> = await api.get(endpoint, {
@@ -145,11 +139,11 @@ export const fetchData = async <T = unknown>(
 };
 
 /* =======================
-   POST
+   POST - UPDATED (accepts any object type)
 ======================= */
-export const postData = async <T = unknown>(
+export const postData = async <T = unknown, D = Record<string, unknown>>(
   endpoint: string,
-  data: Record<string, unknown> | FormData,
+  data: D,
 ): Promise<T> => {
   try {
     const headers: Record<string, string> = {};
@@ -173,11 +167,11 @@ export const postData = async <T = unknown>(
 };
 
 /* =======================
-   PUT
+   PUT - UPDATED (accepts any object type)
 ======================= */
-export const putData = async <T = unknown>(
+export const putData = async <T = unknown, D = Record<string, unknown>>(
   endpoint: string,
-  data: Record<string, unknown>,
+  data: D,
 ): Promise<T> => {
   try {
     const response: AxiosResponse<T> = await api.put(endpoint, data);
@@ -186,6 +180,26 @@ export const putData = async <T = unknown>(
     const err = error as AxiosError;
     console.error(
       `PUT Error (${endpoint}):`,
+      err.response?.data || err.message,
+    );
+    throw err;
+  }
+};
+
+/* =======================
+   PATCH - UPDATED (accepts any object type)
+======================= */
+export const patchData = async <T = unknown, D = Record<string, unknown>>(
+  endpoint: string,
+  data: D,
+): Promise<T> => {
+  try {
+    const response: AxiosResponse<T> = await api.patch(endpoint, data);
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError;
+    console.error(
+      `PATCH Error (${endpoint}):`,
       err.response?.data || err.message,
     );
     throw err;
@@ -214,17 +228,15 @@ export const deleteData = async <T = unknown>(endpoint: string): Promise<T> => {
 ======================= */
 export const apiRequest = async <T = unknown>(
   endpoint: string,
-  method: "GET" | "POST" | "PUT" | "DELETE",
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
   data?: Record<string, unknown> | FormData,
   params?: Record<string, unknown>,
-  noCache: boolean = false, // ✅ Default false
+  noCache: boolean = false,
 ): Promise<T> => {
   try {
     const headers: Record<string, string> = {};
 
-    // ✅ GET requests ke liye cache headers hatao
     if (method === "GET") {
-      // Cache headers mat bhejo
       if (data instanceof FormData) {
         headers["Content-Type"] = "multipart/form-data";
       }
@@ -264,14 +276,12 @@ export const fetchProducts = async (): Promise<Product[]> => {
 
     if (Array.isArray(response)) {
       console.log("✅ Products received as array");
-      // Normalize each product
       return response.map((item: unknown) => normalizeProduct(item));
     } else if (response && typeof response === "object") {
       const responseObj = response as ApiResponse<unknown>;
 
       let productsArray: unknown[] = [];
 
-      // Check for common response formats
       if (Array.isArray(responseObj.data)) {
         console.log("✅ Products found in response.data");
         productsArray = responseObj.data;
@@ -289,7 +299,6 @@ export const fetchProducts = async (): Promise<Product[]> => {
         return [];
       }
 
-      // Normalize all products
       return productsArray.map((item: unknown) => normalizeProduct(item));
     }
 
@@ -309,16 +318,13 @@ export const fetchProductById = async (
     const _id = typeof id === "string" ? id : id.toString();
     console.log("🔄 Fetching product with ID:", _id);
 
-    // Fetch data
     const response = await fetchData<ApiResponse>(`/products/${_id}`);
     console.log("🔍 Full API Response:", response);
 
-    // Extract product data - handle different response structures
     let productData: unknown;
     if (response && typeof response === "object") {
       const apiResponse = response as ApiResponse;
 
-      // Check for nested product data
       if (apiResponse.data && typeof apiResponse.data === "object") {
         productData = apiResponse.data;
       } else if (
@@ -331,7 +337,6 @@ export const fetchProductById = async (
       } else if (apiResponse.result && typeof apiResponse.result === "object") {
         productData = apiResponse.result;
       } else {
-        // Use response directly
         productData = response;
       }
     } else {
@@ -345,10 +350,8 @@ export const fetchProductById = async (
       throw new Error("Product data not found in API response");
     }
 
-    // Normalize the product data
     const product = normalizeProduct(productData);
 
-    // Validate with isProduct type guard
     if (!isProduct(product)) {
       console.error("❌ Invalid product data structure:", product);
       throw new Error("Invalid product data structure received");
