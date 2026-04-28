@@ -1,4 +1,5 @@
-// services/service.package.api.ts
+// src/utils/api/service.package.api.ts (UPDATED)
+
 import {
   fetchData,
   postData,
@@ -9,17 +10,27 @@ import {
 
 // ==================== TYPES ====================
 
-export interface Service {
-  _id: string;
+export interface Subcategory {
+  _id?: string;
   name: string;
   description: string;
   price: number;
   duration: string;
-  isActive: boolean;
   icon: string;
-  category: string;
   image: string;
   order: number;
+  isActive: boolean;
+}
+
+export interface Category {
+  _id: string;
+  name: string;
+  description: string;
+  icon: string;
+  image: string;
+  order: number;
+  isActive: boolean;
+  subcategories: Subcategory[];
   createdAt: string;
   updatedAt: string;
   id?: string;
@@ -31,8 +42,11 @@ export interface ServiceRequest {
   email: string;
   phone: string;
   address: string;
-  service: Service | string;
-  serviceName: string;
+  category: Category | string;
+  categoryName: string;
+  subcategory: Subcategory;
+  subcategoryName: string;
+  price: number;
   communicationMode: "voice_call" | "video_call" | "voice_note";
   description: string;
   status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
@@ -54,7 +68,13 @@ export interface DashboardStats {
   pendingRequests: number;
   completedRequests: number;
   cancelledRequests: number;
-  serviceDistribution: Array<{
+  activeCategories: number;
+  totalSubcategories: number;
+  categoryDistribution: Array<{
+    _id: string;
+    count: number;
+  }>;
+  subcategoryDistribution: Array<{
     _id: string;
     count: number;
   }>;
@@ -69,38 +89,86 @@ export interface ApiResponse<T> {
   total?: number;
 }
 
+// ✅ UPDATED: Support both formats for flexibility
 export interface SubmitServiceRequestData {
   name: string;
   email: string;
   phone: string;
   address: string;
-  serviceId: string;
+  // Option 1: Using serviceId (from payment page)
+  serviceId?: string;
+  // Option 2: Using separate IDs (from booking form)
+  categoryId?: string;
+  subcategoryId?: string;
   communicationMode: "voice_call" | "video_call" | "voice_note";
   description: string;
   preferredDate?: string;
   preferredTimeSlot?: string;
-  [key: string]: string | undefined;
 }
 
 // ==================== SERVICE API FOR WEBSITE ====================
 
 export const servicePackageAPI = {
-  // Get all active services for website
-  getAllServices: (params?: { category?: string }) => {
-    return fetchData<ApiResponse<Service[]>>("/services", {
+  // Get all active categories with their subcategories for website
+  getAllCategories: (params?: { isActive?: boolean }) => {
+    return fetchData<ApiResponse<Category[]>>("/services/categories", {
       ...params,
       isActive: true,
     });
   },
 
-  // Get single service by ID
-  getServiceById: (id: string) => {
-    return fetchData<ApiResponse<Service>>(`/services/${id}`);
+  // Get single category by ID
+  getCategoryById: (id: string) => {
+    return fetchData<ApiResponse<Category>>(`/services/categories/${id}`);
   },
 
-  // Submit service request (website form)
-  submitServiceRequest: (data: SubmitServiceRequestData) => {
-    return postData<ApiResponse<ServiceRequest>>("/services/requests", data);
+  // Get all active services (flattened list of subcategories)
+  getAllServices: () => {
+    return fetchData<ApiResponse<Category[]>>("/services/categories", {
+      isActive: true,
+    });
+  },
+
+  // Get subcategories by category ID
+  getSubcategoriesByCategory: (categoryId: string) => {
+    return fetchData<ApiResponse<Category>>(
+      `/services/categories/${categoryId}`,
+    );
+  },
+
+  // ✅ UPDATED: Submit service request with proper data transformation
+  submitServiceRequest: async (data: SubmitServiceRequestData) => {
+    // Transform data to match backend expected format
+    const transformedData: Record<string, unknown> = {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+      communicationMode: data.communicationMode,
+      description: data.description,
+      preferredDate: data.preferredDate,
+      preferredTimeSlot: data.preferredTimeSlot,
+    };
+
+    // Handle serviceId (from payment page)
+    if (data.serviceId) {
+      // If serviceId is provided, we need to get categoryId and subcategoryId
+      // For now, pass serviceId as subcategoryId
+      transformedData.subcategoryId = data.serviceId;
+    }
+
+    // Handle separate IDs (from booking form)
+    if (data.categoryId) {
+      transformedData.categoryId = data.categoryId;
+    }
+    if (data.subcategoryId) {
+      transformedData.subcategoryId = data.subcategoryId;
+    }
+
+    return postData<ApiResponse<ServiceRequest>>(
+      "/services/requests",
+      transformedData,
+    );
   },
 };
 
@@ -121,29 +189,72 @@ export const userServiceRequestAPI = {
 // ==================== ADMIN API ====================
 
 export const adminServiceAPI = {
-  // Get all services (admin)
-  getAllServicesAdmin: (params?: { isActive?: boolean; category?: string }) => {
-    return fetchData<ApiResponse<Service[]>>("/services", params);
+  // Get all categories (admin)
+  getAllCategories: (params?: { isActive?: boolean }) => {
+    return fetchData<ApiResponse<Category[]>>("/services/categories", params);
   },
 
-  // Create service
-  createService: (data: Partial<Service>) => {
-    return postData<ApiResponse<Service>>("/services", data);
+  // Get single category
+  getCategoryById: (id: string) => {
+    return fetchData<ApiResponse<Category>>(`/services/categories/${id}`);
   },
 
-  // Update service
-  updateService: (id: string, data: Partial<Service>) => {
-    return putData<ApiResponse<Service>>(`/services/${id}`, data);
+  // Create category
+  createCategory: (data: Partial<Category>) => {
+    return postData<ApiResponse<Category>>("/services/categories", data);
   },
 
-  // Delete service
-  deleteService: (id: string) => {
-    return deleteData<ApiResponse<null>>(`/services/${id}`);
+  // Update category
+  updateCategory: (id: string, data: Partial<Category>) => {
+    return putData<ApiResponse<Category>>(`/services/categories/${id}`, data);
   },
 
-  // Toggle service status
-  toggleServiceStatus: (id: string) => {
-    return patchData<ApiResponse<Service>>(`/services/${id}/toggle`, {});
+  // Delete category
+  deleteCategory: (id: string) => {
+    return deleteData<ApiResponse<null>>(`/services/categories/${id}`);
+  },
+
+  // Toggle category status
+  toggleCategoryStatus: (id: string) => {
+    return patchData<ApiResponse<Category>>(
+      `/services/categories/${id}/toggle`,
+      {},
+    );
+  },
+
+  // Add subcategory
+  addSubcategory: (categoryId: string, data: Partial<Subcategory>) => {
+    return postData<ApiResponse<Category>>(
+      `/services/categories/${categoryId}/subcategories`,
+      data,
+    );
+  },
+
+  // Update subcategory
+  updateSubcategory: (
+    categoryId: string,
+    subcategoryId: string,
+    data: Partial<Subcategory>,
+  ) => {
+    return putData<ApiResponse<Category>>(
+      `/services/categories/${categoryId}/subcategories/${subcategoryId}`,
+      data,
+    );
+  },
+
+  // Delete subcategory
+  deleteSubcategory: (categoryId: string, subcategoryId: string) => {
+    return deleteData<ApiResponse<null>>(
+      `/services/categories/${categoryId}/subcategories/${subcategoryId}`,
+    );
+  },
+
+  // Toggle subcategory status
+  toggleSubcategoryStatus: (categoryId: string, subcategoryId: string) => {
+    return patchData<ApiResponse<Category>>(
+      `/services/categories/${categoryId}/subcategories/${subcategoryId}/toggle`,
+      {},
+    );
   },
 
   // Get all service requests (admin)
@@ -174,4 +285,93 @@ export const adminServiceAPI = {
   getDashboardStats: () => {
     return fetchData<ApiResponse<DashboardStats>>("/services/admin/stats");
   },
+};
+
+// ==================== HELPER FUNCTIONS FOR WEBSITE ====================
+
+// Get flattened list of all services for easy display
+export const getAllServicesFlattened = async () => {
+  try {
+    const response = await servicePackageAPI.getAllCategories({
+      isActive: true,
+    });
+    if (response.success && response.data) {
+      const services: Array<{
+        id: string;
+        name: string;
+        description: string;
+        price: number;
+        duration: string;
+        icon: string;
+        image: string;
+        categoryId: string;
+        categoryName: string;
+        categoryIcon: string;
+      }> = [];
+
+      response.data.forEach((category) => {
+        category.subcategories.forEach((subcategory) => {
+          if (subcategory.isActive) {
+            services.push({
+              id: subcategory._id || "",
+              name: subcategory.name,
+              description: subcategory.description,
+              price: subcategory.price,
+              duration: subcategory.duration,
+              icon: subcategory.icon,
+              image: subcategory.image,
+              categoryId: category._id,
+              categoryName: category.name,
+              categoryIcon: category.icon,
+            });
+          }
+        });
+      });
+
+      return services;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching flattened services:", error);
+    return [];
+  }
+};
+
+// Get services by category
+export const getServicesByCategory = async (categoryId: string) => {
+  try {
+    const response = await servicePackageAPI.getCategoryById(categoryId);
+    if (response.success && response.data) {
+      return response.data.subcategories.filter((sub) => sub.isActive);
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching services by category:", error);
+    return [];
+  }
+};
+
+// Get service details
+export const getServiceDetails = async (
+  categoryId: string,
+  subcategoryId: string,
+) => {
+  try {
+    const response = await servicePackageAPI.getCategoryById(categoryId);
+    if (response.success && response.data) {
+      const subcategory = response.data.subcategories.find(
+        (sub) => sub._id === subcategoryId,
+      );
+      if (subcategory) {
+        return {
+          category: response.data,
+          service: subcategory,
+        };
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching service details:", error);
+    return null;
+  }
 };

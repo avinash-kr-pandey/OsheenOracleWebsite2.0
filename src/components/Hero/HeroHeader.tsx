@@ -21,18 +21,14 @@ import {
   FiLogIn,
 } from "react-icons/fi";
 
+import { servicePackageAPI, Category } from "@/utils/api/service.package.api";
+
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "About Us", href: "/about" },
   { name: "Services", href: "#" },
   { name: "Horoscope", href: "/horoscope" },
   { name: "Blog", href: "/blog" },
-];
-
-const servicesLinks = [
-  {name: "Our Packages", href: "/services/ourpackages"},
-  { name: "Spells", href: "/services/spells" },
-  { name: "Reading", href: "/services/reading" },
 ];
 
 interface AuthProfileLink {
@@ -54,14 +50,16 @@ export default function HeroHeader() {
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
-  const [forceUpdate, setForceUpdate] = useState(0); // ✅ ADD THIS
+  const [forceUpdate, setForceUpdate] = useState(0);
+
+  // ✅ Dynamic Services State
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
 
   const router = useRouter();
   const { getTotalItems, clearCart } = useCart();
   const { getTotalWishlistItems, clearWishlist } = useWishlist();
-
-  // Use Auth Context
-  const { user, isAuthenticated, loading, logout, checkAuth } = useAuth(); // ✅ ADD checkAuth
+  const { user, isAuthenticated, loading, logout, checkAuth } = useAuth();
 
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const servicesDropdownRef = useRef<HTMLDivElement>(null);
@@ -69,7 +67,29 @@ export default function HeroHeader() {
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const mobileServicesButtonRef = useRef<HTMLButtonElement>(null);
 
-  // ✅ ADD: Force re-render when auth state changes
+  // ✅ Fetch dynamic services from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingServices(true);
+        const response = await servicePackageAPI.getAllCategories({
+          isActive: true,
+        });
+        if (response.success && response.data) {
+          setCategories(response.data);
+          console.log("✅ Dynamic categories loaded:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Force re-render when auth state changes
   useEffect(() => {
     console.log("Header - Auth State Changed:", {
       isAuthenticated,
@@ -77,12 +97,10 @@ export default function HeroHeader() {
       loading,
       forceUpdate,
     });
-
-    // Force re-render when auth state changes
     setForceUpdate((prev) => prev + 1);
   }, [isAuthenticated, user, loading]);
 
-  // ✅ ADD: Listen for storage changes (when login/logout happens)
+  // Listen for storage changes
   useEffect(() => {
     const handleStorageChange = () => {
       console.log("Storage changed in Header, forcing update");
@@ -91,10 +109,7 @@ export default function HeroHeader() {
     };
 
     window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, [checkAuth]);
 
   // Detect scroll
@@ -115,7 +130,6 @@ export default function HeroHeader() {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Close profile dropdown
       if (
         profileDropdownRef.current &&
         !profileDropdownRef.current.contains(event.target as Node)
@@ -123,7 +137,6 @@ export default function HeroHeader() {
         setProfileDropdownOpen(false);
       }
 
-      // Close desktop services dropdown
       if (
         servicesTriggerRef.current &&
         servicesDropdownRef.current &&
@@ -133,7 +146,6 @@ export default function HeroHeader() {
         setServicesDropdownOpen(false);
       }
 
-      // Close mobile services dropdown when clicking outside
       const target = event.target as HTMLElement;
       if (
         menuOpen &&
@@ -145,22 +157,12 @@ export default function HeroHeader() {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
 
-  const navigateToCart = () => {
-    router.push("/cart");
-  };
+  const navigateToCart = () => router.push("/cart");
+  const navigateToWishlist = () => router.push("/header/wishlist");
 
-const navigateToWishlist = () => {
-  // सीधे wishlist page पर redirect करें
-  router.push("/header/wishlist");
-
-  // अगर wishlist page में authentication required है,
-  // तो वहाँ पर check करें
-};
   const handleProfileClick = () => {
     if (isAuthenticated) {
       setProfileDropdownOpen(!profileDropdownOpen);
@@ -171,19 +173,12 @@ const navigateToWishlist = () => {
 
   const handleLogout = async () => {
     try {
-      // Clear cart and wishlist
       clearCart();
       clearWishlist();
-
-      // Call logout from auth context
       logout();
-
       setProfileDropdownOpen(false);
       setMenuOpen(false);
-
       toast.success("Logged out successfully!");
-
-      // Force update after logout
       setTimeout(() => {
         setForceUpdate((prev) => prev + 1);
         router.push("/");
@@ -195,25 +190,12 @@ const navigateToWishlist = () => {
     }
   };
 
-  // const handleProfileNavigation = (href: string) => {
-  //   setProfileDropdownOpen(false);
-  //   if (isAuthenticated) {
-  //     router.push(href);
-  //   } else {
-  //     toast.error("Please login to access this page");
-  //     router.push("/login");
-  //   }
-  // };
-
-
   const handleProfileNavigation = (href: string) => {
     setProfileDropdownOpen(false);
-
     if (href === "/login") {
       router.push("/login");
       return;
     }
-
     if (isAuthenticated) {
       router.push(href);
     } else {
@@ -221,6 +203,26 @@ const navigateToWishlist = () => {
       router.push("/login");
     }
   };
+
+  // ✅ Handle Service Click - Navigate to category page
+  const handleServiceClick = (categoryId: string, categoryName: string) => {
+    setServicesDropdownOpen(false);
+    setMobileServicesOpen(false);
+    setMenuOpen(false);
+    // Navigate to category details page
+    router.push(
+      `/services/category/${categoryId}?name=${encodeURIComponent(categoryName)}`,
+    );
+  };
+
+  // ✅ Handle "Our Packages" click - Navigate to packages page
+  const handleOurPackagesClick = () => {
+    setServicesDropdownOpen(false);
+    setMobileServicesOpen(false);
+    setMenuOpen(false);
+    router.push("/services/ourpackages");
+  };
+
   // Desktop Services dropdown handlers
   const handleServicesMouseEnter = () => {
     if (window.innerWidth >= 768) {
@@ -237,7 +239,6 @@ const navigateToWishlist = () => {
       ) {
         return;
       }
-
       setTimeout(() => {
         if (!servicesDropdownRef.current?.contains(document.activeElement)) {
           setServicesDropdownOpen(false);
@@ -254,9 +255,7 @@ const navigateToWishlist = () => {
 
   const handleDropdownMouseLeave = () => {
     if (window.innerWidth >= 768) {
-      setTimeout(() => {
-        setServicesDropdownOpen(false);
-      }, 150);
+      setTimeout(() => setServicesDropdownOpen(false), 150);
     }
   };
 
@@ -265,18 +264,6 @@ const navigateToWishlist = () => {
     if (window.innerWidth < 768) {
       setMobileServicesOpen((prev) => !prev);
     }
-  };
-
-  const handleServicesItemClick = (href: string) => {
-    router.push(href);
-    setMobileServicesOpen(false);
-    setMenuOpen(false);
-  };
-
-  // Mobile menu close handler
-  const handleMobileMenuClose = () => {
-    setMenuOpen(false);
-    setMobileServicesOpen(false);
   };
 
   const getInitials = (name: string) => {
@@ -296,7 +283,6 @@ const navigateToWishlist = () => {
     return "User";
   };
 
-  // Profile links for authenticated users
   const getAuthProfileLinks = (): AuthProfileLink[] => [
     {
       name: "View Profile",
@@ -341,7 +327,6 @@ const navigateToWishlist = () => {
     },
   ];
 
-  // Profile links for unauthenticated users
   const getUnauthProfileLinks = (): UnauthProfileLink[] => [
     { name: "Login", href: "/login", icon: <FiLogIn className="text-lg" /> },
     {
@@ -357,7 +342,6 @@ const navigateToWishlist = () => {
     },
   ];
 
-  // ✅ ADD: Show loading skeleton if auth is loading
   if (loading) {
     return (
       <header className="fixed top-0 left-0 w-full z-50 bg-[#FBB5E7] py-4">
@@ -394,16 +378,13 @@ const navigateToWishlist = () => {
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         scrolled ? "bg-[#FBB5E7] py-4" : "bg-[#FBB5E7] py-4"
       }`}
-      key={`header-${forceUpdate}`} // ✅ ADD THIS KEY FOR FORCE RE-RENDER
+      key={`header-${forceUpdate}`}
     >
       <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
-          style: {
-            background: "#363636",
-            color: "#fff",
-          },
+          style: { background: "#363636", color: "#fff" },
         }}
       />
 
@@ -420,9 +401,7 @@ const navigateToWishlist = () => {
               width={scrolled ? 90 : 120}
               height={scrolled ? 90 : 120}
               className="rounded-full transition-all duration-300 hidden sm:block"
-              style={{
-                marginBottom: scrolled ? "-30px" : "-40px",
-              }}
+              style={{ marginBottom: scrolled ? "-30px" : "-40px" }}
             />
             <Image
               src="/logo.png"
@@ -430,9 +409,7 @@ const navigateToWishlist = () => {
               width={scrolled ? 70 : 80}
               height={scrolled ? 70 : 80}
               className="rounded-full transition-all duration-300 sm:hidden"
-              style={{
-                marginBottom: scrolled ? "-20px" : "-25px",
-              }}
+              style={{ marginBottom: scrolled ? "-20px" : "-25px" }}
             />
           </div>
         </div>
@@ -454,20 +431,19 @@ const navigateToWishlist = () => {
                   >
                     {link.name}
                     <MdKeyboardArrowDown
-                      className={`transition-transform duration-300 ${
-                        servicesDropdownOpen ? "rotate-180" : ""
-                      }`}
+                      className={`transition-transform duration-300 ${servicesDropdownOpen ? "rotate-180" : ""}`}
                     />
                   </button>
 
                   <div
                     className="absolute top-full left-0 w-full h-2 bg-transparent"
                     style={{ zIndex: 60 }}
-                  ></div>
+                  />
 
+                  {/* ✅ Dynamic Services Dropdown */}
                   <div
                     ref={servicesDropdownRef}
-                    className={`absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-purple-100 transition-all duration-300 transform ${
+                    className={`absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-purple-100 transition-all duration-300 transform ${
                       servicesDropdownOpen
                         ? "opacity-100 scale-100 translate-y-0"
                         : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
@@ -476,15 +452,47 @@ const navigateToWishlist = () => {
                     onMouseEnter={handleDropdownMouseEnter}
                     onMouseLeave={handleDropdownMouseLeave}
                   >
-                    {servicesLinks.map((service) => (
-                      <button
-                        key={service.name}
-                        onClick={() => handleServicesItemClick(service.href)}
-                        className="w-full px-4 py-3 text-left hover:bg-purple-50 transition-all duration-200 text-gray-700 hover:text-purple-600 font-medium first:rounded-t-xl last:rounded-b-xl cursor-pointer"
-                      >
-                        {service.name}
-                      </button>
-                    ))}
+                    {/* Our Packages - Static */}
+                    <button
+                      onClick={handleOurPackagesClick}
+                      className="w-full px-4 py-3 text-left hover:bg-purple-50 transition-all duration-200 text-gray-700 hover:text-purple-600 font-semibold border-b border-purple-100 first:rounded-t-xl"
+                    >
+                      📦 Our Packages
+                    </button>
+
+                    {/* Dynamic Categories */}
+                    {loadingServices ? (
+                      <div className="px-4 py-3 text-gray-500 text-sm">
+                        Loading...
+                      </div>
+                    ) : categories.length > 0 ? (
+                      categories.map((category) => (
+                        <button
+                          key={category._id}
+                          onClick={() =>
+                            handleServiceClick(category._id, category.name)
+                          }
+                          className="w-full px-4 py-3 text-left hover:bg-purple-50 transition-all duration-200 text-gray-700 hover:text-purple-600 font-medium flex items-center gap-2"
+                        >
+                          {category.icon ? (
+                            <Image
+                              src={category.icon}
+                              alt={category.name}
+                              width={20}
+                              height={20}
+                              className="w-5 h-5"
+                            />
+                          ) : (
+                            <span>🔮</span>
+                          )}
+                          {category.name}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-gray-500 text-sm">
+                        No services available
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -571,13 +579,10 @@ const navigateToWishlist = () => {
                   {getUserName()}
                 </span>
                 <MdKeyboardArrowDown
-                  className={`transition-transform duration-300 ${
-                    profileDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`transition-transform duration-300 ${profileDropdownOpen ? "rotate-180" : ""}`}
                 />
               </div>
 
-              {/* Authenticated User Dropdown */}
               <div
                 className={`absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-purple-100 transition-all duration-300 transform ${
                   profileDropdownOpen
@@ -600,7 +605,6 @@ const navigateToWishlist = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className="max-h-96 overflow-y-auto">
                   {getAuthProfileLinks().map((item, index) => (
                     <button
@@ -633,7 +637,7 @@ const navigateToWishlist = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.push("/login")}
-                className="px-4 py-2 text-gray-700 border border-gyar-700 rounded-lg hover:text-yellow-500 hover:bg-purple-50 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                className="px-4 py-2 text-gray-700 border border-gray-700 rounded-lg hover:text-yellow-500 hover:bg-purple-50 transition-all duration-300 flex items-center gap-2 cursor-pointer"
               >
                 <FiLogIn />
                 <span>Login</span>
@@ -700,19 +704,13 @@ const navigateToWishlist = () => {
             onClick={() => setMenuOpen((open) => !open)}
           >
             <span
-              className={`block w-6 h-0.5 bg-gray-800 mb-1.5 transition-all duration-300 ${
-                menuOpen ? "rotate-45 translate-y-2 bg-white" : ""
-              }`}
+              className={`block w-6 h-0.5 bg-gray-800 mb-1.5 transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-2 bg-white" : ""}`}
             />
             <span
-              className={`block w-6 h-0.5 bg-gray-800 mb-1.5 transition-all duration-300 ${
-                menuOpen ? "opacity-0" : ""
-              }`}
+              className={`block w-6 h-0.5 bg-gray-800 mb-1.5 transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`}
             />
             <span
-              className={`block w-6 h-0.5 bg-gray-800 transition-all duration-300 ${
-                menuOpen ? "-rotate-45 -translate-y-2 bg-white" : ""
-              }`}
+              className={`block w-6 h-0.5 bg-gray-800 transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-2 bg-white" : ""}`}
             />
           </button>
         </div>
@@ -725,7 +723,7 @@ const navigateToWishlist = () => {
             ? "bg-black/50 backdrop-blur-sm opacity-100"
             : "bg-transparent backdrop-blur-0 opacity-0 pointer-events-none"
         }`}
-        onClick={handleMobileMenuClose}
+        onClick={() => setMenuOpen(false)}
       >
         <div
           ref={mobileMenuRef}
@@ -768,37 +766,64 @@ const navigateToWishlist = () => {
                         >
                           <span>Services</span>
                           <MdKeyboardArrowDown
-                            className={`transition-transform duration-300 ${
-                              mobileServicesOpen ? "rotate-180" : ""
-                            }`}
+                            className={`transition-transform duration-300 ${mobileServicesOpen ? "rotate-180" : ""}`}
                           />
                         </button>
 
                         <div
                           className={`mobile-services-dropdown ml-4 mt-1 space-y-1 overflow-hidden transition-[max-height,opacity] duration-400 ease-in-out ${
                             mobileServicesOpen
-                              ? "max-h-40 opacity-100"
+                              ? "max-h-96 opacity-100"
                               : "max-h-0 opacity-0"
                           }`}
                         >
-                          {servicesLinks.map((service) => (
-                            <button
-                              key={service.name}
-                              onClick={() =>
-                                handleServicesItemClick(service.href)
-                              }
-                              className="block w-full text-left text-white/90 text-base font-medium py-2 px-4 rounded-lg hover:bg-white/10 transition-all duration-300"
-                            >
-                              {service.name}
-                            </button>
-                          ))}
+                          {/* Our Packages */}
+                          <button
+                            onClick={handleOurPackagesClick}
+                            className="block w-full text-left text-white/90 text-base font-semibold py-2 px-4 rounded-lg hover:bg-white/10 transition-all duration-300"
+                          >
+                            📦 Our Packages
+                          </button>
+
+                          {/* Dynamic Categories */}
+                          {loadingServices ? (
+                            <div className="text-white/70 text-sm py-2 px-4">
+                              Loading...
+                            </div>
+                          ) : (
+                            categories.map((category) => (
+                              <button
+                                key={category._id}
+                                onClick={() =>
+                                  handleServiceClick(
+                                    category._id,
+                                    category.name,
+                                  )
+                                }
+                                className="block w-full text-left text-white/90 text-base font-medium py-2 px-4 rounded-lg hover:bg-white/10 transition-all duration-300"
+                              >
+                                {category.icon ? (
+                                  <Image
+                                    src={category.icon}
+                                    alt={category.name}
+                                    width={20}
+                                    height={20}
+                                    className="inline-block mr-2 w-4 h-4"
+                                  />
+                                ) : (
+                                  <span className="inline-block mr-2">🔮</span>
+                                )}
+                                {category.name}
+                              </button>
+                            ))
+                          )}
                         </div>
                       </div>
                     ) : (
                       <button
                         onClick={() => {
                           router.push(link.href);
-                          handleMobileMenuClose();
+                          setMenuOpen(false);
                         }}
                         className="text-white text-lg font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2 text-left"
                       >
@@ -822,7 +847,7 @@ const navigateToWishlist = () => {
                             } else if (item.href) {
                               handleProfileNavigation(item.href);
                             }
-                            handleMobileMenuClose();
+                            setMenuOpen(false);
                           }}
                           className="w-full text-white text-lg font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2 flex items-center space-x-3 text-left"
                         >
@@ -835,7 +860,7 @@ const navigateToWishlist = () => {
                           key={item.name}
                           onClick={() => {
                             handleProfileNavigation(item.href);
-                            handleMobileMenuClose();
+                            setMenuOpen(false);
                           }}
                           className="w-full text-white text-lg font-medium py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 transform hover:translate-x-2 flex items-center space-x-3 text-left"
                         >
@@ -848,7 +873,7 @@ const navigateToWishlist = () => {
                 <Link
                   href="/products"
                   className="mt-6 bg-yellow-300 hover:bg-yellow-400 text-black font-semibold px-6 py-4 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 text-center"
-                  onClick={handleMobileMenuClose}
+                  onClick={() => setMenuOpen(false)}
                 >
                   Shop Now
                 </Link>

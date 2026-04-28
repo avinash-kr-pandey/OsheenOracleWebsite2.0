@@ -1,42 +1,33 @@
-
+// app/services/ourpackages/page.tsx (IMPROVED DESIGN)
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Service, servicePackageAPI, SubmitServiceRequestData } from "@/utils/api/service.package.api";
-
+import { servicePackageAPI, Category } from "@/utils/api/service.package.api";
+import { FiArrowLeft, FiStar, FiShield, FiHeart } from "react-icons/fi";
 
 const OurPackages = () => {
   const router = useRouter();
-  const [packages, setPackages] = useState<Service[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPackage, setSelectedPackage] = useState<Service | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  const [formData, setFormData] = useState<SubmitServiceRequestData>({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    serviceId: "",
-    communicationMode: "voice_call",
-    description: "",
-    preferredDate: "",
-    preferredTimeSlot: "",
-  });
 
   useEffect(() => {
-    fetchPackages();
+    fetchCategories();
   }, []);
 
-  const fetchPackages = async () => {
+  const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await servicePackageAPI.getAllServices();
-      setPackages(response.data || []);
+      const response = await servicePackageAPI.getAllCategories({
+        isActive: true,
+      });
+      if (response.success && response.data) {
+        setCategories(response.data);
+      } else {
+        setError("Failed to load categories");
+      }
     } catch (err) {
       setError("Failed to load packages");
       console.error(err);
@@ -45,97 +36,31 @@ const OurPackages = () => {
     }
   };
 
-  const handleBookNow = (pkg: Service) => {
-    setSelectedPackage(pkg);
-    setFormData({
-      ...formData,
-      serviceId: pkg._id,
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedPackage(null);
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      serviceId: "",
-      communicationMode: "voice_call",
-      description: "",
-      preferredDate: "",
-      preferredTimeSlot: "",
-    });
-  };
-
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-
-    if (!selectedPackage) {
-      alert("Please select a package");
-      setSubmitting(false);
-      return;
-    }
-
-    try {
-      // Store complete data including package details
-      const serviceRequestData = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        serviceId: selectedPackage._id,
-        communicationMode: formData.communicationMode,
-        description: formData.description,
-        preferredDate: formData.preferredDate,
-        preferredTimeSlot: formData.preferredTimeSlot,
-        packageName: selectedPackage.name,
-        packagePrice: selectedPackage.price,
-        packageDuration: selectedPackage.duration,
-      };
-
-      sessionStorage.setItem(
-        "pendingServiceRequest",
-        JSON.stringify(serviceRequestData),
-      );
-
-      // Redirect to payment methods page
-      router.push("/header/payment-methods");
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+  const handleCategoryClick = (categoryId: string, categoryName: string) => {
+    router.push(
+      `/services/category/${categoryId}?name=${encodeURIComponent(categoryName)}`,
+    );
   };
 
   if (error) {
     return (
       <div
-        className="min-h-screen pt-24 pb-20"
+        className="min-h-screen pt-28 pb-20"
         style={{
           background:
             "linear-gradient(to bottom, #FBB5E7 0%, #FBB5E7 20%, #C4F9FF 100%)",
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center py-12 bg-white/50 rounded-3xl">
-            <p className="text-red-600 text-xl">{error}</p>
+          <div className="text-center py-16 bg-white/80 rounded-3xl backdrop-blur-sm shadow-xl">
+            <div className="text-7xl mb-4">🔮</div>
+            <p className="text-red-600 text-xl mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-2.5 rounded-xl hover:shadow-lg transition-all"
+            >
+              Try Again
+            </button>
           </div>
         </div>
       </div>
@@ -144,291 +69,199 @@ const OurPackages = () => {
 
   return (
     <div
-      className="min-h-screen pt-24 pb-20"
+      className="min-h-screen pt-28 pb-20"
       style={{
         background:
           "linear-gradient(to bottom, #FBB5E7 0%, #FBB5E7 20%, #C4F9FF 100%)",
       }}
     >
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Back Button */}
+        <button
+          onClick={() => router.push("/")}
+          className="pt-10 group flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium mb-6 transition-all hover:translate-x-[-4px]"
+        >
+          <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" />
+          Back to Home
+        </button>
+
+        {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold text-purple-900 mb-6">
-            Our Packages
+          <div className="inline-block bg-gradient-to-r from-purple-100 to-pink-100 rounded-full px-6 py-2 mb-4">
+            <span className="text-purple-600 font-semibold">
+              ✨ Spiritual Services
+            </span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-purple-900 to-pink-700 bg-clip-text text-transparent mb-4">
+            Our Services
           </h1>
-          <p className="text-xl text-purple-700 max-w-2xl mx-auto">
-            Discover our spiritual packages designed to bring peace, prosperity,
+          <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mb-6 rounded-full"></div>
+          <p className="text-xl text-purple-800 max-w-2xl mx-auto">
+            Discover our spiritual services designed to bring peace, prosperity,
             and positivity to your life
           </p>
-          <div className="w-24 h-1 bg-gradient-to-r from-purple-400 to-pink-400 mx-auto mt-8"></div>
         </div>
-      </section>
 
-      {/* Packages Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Categories Grid */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-600"></div>
           </div>
-        ) : packages.length === 0 ? (
-          <div className="text-center py-20 bg-white/30 rounded-3xl">
-            <p className="text-purple-800 text-xl">
-              No packages available at the moment.
+        ) : categories.length === 0 ? (
+          <div className="text-center py-16 bg-white/60 rounded-3xl backdrop-blur-sm">
+            <div className="text-6xl mb-4">📦</div>
+            <p className="text-gray-600 text-lg">
+              No services available at the moment.
             </p>
+            <p className="text-gray-500 mt-2">Please check back later.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {packages.map((pkg) => (
+            {categories.map((category, index) => (
               <div
-                key={pkg._id}
-                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                key={category._id}
+                onClick={() => handleCategoryClick(category._id, category.name)}
+                className="group bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer border border-purple-100 hover:border-purple-300 animate-fadeInUp"
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className="relative h-56 bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center">
-                  {pkg.icon ? (
-                    <Image
-                      src={pkg.icon}
-                      alt={pkg.name}
-                      width={100}
-                      height={100}
-                      className="object-contain group-hover:scale-110 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="text-6xl">✨</div>
-                  )}
-                  {!pkg.isActive && (
-                    <div className="absolute top-4 right-4 bg-gray-800 text-white px-3 py-1 rounded-full text-sm">
-                      Coming Soon
-                    </div>
-                  )}
+                {/* Icon Section */}
+                <div className="relative h-52 bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all duration-500"></div>
+                  <div className="relative z-10">
+                    {category.icon ? (
+                      <Image
+                        src={category.icon}
+                        alt={category.name}
+                        width={90}
+                        height={90}
+                        className="object-contain group-hover:scale-110 transition-transform duration-500 filter drop-shadow-lg"
+                      />
+                    ) : (
+                      <div className="text-8xl group-hover:scale-110 transition-transform duration-500 drop-shadow-lg">
+                        🔮
+                      </div>
+                    )}
+                  </div>
+                  {/* Decorative circles */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
                 </div>
 
+                {/* Content */}
                 <div className="p-6 bg-white">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-2xl font-bold text-purple-900">
-                      {pkg.name}
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-2xl font-bold text-purple-900 group-hover:text-purple-600 transition-colors">
+                      {category.name}
                     </h3>
-                    <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                      {pkg.category}
-                    </span>
+                    <div className="bg-purple-100 rounded-full px-3 py-1">
+                      <span className="text-xs font-semibold text-purple-600">
+                        {category.subcategories?.filter(
+                          (s) => s.isActive !== false,
+                        ).length || 0}
+                      </span>
+                    </div>
                   </div>
 
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {pkg.description}
+                  <p className="text-gray-600 mb-4 line-clamp-2 leading-relaxed">
+                    {category.description}
                   </p>
 
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="text-3xl font-bold text-purple-700">
-                      ₹{pkg.price}
+                  {/* Features */}
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    <span className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-full">
+                      ✨ Authentic
                     </span>
-                    <span className="text-gray-500">/ {pkg.duration}</span>
+                    <span className="text-xs bg-pink-50 text-pink-600 px-2 py-1 rounded-full">
+                      🕉️ Traditional
+                    </span>
+                    <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full">
+                      ⭐ Trusted
+                    </span>
                   </div>
 
-                  <button
-                    onClick={() => handleBookNow(pkg)}
-                    disabled={!pkg.isActive}
-                    className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 ${
-                      pkg.isActive
-                        ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg hover:scale-105"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                  >
-                    {pkg.isActive ? "Book Now →" : "Coming Soon"}
+                  {/* Explore Button */}
+                  <button className="w-full mt-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all group-hover:scale-[1.02] flex items-center justify-center gap-2">
+                    <span>Explore Services</span>
+                    <svg
+                      className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
+                    </svg>
                   </button>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </section>
 
-      {/* Booking Modal */}
-      {isModalOpen && selectedPackage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 rounded-t-2xl">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-bold">Complete Your Booking</h2>
-                  <p className="text-purple-100 mt-1">{selectedPackage.name}</p>
+        {/* Trust Badges Section */}
+        <div className="mt-20 text-center">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
+            <h3 className="text-2xl font-bold text-purple-900 mb-6">
+              Why Choose Us?
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                  <FiShield className="w-6 h-6 text-purple-600" />
                 </div>
-                <button
-                  onClick={handleCloseModal}
-                  className="text-white hover:text-gray-200 text-3xl leading-none"
-                >
-                  &times;
-                </button>
+                <span className="font-semibold text-gray-800">
+                  100% Ethical
+                </span>
+                <p className="text-sm text-gray-500">
+                  Authentic spiritual practices
+                </p>
               </div>
-            </div>
-
-            <div className="p-6">
-              <div className="mb-6 p-4 bg-purple-50 rounded-xl">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-sm text-gray-600">Package Price</p>
-                    <p className="text-2xl font-bold text-purple-700">
-                      ₹{selectedPackage.price}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-gray-600">Duration</p>
-                    <p className="text-lg font-semibold text-gray-700">
-                      {selectedPackage.duration}
-                    </p>
-                  </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
+                  <FiHeart className="w-6 h-6 text-pink-600" />
                 </div>
+                <span className="font-semibold text-gray-800">
+                  Personalized
+                </span>
+                <p className="text-sm text-gray-500">Tailored just for you</p>
               </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      required
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                      placeholder="Enter your name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                      placeholder="Enter your email"
-                    />
-                  </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                  <FiStar className="w-6 h-6 text-yellow-600" />
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      required
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                      placeholder="Enter your phone number"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Communication Mode *
-                    </label>
-                    <select
-                      name="communicationMode"
-                      required
-                      value={formData.communicationMode}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    >
-                      <option value="voice_call">📞 Voice Call</option>
-                      <option value="video_call">📹 Video Call</option>
-                      <option value="voice_note">🎤 Voice Note</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Address *
-                  </label>
-                  <textarea
-                    name="address"
-                    required
-                    rows={2}
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    placeholder="Enter your full address"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description / Requirements *
-                  </label>
-                  <textarea
-                    name="description"
-                    required
-                    rows={3}
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    placeholder="Please describe your requirements..."
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Preferred Date
-                    </label>
-                    <input
-                      type="date"
-                      name="preferredDate"
-                      value={formData.preferredDate}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Preferred Time Slot
-                    </label>
-                    <select
-                      name="preferredTimeSlot"
-                      value={formData.preferredTimeSlot}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    >
-                      <option value="">Select time slot</option>
-                      <option value="morning">Morning (9 AM - 12 PM)</option>
-                      <option value="afternoon">
-                        Afternoon (12 PM - 4 PM)
-                      </option>
-                      <option value="evening">Evening (4 PM - 8 PM)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
-                  >
-                    {submitting ? "Processing..." : `Proceed to Payment →`}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCloseModal}
-                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-all"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+                <span className="font-semibold text-gray-800">
+                  5 Star Rated
+                </span>
+                <p className="text-sm text-gray-500">Trusted by thousands</p>
+              </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Add animation styles */}
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeInUp {
+          animation: fadeInUp 0.6s ease-out forwards;
+          opacity: 0;
+        }
+      `}</style>
     </div>
   );
-};;
+};
 
 export default OurPackages;
