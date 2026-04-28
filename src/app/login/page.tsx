@@ -1425,8 +1425,10 @@ const Login = () => {
       {/* Main Section */}
       <div className="w-full flex flex-col lg:flex-row justify-between items-center px-4 sm:px-8 md:px-16 py-6 md:py-10 gap-8 md:gap-0 md:pt-0 pt-30">
         {/* Background circular image */}
+
         <Image
-          src="/images/fullrounded.png"
+          // src="/images/fullrounded.png"
+          src="/images/roundimage.png"
           alt="background illustration"
           width={650}
           height={650}
