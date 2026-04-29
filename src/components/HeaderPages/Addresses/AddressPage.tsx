@@ -1,60 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  fetchData,
-  postData,
-  putData,
-  deleteData,
-  setAuthToken,
-} from "@/utils/api/api";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import profileApi, { type Address } from "@/utils/api/profile.api";
 
-// Define TypeScript interfaces based on your backend API
-interface Address {
-  id: string;
-  street: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  // Note: Backend doesn't have name, phone, type, isDefault based on Swagger
-}
-
+// Local FormData interface - simplified for backend
 interface FormData {
-  street: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  // Added for UI only (not sent to backend)
-  name?: string;
-  phone?: string;
-  addressType?: "home" | "work" | "other";
-  isDefault?: boolean;
-}
-
-interface ApiAddress {
-  _id: string;
-  street: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  user?: string;
-}
-
-// Proper error interface
-interface ApiError {
-  response?: {
-    status?: number;
-    data?: {
-      message?: string;
-    };
-  };
-  request?: unknown;
-  message?: string;
+  type: string;
+  name: string;
+  address: string;
+  phone: string;
+  isDefault: boolean;
 }
 
 const AddressPage = () => {
@@ -63,100 +20,56 @@ const AddressPage = () => {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  const { isAuthenticated } = useAuth();
+
   const [formData, setFormData] = useState<FormData>({
-    street: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "India",
-    // UI-only fields
+    type: "Home",
     name: "",
+    address: "",
     phone: "",
-    addressType: "home",
     isDefault: false,
   });
 
-  // Get authentication state
-  const { token, isAuthenticated, user } = useAuth();
-
-  // Set auth token when component mounts or token changes
-  useEffect(() => {
-    console.log("Token in AddressPage:", token ? "Available" : "No token");
-
-    if (token) {
-      setAuthToken(token);
-      console.log("Auth token set successfully");
-    }
-  }, [token]);
-
   // Fetch addresses when authenticated
   useEffect(() => {
-    if (isAuthenticated && token) {
-      console.log("Fetching addresses for user:", user?.email);
+    if (isAuthenticated) {
       fetchAddresses();
     }
-  }, [isAuthenticated, token, user]);
+  }, [isAuthenticated]);
 
   const fetchAddresses = async () => {
-    if (!isAuthenticated || !token) {
+    if (!isAuthenticated) {
       console.warn("Not authenticated, skipping address fetch");
-      toast.error("Please login to view addresses");
       return;
     }
 
     try {
       setLoading(true);
-      console.log("Making API request to /addresses...");
+      const response = await profileApi.getAddresses();
 
-      // Make API call
-      const response = await fetchData("/addresses");
-      console.log("API Response received:", response);
-
-      if (response && Array.isArray(response)) {
-        // Transform API response to match our interface
-        const formattedAddresses = response.map((addr: ApiAddress) => ({
-          id: addr._id,
-          street: addr.street || "",
-          city: addr.city || "",
-          state: addr.state || "",
-          postalCode: addr.postalCode || "",
-          country: addr.country || "India",
-        }));
-
-        console.log("Formatted addresses:", formattedAddresses);
-        setAddresses(formattedAddresses);
-        toast.success(`Loaded ${formattedAddresses.length} address(es)`);
+      // Backend returns { addresses: [...] }
+      if (response && response.addresses && Array.isArray(response.addresses)) {
+        setAddresses(response.addresses);
       } else {
-        console.warn("Unexpected response format:", response);
-        toast.error("No addresses found or invalid response");
         setAddresses([]);
       }
+      setDataLoaded(true);
     } catch (error) {
       console.error("Error fetching addresses:", error);
-      const err = error as ApiError;
-
-      if (err.response?.status === 401) {
-        toast.error("Session expired. Please login again.");
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-      } else if (err.response?.status === 403) {
-        toast.error("You don't have permission to view addresses");
-      } else if (err.response?.status === 404) {
-        toast.error("Addresses endpoint not found");
-      } else if (err.request) {
-        toast.error("Network error. Please check your connection.");
-      } else {
-        toast.error("Failed to load addresses");
-      }
-
+      toast.error("Failed to load addresses");
       setAddresses([]);
+      setDataLoaded(true);
     } finally {
       setLoading(false);
     }
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
@@ -170,65 +83,55 @@ const AddressPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Check authentication
-    if (!isAuthenticated || !token) {
+    if (!isAuthenticated) {
       toast.error("Please login to save address");
       return;
     }
 
-    // Form validation for backend required fields
-    if (
-      !formData.street.trim() ||
-      !formData.city.trim() ||
-      !formData.state.trim() ||
-      !formData.postalCode.trim() ||
-      !formData.country.trim()
-    ) {
-      toast.error("Please fill all required fields");
+    // Validation
+    if (!formData.type.trim()) {
+      toast.error("Please select address type");
+      return;
+    }
+    if (!formData.name.trim()) {
+      toast.error("Please enter recipient name");
+      return;
+    }
+    if (!formData.address.trim()) {
+      toast.error("Please enter full address");
+      return;
+    }
+    if (!formData.phone.trim()) {
+      toast.error("Please enter phone number");
       return;
     }
 
     setLoading(true);
 
     try {
-      // Prepare data for API - ONLY send what backend expects
-   const apiData = {
-     street: formData.street,
-     city: formData.city,
-     state: formData.state,
-     postalCode: formData.postalCode,
-     country: formData.country,
-     type: formData.addressType || "home", // ✅ REQUIRED FIELD
-   };
-
-      console.log("Submitting address data to backend:", apiData);
+      const apiData: Omit<Address, "_id"> = {
+        type: formData.type,
+        name: formData.name,
+        address: formData.address,
+        phone: formData.phone,
+        isDefault: formData.isDefault,
+      };
 
       if (editingAddress) {
-        // Update existing address
-        await putData(`/addresses/${editingAddress.id}`, apiData);
+        await profileApi.updateAddress(editingAddress._id, apiData);
         toast.success("Address updated successfully!");
       } else {
-        // Add new address
-        await postData("/addresses", apiData);
+        await profileApi.createAddress(apiData);
         toast.success("Address added successfully!");
       }
 
-      fetchAddresses(); // Refresh list
+      await fetchAddresses();
       resetForm();
     } catch (error) {
       console.error("Error saving address:", error);
-      const err = error as ApiError;
-
-      if (err.response?.status === 401) {
-        toast.error("Session expired. Please login again.");
-      } else if (err.response?.status === 400) {
-        const errorMsg = err.response.data?.message || "Invalid address data";
-        toast.error(`Validation error: ${errorMsg}`);
-      } else {
-        toast.error(
-          editingAddress ? "Failed to update address" : "Failed to add address"
-        );
-      }
+      toast.error(
+        editingAddress ? "Failed to update address" : "Failed to add address",
+      );
     } finally {
       setLoading(false);
     }
@@ -236,14 +139,10 @@ const AddressPage = () => {
 
   const resetForm = () => {
     setFormData({
-      street: "",
-      city: "",
-      state: "",
-      postalCode: "",
-      country: "India",
+      type: "Home",
       name: "",
+      address: "",
       phone: "",
-      addressType: "home",
       isDefault: false,
     });
     setShowAddForm(false);
@@ -252,47 +151,52 @@ const AddressPage = () => {
 
   const handleEdit = (address: Address) => {
     setFormData({
-      street: address.street,
-      city: address.city,
-      state: address.state,
-      postalCode: address.postalCode,
-      country: address.country,
-      // UI-only fields with defaults
-      name: "",
-      phone: "",
-      addressType: "home",
-      isDefault: false,
+      type: address.type,
+      name: address.name,
+      address: address.address,
+      phone: address.phone,
+      isDefault: address.isDefault || false,
     });
     setEditingAddress(address);
     setShowAddForm(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!isAuthenticated || !token) {
+  const handleDelete = async (addressId: string) => {
+    if (!isAuthenticated) {
       toast.error("Please login to delete address");
       return;
     }
 
     try {
-      await deleteData(`/addresses/${id}`);
-      setAddresses((prev) => prev.filter((addr) => addr.id !== id));
+      await profileApi.deleteAddress(addressId);
+      setAddresses((prev) => prev.filter((addr) => addr._id !== addressId));
       toast.success("Address deleted successfully!");
       setDeleteConfirm(null);
     } catch (error) {
       console.error("Error deleting address:", error);
-      const err = error as ApiError;
-
-      if (err.response?.status === 401) {
-        toast.error("Session expired. Please login again.");
-      } else {
-        toast.error("Failed to delete address");
-      }
+      toast.error("Failed to delete address");
     }
   };
 
-  // Remove setAsDefault function since backend doesn't support it
-  const getAddressTypeIcon = (type: "home" | "work" | "other"): string => {
-    switch (type) {
+  const setAsDefault = async (addressId: string) => {
+    if (!isAuthenticated) {
+      toast.error("Please login to set default address");
+      return;
+    }
+
+    try {
+      await profileApi.updateAddress(addressId, { isDefault: true });
+      // Refresh addresses to get updated list
+      await fetchAddresses();
+      toast.success("Default address updated!");
+    } catch (error) {
+      console.error("Error setting default address:", error);
+      toast.error("Failed to set default address");
+    }
+  };
+
+  const getAddressTypeIcon = (type: string): string => {
+    switch (type?.toLowerCase()) {
       case "home":
         return "🏠";
       case "work":
@@ -304,12 +208,12 @@ const AddressPage = () => {
     }
   };
 
-  const handleAddressTypeSelect = (type: "home" | "work" | "other") => {
-    setFormData((prev) => ({ ...prev, addressType: type }));
+  const handleAddressTypeSelect = (type: string) => {
+    setFormData((prev) => ({ ...prev, type }));
   };
 
   // Show loading state
-  if (loading && addresses.length === 0) {
+  if ((loading || !dataLoaded) && addresses.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-amber-50 pt-30 pb-12 px-4 flex items-center justify-center">
         <div className="text-center">
@@ -348,14 +252,13 @@ const AddressPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-amber-50 pt-30 pb-12 px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Page Header with Animation */}
+        {/* Page Header */}
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-600 to-amber-600 bg-clip-text text-transparent mb-4">
             My Addresses
           </h1>
           <p className="text-gray-600 max-w-lg mx-auto text-lg">
-            Manage your delivery addresses for faster checkout and order
-            tracking
+            Manage your delivery addresses for faster checkout
           </p>
         </div>
 
@@ -380,16 +283,6 @@ const AddressPage = () => {
             </svg>
             Add New Address
           </button>
-        </div>
-
-        {/* Debug Info */}
-        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-          <p>
-            <strong>Debug Info:</strong> User: {user?.email}, Authenticated:{" "}
-            {isAuthenticated ? "Yes" : "No"}, Token:{" "}
-            {token ? "Present" : "Missing"}
-          </p>
-          <p>Total Addresses: {addresses.length}</p>
         </div>
 
         {/* Add/Edit Address Form Modal */}
@@ -424,144 +317,79 @@ const AddressPage = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* Note: Name and Phone are UI-only, not sent to backend */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Full Name (Optional)
+                      Recipient Name *
                     </label>
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
+                      required
                       disabled={loading}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-300 disabled:opacity-50"
-                      placeholder="Enter your full name (optional)"
+                      placeholder="Full name of recipient"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone Number (Optional)
+                      Phone Number *
                     </label>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      disabled={loading}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-300 disabled:opacity-50"
-                      placeholder="+91 98765 43210 (optional)"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Street Address *
-                    </label>
-                    <input
-                      type="text"
-                      name="street"
-                      value={formData.street}
-                      onChange={handleInputChange}
                       required
                       disabled={loading}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-300 disabled:opacity-50"
-                      placeholder="House no, Street, Area"
+                      placeholder="+91 98765 43210"
                     />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        City *
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        required
-                        disabled={loading}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-300 disabled:opacity-50"
-                        placeholder="City"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        State *
-                      </label>
-                      <input
-                        type="text"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleInputChange}
-                        required
-                        disabled={loading}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-300 disabled:opacity-50"
-                        placeholder="State"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        PIN Code *
-                      </label>
-                      <input
-                        type="text"
-                        name="postalCode"
-                        value={formData.postalCode}
-                        onChange={handleInputChange}
-                        required
-                        disabled={loading}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-300 disabled:opacity-50"
-                        placeholder="PIN Code"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Country *
-                      </label>
-                      <select
-                        name="country"
-                        value={formData.country}
-                        onChange={handleInputChange}
-                        required
-                        disabled={loading}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-300 disabled:opacity-50"
-                      >
-                        <option value="India">India</option>
-                        <option value="United States">United States</option>
-                        <option value="Canada">Canada</option>
-                        <option value="United Kingdom">United Kingdom</option>
-                        <option value="Australia">Australia</option>
-                      </select>
-                    </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Address Type (UI Only)
+                      Complete Address *
+                    </label>
+                    <textarea
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      required
+                      disabled={loading}
+                      rows={3}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-300 disabled:opacity-50 resize-none"
+                      placeholder="House No, Street, Area, City, State, PIN Code"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Example: 123, Main Street, Andheri East, Mumbai,
+                      Maharashtra - 400069
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Address Type *
                     </label>
                     <div className="grid grid-cols-3 gap-2">
-                      {(["home", "work", "other"] as const).map((type) => (
+                      {(["Home", "Work", "Other"] as const).map((type) => (
                         <button
                           key={type}
                           type="button"
                           onClick={() => handleAddressTypeSelect(type)}
                           disabled={loading}
                           className={`p-3 rounded-xl border-2 transition-all duration-300 disabled:opacity-50 ${
-                            formData.addressType === type
-                              ? `border-pink-500 bg-pink-50 text-pink-700`
+                            formData.type === type
+                              ? "border-pink-500 bg-pink-50 text-pink-700"
                               : "border-gray-200 hover:border-gray-300"
                           }`}
                         >
                           <span className="block text-lg mb-1">
                             {getAddressTypeIcon(type)}
                           </span>
-                          <span className="block text-sm font-medium capitalize">
+                          <span className="block text-sm font-medium">
                             {type}
                           </span>
                         </button>
@@ -569,7 +397,6 @@ const AddressPage = () => {
                     </div>
                   </div>
 
-                  {/* Note: isDefault is UI-only, not sent to backend */}
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -580,7 +407,7 @@ const AddressPage = () => {
                       className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded disabled:opacity-50"
                     />
                     <label className="ml-2 block text-sm text-gray-700">
-                      Set as default address (UI Only)
+                      Set as default address
                     </label>
                   </div>
 
@@ -601,8 +428,8 @@ const AddressPage = () => {
                       {loading
                         ? "Saving..."
                         : editingAddress
-                        ? "Update Address"
-                        : "Save Address"}
+                          ? "Update Address"
+                          : "Save Address"}
                     </button>
                   </div>
                 </form>
@@ -662,18 +489,27 @@ const AddressPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {addresses.map((address, index) => (
             <div
-              key={address.id}
-              className={`bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-2 animate-fade-in-up`}
+              key={address._id}
+              className={`bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-2 animate-fade-in-up ${
+                address.isDefault ? "ring-2 ring-pink-500" : ""
+              }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="p-6">
                 {/* Header */}
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg">📍</span>
-                    <span className="text-sm font-medium text-gray-600 capitalize">
-                      Address
+                    <span className="text-lg">
+                      {getAddressTypeIcon(address.type)}
                     </span>
+                    <span className="text-sm font-medium text-gray-600 capitalize">
+                      {address.type}
+                    </span>
+                    {address.isDefault && (
+                      <span className="bg-pink-100 text-pink-700 text-xs px-2 py-1 rounded-full">
+                        Default
+                      </span>
+                    )}
                   </div>
                   <div className="flex space-x-1">
                     <button
@@ -692,7 +528,7 @@ const AddressPage = () => {
                       </svg>
                     </button>
                     <button
-                      onClick={() => setDeleteConfirm(address.id)}
+                      onClick={() => setDeleteConfirm(address._id)}
                       className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-300"
                       title="Delete address"
                       disabled={loading}
@@ -713,66 +549,72 @@ const AddressPage = () => {
                   </div>
                 </div>
 
-                {/* Contact Info - UI only since backend doesn't have name/phone */}
-                {formData.name && (
-                  <div className="mb-4">
-                    <h3 className="font-bold text-lg text-gray-800">
-                      {formData.name}
-                    </h3>
-                    {formData.phone && (
-                      <p className="text-gray-600">{formData.phone}</p>
-                    )}
-                  </div>
-                )}
-
-                {/* Address Details */}
-                <div className="text-gray-600 mb-6 space-y-1">
-                  <p>{address.street}</p>
-                  <p>
-                    {address.city}, {address.state} {address.postalCode}
-                  </p>
-                  <p>{address.country}</p>
+                {/* Contact Info */}
+                <div className="mb-4">
+                  <h3 className="font-bold text-lg text-gray-800">
+                    {address.name}
+                  </h3>
+                  <p className="text-gray-600">{address.phone}</p>
                 </div>
 
-                {/* Action Button */}
-                <button className="w-full py-3 bg-pink-50 text-pink-600 rounded-xl font-medium hover:bg-pink-100 transition-all duration-300">
-                  Deliver to this Address
-                </button>
+                {/* Address Details */}
+                <div className="text-gray-600 mb-6">
+                  <p className="whitespace-pre-wrap">{address.address}</p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-3">
+                  {!address.isDefault && (
+                    <button
+                      onClick={() => setAsDefault(address._id)}
+                      className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all duration-300 text-sm"
+                    >
+                      Set as Default
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleEdit(address)}
+                    className="flex-1 py-2 bg-pink-50 text-pink-600 rounded-xl font-medium hover:bg-pink-100 transition-all duration-300 text-sm"
+                  >
+                    Edit Address
+                  </button>
+                </div>
               </div>
             </div>
           ))}
 
           {/* Empty State Card for Adding New Address */}
-          <div
-            onClick={() => !loading && setShowAddForm(true)}
-            className="bg-gradient-to-br from-pink-50 to-amber-50 rounded-2xl border-2 border-dashed border-pink-300 overflow-hidden flex flex-col items-center justify-center p-8 text-center transition-all duration-500 hover:border-pink-400 hover:shadow-lg cursor-pointer transform hover:scale-105 animate-fade-in-up"
-            style={{ animationDelay: `${addresses.length * 100}ms` }}
-          >
-            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-pink-400 to-amber-400 flex items-center justify-center mb-4 shadow-lg">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-10 w-10 text-white"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
+          {addresses.length < 6 && (
+            <div
+              onClick={() => !loading && setShowAddForm(true)}
+              className="bg-gradient-to-br from-pink-50 to-amber-50 rounded-2xl border-2 border-dashed border-pink-300 overflow-hidden flex flex-col items-center justify-center p-8 text-center transition-all duration-500 hover:border-pink-400 hover:shadow-lg cursor-pointer transform hover:scale-105 animate-fade-in-up"
+            >
+              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-pink-400 to-amber-400 flex items-center justify-center mb-4 shadow-lg">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-white"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                Add New Address
+              </h3>
+              <p className="text-gray-600 max-w-xs">
+                Save a new delivery address for faster checkout
+              </p>
             </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              Add New Address
-            </h3>
-            <p className="text-gray-600 max-w-xs">
-              Save a new delivery address for faster checkout
-            </p>
-          </div>
+          )}
         </div>
 
         {/* Empty State */}
-        {addresses.length === 0 && !showAddForm && !loading && (
+        {addresses.length === 0 && !showAddForm && dataLoaded && (
           <div className="text-center py-16 animate-fade-in">
             <div className="w-32 h-32 bg-gradient-to-r from-pink-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg
@@ -800,7 +642,7 @@ const AddressPage = () => {
               No Addresses Yet
             </h3>
             <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              You haven&rsquo;t added any delivery addresses yet. Add your first
+              You haven&apos;t added any delivery addresses yet. Add your first
               address to get started with faster checkout.
             </p>
             <button
@@ -825,7 +667,7 @@ const AddressPage = () => {
         )}
       </div>
 
-      {/* Add custom animations to global CSS */}
+      {/* Custom animations */}
       <style jsx>{`
         @keyframes fade-in {
           from {

@@ -1,27 +1,48 @@
 // services/blog.api.ts
 
-import { fetchData } from "./api";
-
+import { fetchData, postData } from "./api";
 
 export interface Blog {
   _id: string;
   title: string;
-  content: string;
-  excerpt?: string;
-  author: string;
+  description: string;
+  image: string;
   category: string;
-  tags?: string[];
-  coverImage?: string;
-  views: number;
+  author: string;
+  authorInitials: string;
+  date: string;
   comments: number;
-  createdAt: string;
-  updatedAt: string;
+  views: number;
+  tags?: string[];
+  excerpt?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface BlogResponse {
   success: boolean;
   count?: number;
   data?: Blog | Blog[];
+  message?: string;
+  error?: string;
+}
+
+// ✅ Comment Interfaces
+export interface Comment {
+  _id: string;
+  blogId: string;
+  name: string;
+  email: string;
+  comment: string;
+  isApproved: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommentResponse {
+  success: boolean;
+  count?: number;
+  data?: Comment | Comment[];
   message?: string;
   error?: string;
 }
@@ -73,6 +94,53 @@ export const blogAPI = {
       return {
         success: false,
         data: null,
+      };
+    }
+  },
+
+  // ✅ Get comments for a blog
+  getBlogComments: async (
+    blogId: string,
+  ): Promise<{ success: boolean; data?: Comment[]; error?: string }> => {
+    try {
+      const response = await fetchData<CommentResponse>(
+        `/blogs/${blogId}/comments`,
+      );
+      if (response.success && Array.isArray(response.data)) {
+        return { success: true, data: response.data };
+      }
+      return { success: true, data: [] };
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      return { success: false, error: "Failed to fetch comments" };
+    }
+  },
+
+  // ✅ Add a comment to blog
+  addBlogComment: async (
+    blogId: string,
+    commentData: { name: string; email: string; comment: string },
+  ): Promise<{ success: boolean; message?: string; error?: string }> => {
+    try {
+      const response = await postData<CommentResponse>(
+        `/blogs/${blogId}/comments`,
+        commentData,
+      );
+      if (response.success) {
+        return {
+          success: true,
+          message: response.message || "Comment submitted successfully",
+        };
+      }
+      return {
+        success: false,
+        error: response.error || "Failed to submit comment",
+      };
+    } catch (error: any) {
+      console.error("Error adding comment:", error);
+      return {
+        success: false,
+        error: error?.response?.data?.message || "Failed to submit comment",
       };
     }
   },

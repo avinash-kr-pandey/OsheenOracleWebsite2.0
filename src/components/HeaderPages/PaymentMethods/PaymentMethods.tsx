@@ -1,4 +1,4 @@
-// components/HeaderPages/PaymentMethods/PaymentMethods.tsx (WITHOUT ANY)
+// components/HeaderPages/PaymentMethods/PaymentMethods.tsx (WITH 18% TAX)
 "use client";
 
 import React, { useState } from "react";
@@ -73,6 +73,23 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
 }) => {
   const [processing, setProcessing] = useState(false);
 
+  // Calculate tax (18%) and total amount (amount + 18% tax)
+  const calculateTotalWithTax = (baseAmount: number) => {
+    const tax = baseAmount * 0.18; // 18% tax
+    const total = baseAmount + tax;
+    return {
+      baseAmount,
+      tax,
+      total: Math.round(total), // Round to nearest integer for Razorpay
+    };
+  };
+
+  const {
+    baseAmount,
+    tax,
+    total: totalWithTax,
+  } = calculateTotalWithTax(amount);
+
   const loadRazorpayScript = (): Promise<boolean> => {
     return new Promise((resolve) => {
       if (
@@ -108,13 +125,17 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
         return;
       }
 
+      // Send the total amount with tax to the payment gateway
       const orderData = await paymentAPI.createOrder({
-        amount: amount,
+        amount: totalWithTax, // Send total with tax (base + 18%)
         currency: "INR",
         receipt: `order_${Date.now()}`,
       });
 
       console.log("Order created:", orderData);
+      console.log(
+        `Base amount: ₹${baseAmount}, Tax (18%): ₹${tax}, Total: ₹${totalWithTax}`,
+      );
 
       if (!orderData.success) {
         throw new Error("Failed to create order");
@@ -125,7 +146,7 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
         amount: orderData.order.amount,
         currency: orderData.order.currency,
         name: "Osheen Oracle",
-        description: "Service Booking Payment",
+        description: `Service Booking Payment (Tax: ₹${tax.toFixed(2)})`,
         order_id: orderData.order.id,
         handler: async (response: RazorpayResponse) => {
           try {
@@ -199,7 +220,7 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
 
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 text-center">
         <p className="text-sm text-gray-600 mb-2">Amount to Pay</p>
-        <p className="text-4xl font-bold text-purple-700">₹{amount}</p>
+        <p className="text-4xl font-bold text-purple-700">₹{totalWithTax}</p>
       </div>
 
       <div className="bg-white rounded-xl p-5 shadow-sm space-y-3">
@@ -210,15 +231,21 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
         <div className="space-y-2 text-sm">
           <div className="flex justify-between py-2 border-b border-gray-100">
             <span className="text-gray-500">Service Amount</span>
-            <span className="font-semibold text-gray-800">₹{amount}</span>
+            <span className="font-semibold text-gray-800">
+              ₹{baseAmount.toFixed(2)}
+            </span>
           </div>
           <div className="flex justify-between py-2 border-b border-gray-100">
-            <span className="text-gray-500">Tax (GST)</span>
-            <span className="font-semibold text-gray-800">₹0</span>
+            <span className="text-gray-500">Tax (GST 18%)</span>
+            <span className="font-semibold text-gray-800">
+              ₹{tax.toFixed(2)}
+            </span>
           </div>
           <div className="flex justify-between py-2 pt-3">
             <span className="text-gray-800 font-bold">Total Amount</span>
-            <span className="text-xl font-bold text-purple-700">₹{amount}</span>
+            <span className="text-xl font-bold text-purple-700">
+              ₹{totalWithTax}
+            </span>
           </div>
         </div>
       </div>
@@ -245,7 +272,7 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
             <span>Processing...</span>
           </div>
         ) : (
-          `Pay ₹${amount} Securely`
+          `Pay ₹${totalWithTax} Securely`
         )}
       </button>
 

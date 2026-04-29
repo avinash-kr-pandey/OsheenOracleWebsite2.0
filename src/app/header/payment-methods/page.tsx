@@ -1,11 +1,13 @@
-// app/header/payment-methods/page.tsx (COMPLETE UPDATED)
+// app/header/payment-methods/page.tsx (UPDATED - No tax calculation here, PaymentMethods will handle it)
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { servicePackageAPI } from "@/utils/api/service.package.api";
 import PaymentMethods from "@/components/HeaderPages/PaymentMethods/PaymentMethods";
-import { FiArrowLeft } from "react-icons/fi";
+import { FiArrowLeft, FiUser, FiPhone, FiMail, FiMapPin } from "react-icons/fi";
+import { FaUserCircle } from "react-icons/fa";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SelectedService {
   serviceId: string;
@@ -15,6 +17,15 @@ interface SelectedService {
   serviceDescription: string;
   categoryId: string;
   categoryName: string;
+  // User details from form
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  description?: string;
+  communicationMode?: "voice_call" | "video_call" | "voice_note";
+  preferredDate?: string;
+  preferredTimeSlot?: string;
 }
 
 interface UserDetails {
@@ -26,11 +37,13 @@ interface UserDetails {
 
 const PaymentMethodsPage = () => {
   const router = useRouter();
+  const { user, isAuthenticated } = useAuth();
   const [selectedService, setSelectedService] =
     useState<SelectedService | null>(null);
-  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [formUserDetails, setFormUserDetails] = useState<UserDetails | null>(
+    null,
+  );
   const [processing, setProcessing] = useState(false);
-  const [showUserForm, setShowUserForm] = useState(true);
 
   useEffect(() => {
     // Get selected service from sessionStorage
@@ -49,20 +62,24 @@ const PaymentMethodsPage = () => {
       console.log("✅ Parsed service:", parsedService);
       setSelectedService(parsedService);
 
-      // Check if user is logged in
-      const token = localStorage.getItem("token");
-      const userStr = localStorage.getItem("user");
-
-      if (token && userStr) {
-        const user = JSON.parse(userStr);
-        console.log("👤 Logged in user:", user);
-        setUserDetails({
-          name: user.name || "",
-          email: user.email || "",
-          phone: user.phone || "",
-          address: user.address || "",
+      // Extract user details from the service data (filled in the form)
+      if (
+        parsedService.name &&
+        parsedService.email &&
+        parsedService.phone &&
+        parsedService.address
+      ) {
+        setFormUserDetails({
+          name: parsedService.name,
+          email: parsedService.email,
+          phone: parsedService.phone,
+          address: parsedService.address,
         });
-        setShowUserForm(false);
+        console.log("📝 Form user details extracted:", {
+          name: parsedService.name,
+          email: parsedService.email,
+          phone: parsedService.phone,
+        });
       }
     } catch (error) {
       console.error("❌ Error parsing service data:", error);
@@ -70,29 +87,16 @@ const PaymentMethodsPage = () => {
     }
   }, [router]);
 
-  const handleUserSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const details: UserDetails = {
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      phone: formData.get("phone") as string,
-      address: formData.get("address") as string,
-    };
-
-    if (!details.name || !details.email || !details.phone || !details.address) {
-      alert("Please fill all fields");
-      return;
-    }
-
-    console.log("📝 User details submitted:", details);
-    setUserDetails(details);
-    setShowUserForm(false);
-  };
-
   const handlePaymentSuccess = async () => {
-    if (!selectedService || !userDetails) {
-      console.error("❌ Missing data:", { selectedService, userDetails });
+    // Use form user details (from the modal) for the booking
+    const bookingUserDetails = formUserDetails;
+
+    if (!selectedService || !bookingUserDetails) {
+      console.error("❌ Missing data:", {
+        selectedService,
+        bookingUserDetails,
+      });
+      alert("Missing user details. Please try again.");
       return;
     }
 
@@ -101,13 +105,14 @@ const PaymentMethodsPage = () => {
 
     try {
       const response = await servicePackageAPI.submitServiceRequest({
-        name: userDetails.name,
-        email: userDetails.email,
-        phone: userDetails.phone,
-        address: userDetails.address,
+        name: bookingUserDetails.name,
+        email: bookingUserDetails.email,
+        phone: bookingUserDetails.phone,
+        address: bookingUserDetails.address,
         serviceId: selectedService.serviceId,
-        communicationMode: "voice_call",
-        description: selectedService.serviceDescription,
+        communicationMode: selectedService.communicationMode || "voice_call",
+        description:
+          selectedService.description || selectedService.serviceDescription,
       });
 
       console.log("📦 Service request response:", response);
@@ -124,6 +129,17 @@ const PaymentMethodsPage = () => {
       alert("Something went wrong. Please try again.");
     } finally {
       setProcessing(false);
+    }
+  };
+
+  // Handle back button - go back in browser history instead of redirect
+  const handleBack = () => {
+    // Check if there's history to go back to
+    if (window.history.length > 1) {
+      router.back(); // This goes to the previous page in browser history
+    } else {
+      // Fallback if no history exists
+      router.push("/services/ourpackages");
     }
   };
 
@@ -151,12 +167,12 @@ const PaymentMethodsPage = () => {
     >
       <div className="max-w-6xl mx-auto px-4 pt-12">
         <button
-                  onClick={() => router.push("/services/ourpackages")}
-                  className="group flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium mb-6 transition-all hover:translate-x-[-4px] pt-8"
-                >
-                  <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" />
-                  Back
-                </button>
+          onClick={handleBack} // Changed from router.push to handleBack
+          className="group flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium mb-6 transition-all hover:translate-x-[-4px] pt-8"
+        >
+          <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" />
+          Back
+        </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Order Summary */}
@@ -184,99 +200,171 @@ const PaymentMethodsPage = () => {
                   </p>
                 </div>
 
-                {userDetails && (
+                {/* ✅ Logged-in User Profile Section (if authenticated) */}
+                {isAuthenticated && user && (
                   <div className="py-4 border-b border-gray-100">
-                    <h4 className="font-semibold text-gray-700 text-sm mb-3">
-                      Customer Details
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex">
-                        <span className="text-gray-400 w-24">Name</span>
-                        <span className="text-gray-700">
-                          : {userDetails.name}
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white">
+                        <FaUserCircle className="text-xl" />
+                      </div>
+                      <h4 className="font-semibold text-gray-700 text-sm">
+                        Logged-in User Profile
+                      </h4>
+                    </div>
+                    <div className="space-y-2 text-sm bg-purple-50 p-3 rounded-xl">
+                      <div className="flex items-center gap-2">
+                        <FiUser className="text-purple-500 text-xs" />
+                        <span className="text-gray-500 w-20">Name</span>
+                        <span className="text-gray-700 font-medium">
+                          : {user.name || "N/A"}
                         </span>
                       </div>
-                      <div className="flex">
-                        <span className="text-gray-400 w-24">Email</span>
+                      <div className="flex items-center gap-2">
+                        <FiMail className="text-purple-500 text-xs" />
+                        <span className="text-gray-500 w-20">Email</span>
                         <span className="text-gray-700 break-all">
-                          : {userDetails.email}
+                          : {user.email || "N/A"}
                         </span>
                       </div>
-                      <div className="flex">
-                        <span className="text-gray-400 w-24">Phone</span>
+                      <div className="flex items-center gap-2">
+                        <FiPhone className="text-purple-500 text-xs" />
+                        <span className="text-gray-500 w-20">Phone</span>
                         <span className="text-gray-700">
-                          : {userDetails.phone}
+                          : {user.phone || "N/A"}
                         </span>
                       </div>
                     </div>
                   </div>
                 )}
 
+                {/* ✅ Form User Details Section (from Complete Your Details modal) */}
+                {formUserDetails && (
+                  <div className="py-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white">
+                        <FiUser className="text-lg" />
+                      </div>
+                      <h4 className="font-semibold text-gray-700 text-sm">
+                        Booking Details (From Form)
+                      </h4>
+                    </div>
+                    <div className="space-y-2 text-sm bg-green-50 p-3 rounded-xl">
+                      <div className="flex items-center gap-2">
+                        <FiUser className="text-green-500 text-xs" />
+                        <span className="text-gray-500 w-20">Name</span>
+                        <span className="text-gray-700 font-medium">
+                          : {formUserDetails.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FiMail className="text-green-500 text-xs" />
+                        <span className="text-gray-500 w-20">Email</span>
+                        <span className="text-gray-700 break-all">
+                          : {formUserDetails.email}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FiPhone className="text-green-500 text-xs" />
+                        <span className="text-gray-500 w-20">Phone</span>
+                        <span className="text-gray-700">
+                          : {formUserDetails.phone}
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <FiMapPin className="text-green-500 text-xs mt-1" />
+                        <span className="text-gray-500 w-20">Address</span>
+                        <span className="text-gray-700 flex-1">
+                          : {formUserDetails.address}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Show additional details if available */}
+                    {selectedService.description && (
+                      <div className="mt-3 p-3 bg-gray-50 rounded-xl">
+                        <p className="text-xs text-gray-500 mb-1">
+                          Requirements / Description
+                        </p>
+                        <p className="text-sm text-gray-700">
+                          {selectedService.description}
+                        </p>
+                      </div>
+                    )}
+
+                    {selectedService.communicationMode && (
+                      <div className="mt-2 flex items-center gap-2 text-sm">
+                        <span className="text-gray-500">
+                          Communication Mode:
+                        </span>
+                        <span className="text-purple-600 font-medium">
+                          {selectedService.communicationMode === "voice_call" &&
+                            "📞 Voice Call"}
+                          {selectedService.communicationMode === "video_call" &&
+                            "📹 Video Call"}
+                          {selectedService.communicationMode === "voice_note" &&
+                            "🎤 Voice Note"}
+                        </span>
+                      </div>
+                    )}
+
+                    {(selectedService.preferredDate ||
+                      selectedService.preferredTimeSlot) && (
+                      <div className="mt-2 flex flex-wrap gap-3 text-sm">
+                        {selectedService.preferredDate && (
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-500">
+                              Preferred Date:
+                            </span>
+                            <span className="text-purple-600">
+                              {new Date(
+                                selectedService.preferredDate,
+                              ).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                        {selectedService.preferredTimeSlot && (
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-500">Time Slot:</span>
+                            <span className="text-purple-600">
+                              {selectedService.preferredTimeSlot ===
+                                "morning" && "Morning (9 AM - 12 PM)"}
+                              {selectedService.preferredTimeSlot ===
+                                "afternoon" && "Afternoon (12 PM - 4 PM)"}
+                              {selectedService.preferredTimeSlot ===
+                                "evening" && "Evening (4 PM - 8 PM)"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="pt-4">
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-gray-800 text-lg">
-                      Total Amount
+                      Base Amount
                     </span>
                     <span className="text-2xl font-bold text-purple-700">
                       ₹{selectedService.servicePrice.toLocaleString()}
                     </span>
                   </div>
+                  {/* Note: Tax will be added in payment component */}
+                  <p className="text-xs text-gray-500 mt-2 text-right">
+                    * 18% GST will be added at checkout
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column - User Form + Payment */}
+          {/* Right Column - Payment Component */}
           <div>
-            {showUserForm ? (
-              <div className="bg-white rounded-2xl shadow-lg p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
-                  Enter Your Details
-                </h2>
-                <form onSubmit={handleUserSubmit} className="space-y-4">
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Full Name"
-                    required
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email Address"
-                    required
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                  <input
-                    type="tel"
-                    name="phone"
-                    placeholder="Phone Number"
-                    required
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                  <textarea
-                    name="address"
-                    placeholder="Your Address"
-                    rows={3}
-                    required
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
-                  >
-                    Proceed to Payment
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <PaymentMethods
-                onPaymentSuccess={handlePaymentSuccess}
-                amount={selectedService.servicePrice}
-                customerDetails={userDetails || undefined}
-              />
-            )}
+            <PaymentMethods
+              onPaymentSuccess={handlePaymentSuccess}
+              amount={selectedService.servicePrice}
+              customerDetails={formUserDetails || undefined}
+            />
           </div>
         </div>
       </div>

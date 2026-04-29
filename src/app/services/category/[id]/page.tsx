@@ -1,4 +1,4 @@
-// app/services/category/[id]/page.tsx (UPDATED - With Form before Payment)
+// app/services/category/[id]/page.tsx (UPDATED - With Auth Check)
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
@@ -18,6 +18,8 @@ import {
   FiX,
 } from "react-icons/fi";
 import { FaRupeeSign } from "react-icons/fa";
+import { toast, Toaster } from "react-hot-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Loading Skeleton Component
 const CategorySkeleton = () => (
@@ -99,6 +101,19 @@ const UserDetailsModal = ({
     preferredTimeSlot: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const { user } = useAuth();
+
+  // Pre-fill form if user is logged in
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      }));
+    }
+  }, [user]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -395,6 +410,7 @@ const CategoryPage = () => {
   const params = useParams();
   const router = useRouter();
   const categoryId = params.id as string;
+  const { isAuthenticated } = useAuth();
 
   const [category, setCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
@@ -433,6 +449,41 @@ const CategoryPage = () => {
     category?.subcategories?.filter((sub) => sub.isActive !== false) || [];
 
   const handleBookNow = (service: Subcategory) => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Store the service details in sessionStorage before redirecting
+      const serviceDataForLater = {
+        serviceId: service._id,
+        serviceName: service.name,
+        servicePrice: service.price,
+        serviceDuration: service.duration,
+        serviceDescription: service.description,
+        categoryId: category?._id,
+        categoryName: category?.name,
+      };
+      sessionStorage.setItem(
+        "pendingService",
+        JSON.stringify(serviceDataForLater),
+      );
+
+      // Show toast message
+      toast.error("Please login to continue with booking", {
+        duration: 3000,
+        position: "top-center",
+        icon: "🔐",
+      });
+
+      // Store current path to return after login
+      sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
+
+      // Redirect to login page
+      setTimeout(() => {
+        router.push("/login");
+      }, 1000);
+      return;
+    }
+
+    // If authenticated, proceed with booking
     setSelectedService(service);
     setShowForm(true);
   };
@@ -474,6 +525,38 @@ const CategoryPage = () => {
     router.push("/header/payment-methods");
   };
 
+  // Check for pending service after login
+  useEffect(() => {
+    const pendingService = sessionStorage.getItem("pendingService");
+    const redirectPath = sessionStorage.getItem("redirectAfterLogin");
+
+    if (
+      isAuthenticated &&
+      pendingService &&
+      redirectPath === window.location.pathname
+    ) {
+      // Clear the pending service and redirect
+      const parsedService = JSON.parse(pendingService);
+      sessionStorage.removeItem("pendingService");
+      sessionStorage.removeItem("redirectAfterLogin");
+
+      // Show success toast
+      toast.success("Login successful! You can now book the service.", {
+        duration: 3000,
+        position: "top-center",
+      });
+
+      // Find the service in the list and open booking form
+      const serviceToBook = activeSubcategories.find(
+        (s) => s._id === parsedService.serviceId,
+      );
+      if (serviceToBook) {
+        setSelectedService(serviceToBook);
+        setShowForm(true);
+      }
+    }
+  }, [isAuthenticated, activeSubcategories, window.location.pathname]);
+
   if (loading) {
     return <CategorySkeleton />;
   }
@@ -501,6 +584,7 @@ const CategoryPage = () => {
 
   return (
     <>
+      <Toaster />
       <div
         style={{
           background:

@@ -3,15 +3,36 @@ import React, { useState, useMemo, useEffect } from "react";
 import Products from "./Products";
 import Filters from "./Filters";
 import CommonPageHeader from "../CommonPages/CommonPageHeader";
-import { fetchProducts } from "@/utils/api/api";
+import {
+  fetchProducts,
+  fetchFilterOptions,
+  FilterOptions,
+} from "@/utils/api/productApi";
 import { Product } from "@/types/product";
 
+// Extended Product type for additional fields
+interface ExtendedProduct extends Product {
+  gender?: string[];
+  catalogue?: string;
+  subCategory?: string;
+  sizeOptions?: number[];
+  createdAt?: string;
+}
 
 const ProductListing: React.FC = () => {
-  // State for all products from API
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<ExtendedProduct[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Filter options from API
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+    brands: [],
+    categories: [],
+    sizes: [],
+    colors: [],
+    minPrice: 0,
+    maxPrice: 10000,
+  });
 
   // Filter states
   const [priceRange, setPriceRange] = useState<number>(10000);
@@ -19,157 +40,111 @@ const ProductListing: React.FC = () => {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedProductCatalogues, setSelectedProductCatalogues] = useState<string[]>([]);
-  const [selectedSubCategories, setSelectedSubCategories] = useState<string[]>([]);
+  const [selectedProductCatalogues, setSelectedProductCatalogues] = useState<
+    string[]
+  >([]);
+  const [selectedSubCategories, setSelectedSubCategories] = useState<string[]>(
+    [],
+  );
   const [sortOption, setSortOption] = useState<string>("newest");
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
-  // Fetch products from API on component mount
+  // Fetch products and filter options
   useEffect(() => {
-    const loadProducts = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        console.log("🔄 Fetching products from API...");
-        const response = await fetchProducts();
+        console.log("🔄 Fetching products...");
 
-        console.log("📦 API Response:", response);
+        const products = await fetchProducts();
+        const options = await fetchFilterOptions();
 
-        // ✅ Handle both _id and id from backend
-        let productList: Product[] = [];
+        console.log("📦 Products loaded:", products.length);
+        console.log("🎯 Filter options:", options);
 
-        if (Array.isArray(response)) {
-          productList = response;
-        } else if (response && typeof response === "object") {
-          const responseObj = response as Record<string, unknown>;
-          if (Array.isArray(responseObj.data)) {
-            productList = responseObj.data;
-          } else if (Array.isArray(responseObj.products)) {
-            productList = responseObj.products;
-          }
+        setAllProducts(products);
+        setFilterOptions(options);
+
+        if (options.maxPrice) {
+          setPriceRange(options.maxPrice);
         }
-
-        // ✅ Transform backend data to match frontend interface
-        productList = productList.map((product, index) => {
-          // If product doesn't exist, return empty object
-          if (!product || typeof product !== "object") {
-            return {
-              id: String(index + 1),
-              _id: String(index + 1),
-              name: "Unknown Product",
-              price: 0,
-              image: "/placeholder.jpg",
-              images: [],
-              category: "Uncategorized",
-              brand: "Unknown",
-              gender: [],
-              isNew: false,
-              rating: 0,
-            } as Product;
-          }
-
-          // ✅ Use _id from MongoDB as primary id if available
-          const productId = (product as any)._id || product.id || String(index + 1);
-          
-          // Log for debugging
-          console.log(`Product ${index}:`, {
-            original_id: product.id,
-            original__id: (product as any)._id,
-            final_id: productId,
-            name: product.name
-          });
-
-          return {
-            ...product,
-            id: productId, // ✅ Use _id if available
-            _id: (product as any)._id, // ✅ Keep _id
-          } as Product;
-        });
-
-        console.log("✅ Processed Products:", productList);
-        console.log("✅ First product details:", {
-          id: productList[0]?.id,
-          _id: productList[0]?._id,
-          type: typeof productList[0]?.id
-        });
-        
-        setAllProducts(productList);
       } catch (error) {
         console.error("Error loading products:", error);
         setError("Failed to load products. Please try again.");
-        setAllProducts([]);
       } finally {
         setLoading(false);
       }
     };
 
-    loadProducts();
+    loadData();
   }, []);
 
-  // Extract unique brands, categories, etc. from fetched products
-  const uniqueBrands = useMemo(() => {
-    if (!Array.isArray(allProducts)) return [];
-    const brands = allProducts
-      .map((p) => p.brand)
-      .filter((brand): brand is string => Boolean(brand));
-    return [...new Set(brands)].sort();
-  }, [allProducts]);
-
-  const uniqueCategories = useMemo(() => {
-    if (!Array.isArray(allProducts)) return [];
-    const categories = allProducts
-      .map((product) => product.category)
-      .filter((category): category is string => Boolean(category));
-    return Array.from(new Set(categories)).sort();
-  }, [allProducts]);
-
-  const uniqueGenders = useMemo(() => {
-    if (!Array.isArray(allProducts)) return [];
-    const allGenders = allProducts.flatMap((product) => product.gender || []);
-    return Array.from(new Set(allGenders)).sort();
-  }, [allProducts]);
-
-  const uniqueSizes = useMemo(() => {
-    if (!Array.isArray(allProducts)) return [];
-    const allSizes = allProducts.flatMap((product) => product.size || []);
-    return Array.from(new Set(allSizes)).sort();
-  }, [allProducts]);
-
-  // Filter logic
+  // Filter logic - Get filtered products based on selected filters
   const filteredProducts = useMemo(() => {
-    if (!Array.isArray(allProducts)) return [];
+    if (!Array.isArray(allProducts) || allProducts.length === 0) return [];
 
     const filtered = allProducts.filter((product) => {
       if (!product) return false;
+
+      // Price filter
       if (product.price > priceRange) return false;
-      
-      if (
-        selectedGenders.length > 0 &&
-        (!product.gender ||
-          !selectedGenders.some((g) => product.gender?.includes(g)))
-      )
-        return false;
 
-      if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand))
-        return false;
+      // Gender filter
+      if (selectedGenders.length > 0) {
+        const productGender = product.gender;
+        if (!productGender || !Array.isArray(productGender)) return false;
+        if (!selectedGenders.some((g) => productGender.includes(g)))
+          return false;
+      }
 
-      if (
-        selectedSizes.length > 0 &&
-        (!product.size || !product.size.some((s) => selectedSizes.includes(s)))
-      )
-        return false;
+      // Brand filter
+      if (selectedBrands.length > 0) {
+        if (!product.brand || !selectedBrands.includes(product.brand))
+          return false;
+      }
 
-      if (
-        selectedCategories.length > 0 &&
-        !selectedCategories.includes(product.category)
-      )
-        return false;
+      // Size filter
+      if (selectedSizes.length > 0) {
+        const productSizes = product.sizeOptions || [];
+        if (productSizes.length === 0) return false;
+        const hasMatchingSize = productSizes.some((size: number) =>
+          selectedSizes.includes(size.toString()),
+        );
+        if (!hasMatchingSize) return false;
+      }
+
+      // Category filter
+      if (selectedCategories.length > 0) {
+        if (!product.category || !selectedCategories.includes(product.category))
+          return false;
+      }
+
+      // Product Catalogue filter
+      if (selectedProductCatalogues.length > 0) {
+        const productCatalogue = product.catalogue;
+        if (
+          !productCatalogue ||
+          !selectedProductCatalogues.includes(productCatalogue)
+        )
+          return false;
+      }
+
+      // Sub Categories filter
+      if (selectedSubCategories.length > 0) {
+        const productSubCategory = product.subCategory;
+        if (
+          !productSubCategory ||
+          !selectedSubCategories.includes(productSubCategory)
+        )
+          return false;
+      }
 
       return true;
     });
 
-    // Sorting
+    // Apply sorting
     switch (sortOption) {
       case "price-low":
         filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
@@ -178,13 +153,21 @@ const ProductListing: React.FC = () => {
         filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
         break;
       case "newest":
-        filtered.sort((a, b) => (a.isNew === b.isNew ? 0 : a.isNew ? -1 : 1));
+        filtered.sort((a, b) => {
+          const dateA = new Date(a.createdAt || 0).getTime();
+          const dateB = new Date(b.createdAt || 0).getTime();
+          return dateB - dateA;
+        });
         break;
       case "rating":
         filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
       default:
-        filtered.sort((a, b) => (a.isNew === b.isNew ? 0 : a.isNew ? -1 : 1));
+        filtered.sort((a, b) => {
+          const dateA = new Date(a.createdAt || 0).getTime();
+          const dateB = new Date(b.createdAt || 0).getTime();
+          return dateB - dateA;
+        });
     }
 
     return filtered;
@@ -195,27 +178,63 @@ const ProductListing: React.FC = () => {
     selectedBrands,
     selectedSizes,
     selectedCategories,
+    selectedProductCatalogues,
+    selectedSubCategories,
     sortOption,
   ]);
 
-  // Handlers (unchanged)
+  // Prepare data for Filters component
+  const availableGenders = useMemo(() => {
+    const genders = new Set<string>();
+    allProducts.forEach((product) => {
+      const productGender = product.gender;
+      if (productGender && Array.isArray(productGender)) {
+        productGender.forEach((g: string) => genders.add(g));
+      }
+    });
+    return Array.from(genders);
+  }, [allProducts]);
+
+  const availableProductCatalogues = useMemo(() => {
+    const catalogues = new Set<string>();
+    allProducts.forEach((product) => {
+      const catalogue = product.catalogue;
+      if (catalogue) catalogues.add(catalogue);
+    });
+    return Array.from(catalogues);
+  }, [allProducts]);
+
+  const availableSubCategories = useMemo(() => {
+    const subCategories = new Set<string>();
+    allProducts.forEach((product) => {
+      const subCategory = product.subCategory;
+      if (subCategory) subCategories.add(subCategory);
+    });
+    return Array.from(subCategories);
+  }, [allProducts]);
+
+  const availableSizesAsString = useMemo(() => {
+    return filterOptions.sizes.map((size) => size.toString());
+  }, [filterOptions.sizes]);
+
+  // Handlers
   const handleGenderChange = (gender: string) => {
     setSelectedGenders((prev) =>
       prev.includes(gender)
         ? prev.filter((g) => g !== gender)
-        : [...prev, gender]
+        : [...prev, gender],
     );
   };
 
   const handleBrandChange = (brand: string) => {
     setSelectedBrands((prev) =>
-      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
     );
   };
 
   const handleSizeChange = (size: string) => {
     setSelectedSizes((prev) =>
-      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
     );
   };
 
@@ -223,7 +242,7 @@ const ProductListing: React.FC = () => {
     setSelectedCategories((prev) =>
       prev.includes(category)
         ? prev.filter((c) => c !== category)
-        : [...prev, category]
+        : [...prev, category],
     );
   };
 
@@ -231,7 +250,7 @@ const ProductListing: React.FC = () => {
     setSelectedProductCatalogues((prev) =>
       prev.includes(catalogue)
         ? prev.filter((c) => c !== catalogue)
-        : [...prev, catalogue]
+        : [...prev, catalogue],
     );
   };
 
@@ -239,14 +258,14 @@ const ProductListing: React.FC = () => {
     setSelectedSubCategories((prev) =>
       prev.includes(subCategory)
         ? prev.filter((s) => s !== subCategory)
-        : [...prev, subCategory]
+        : [...prev, subCategory],
     );
   };
 
   const handleSortChange = (option: string) => setSortOption(option);
 
   const clearAllFilters = () => {
-    setPriceRange(10000);
+    setPriceRange(filterOptions.maxPrice || 10000);
     setSelectedGenders([]);
     setSelectedBrands([]);
     setSelectedSizes([]);
@@ -295,7 +314,7 @@ const ProductListing: React.FC = () => {
   }
 
   // No products state
-  if (!Array.isArray(allProducts) || allProducts.length === 0) {
+  if (allProducts.length === 0) {
     return (
       <div className="flex flex-col min-h-screen bg-[#C4F9FF]">
         <CommonPageHeader title="Products" subtitle="Home - Products" />
@@ -306,7 +325,7 @@ const ProductListing: React.FC = () => {
               No products available
             </h3>
             <p className="text-gray-500 text-sm mb-4">
-              Check back later or contact support.
+              Check back later for new products!
             </p>
           </div>
         </div>
@@ -315,28 +334,30 @@ const ProductListing: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#C4F9FF] ">
+    <div className="flex flex-col min-h-screen bg-[#C4F9FF]">
       <CommonPageHeader title="Products" subtitle="Home - Products" />
 
       {/* Mobile Filter Toggle */}
-      <div className="md:hidden border-b border-gray-200 flex justify-between items-center px-4 sticky top-0 z-20 py-2">
-        <h2 className="text-lg font-semibold">All Products</h2>
+      <div className="md:hidden border-b border-gray-200 flex justify-between items-center px-4 sticky top-0 z-20 py-2 bg-white shadow-sm">
+        <h2 className="text-lg font-semibold">
+          All Products ({filteredProducts.length})
+        </h2>
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="px-4 py-2 bg-black text-white text-sm rounded-lg"
+          className="px-4 py-2 bg-black text-white text-sm rounded-lg hover:bg-gray-800 transition-colors"
         >
           {showFilters ? "Hide Filters" : "Show Filters"}
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row flex-grow border-t border-gray-300 ">
-        {/* Filters */}
+      <div className="flex flex-col md:flex-row flex-grow">
+        {/* Filters Sidebar */}
         <div
           className={`${
             showFilters ? "block" : "hidden"
-          } md:block w-full md:w-1/4 md:sticky md:top-0 z-10 py-0 bg-[#C4F9FF]`}
+          } md:block w-full md:w-80 lg:w-96 md:sticky md:top-0 z-10 bg-[#C4F9FF] border-r border-gray-200`}
         >
-          <div className="h-full min-h-screen border-r border-gray-300">
+          <div className="h-full overflow-y-auto">
             <Filters
               priceRange={priceRange}
               setPriceRange={setPriceRange}
@@ -353,15 +374,17 @@ const ProductListing: React.FC = () => {
               selectedSubCategories={selectedSubCategories}
               onSubCategoryChange={handleSubCategoryChange}
               onClearFilters={clearAllFilters}
-              availableBrands={uniqueBrands}
-              availableCategories={uniqueCategories}
-              availableGenders={uniqueGenders}
-              availableSizes={uniqueSizes}
+              availableGenders={availableGenders}
+              availableBrands={filterOptions.brands}
+              availableSizes={availableSizesAsString}
+              availableCategories={filterOptions.categories}
+              availableProductCatalogues={availableProductCatalogues}
+              availableSubCategories={availableSubCategories}
             />
           </div>
         </div>
 
-        {/* Products */}
+        {/* Products Grid */}
         <div className="flex-1">
           <Products
             products={filteredProducts}

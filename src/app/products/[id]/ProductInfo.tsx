@@ -196,7 +196,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     }
 
     // Navigate to checkout
-    window.location.href = "/getway";
+    window.location.href = "/cart";
   };
 
   const handleWishlistToggle = () => {
