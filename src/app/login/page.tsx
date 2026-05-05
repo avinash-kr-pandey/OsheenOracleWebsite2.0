@@ -1002,20 +1002,19 @@ const Login = () => {
           </span>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between gap-3">
-          {/* Google Login Button */}
+        <div className="flex flex-col sm:flex-row justify-between gap-3 w-1/2 mx-auto">
           <div className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 text-sm md:text-base font-medium cursor-pointer">
             <GoogleLoginButton />
           </div>
 
-          <button
+          {/* <button
             type="button"
             onClick={handleAppleLogin}
             className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 text-sm md:text-base font-medium cursor-pointer"
           >
             <FaApple size={18} className="text-black" />
             <span>Apple</span>
-          </button>
+          </button> */}
         </div>
 
         <p className="text-xs text-gray-500 text-center mt-4 md:mt-6 leading-5">

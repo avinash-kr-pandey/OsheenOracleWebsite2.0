@@ -328,6 +328,8 @@ const ServiceCard = ({
   categoryName: string;
   onBookNow: (service: Subcategory) => void;
 }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <div
       style={{
@@ -359,10 +361,20 @@ const ServiceCard = ({
         {service.name}
       </h3>
 
-      {/* Description */}
-      <p className="text-gray-500 text-sm mb-4 line-clamp-2 leading-relaxed">
-        {service.description}
-      </p>
+      {/* Description with Read More */}
+      <div className="mb-4">
+        <p className={`text-gray-500 text-sm leading-relaxed ${!isExpanded && 'line-clamp-3'}`}>
+          {service.description}
+        </p>
+        {service.description.length > 100 && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-xs text-purple-600 hover:text-purple-800 font-medium mt-1 focus:outline-none"
+          >
+            {isExpanded ? 'Show less' : 'Read more'}
+          </button>
+        )}
+      </div>
 
       {/* Price and Duration */}
       <div className="flex items-center justify-between mb-4 pt-2 border-t border-gray-100">

@@ -15,6 +15,7 @@ const API_BASE_URL = "https://api.osheenoracle.com/api";
 
 // Google Auth API object
 export const googleAuthApi = {
+  
   loginWithGoogle: async (
     googleUserData: GoogleUserData,
   ): Promise<GoogleAuthResponse> => {
