@@ -1,4 +1,4 @@
-// app/services/category/[id]/page.tsx (UPDATED - With Auth Check)
+// app/services/category/[id]/page.tsx (UPDATED - With Better UX for Many Cards)
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
@@ -16,8 +16,12 @@ import {
   FiShield,
   FiHeart,
   FiX,
+  FiSearch,
+  FiFilter,
+  FiChevronLeft,
+  FiChevronRight,
 } from "react-icons/fi";
-import { FaRupeeSign } from "react-icons/fa";
+import { FaRupeeSign, FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import { toast, Toaster } from "react-hot-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -103,7 +107,6 @@ const UserDetailsModal = ({
   const [submitting, setSubmitting] = useState(false);
   const { user } = useAuth();
 
-  // Pre-fill form if user is logged in
   useEffect(() => {
     if (user) {
       setFormData((prev) => ({
@@ -136,7 +139,7 @@ const UserDetailsModal = ({
       !formData.address ||
       !formData.description
     ) {
-      alert("Please fill all required fields");
+      toast.error("Please fill all required fields");
       return;
     }
 
@@ -164,7 +167,6 @@ const UserDetailsModal = ({
         </div>
 
         <div className="p-6">
-          {/* Package Summary */}
           <div className="mb-6 p-4 bg-purple-50 rounded-xl">
             <div className="flex justify-between items-center">
               <div>
@@ -353,7 +355,6 @@ const ServiceCard = ({
       }}
       className="group bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-500 cursor-pointer border border-purple-100 hover:border-purple-300"
     >
-      {/* Icon */}
       <div className="relative mb-4">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
         <div className="relative w-14 h-14 bg-gradient-to-br from-purple-400 to-pink-400 rounded-xl flex items-center justify-center text-white text-2xl shadow-md group-hover:scale-110 transition-transform duration-500">
@@ -371,12 +372,10 @@ const ServiceCard = ({
         </div>
       </div>
 
-      {/* Service Name */}
       <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-purple-700 transition-colors duration-300 line-clamp-1">
         {service.name}
       </h3>
 
-      {/* Description with Read More */}
       <div className="mb-4">
         <p className={`text-gray-500 text-sm leading-relaxed ${!isExpanded && 'line-clamp-3'}`}>
           {service.description}
@@ -391,7 +390,6 @@ const ServiceCard = ({
         )}
       </div>
 
-      {/* Price and Duration */}
       <div className="flex items-center justify-between mb-4 pt-2 border-t border-gray-100">
         <div className="flex items-center gap-1 text-purple-700 font-semibold">
           <FaRupeeSign className="text-sm" />
@@ -403,7 +401,6 @@ const ServiceCard = ({
         </div>
       </div>
 
-      {/* Book Now Button */}
       <button
         onClick={() => onBookNow(service)}
         style={{
@@ -431,6 +428,13 @@ const CategoryPage = () => {
     null,
   );
   const [showForm, setShowForm] = useState(false);
+  
+  // Pagination and Filtering State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<"price_asc" | "price_desc" | "name_asc" | "name_desc">("name_asc");
+  const [showFilters, setShowFilters] = useState(false);
+  const itemsPerPage = 8;
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -460,10 +464,39 @@ const CategoryPage = () => {
   const activeSubcategories =
     category?.subcategories?.filter((sub) => sub.isActive !== false) || [];
 
+  // Filter and Sort Services
+  const filteredServices = activeSubcategories.filter((service) =>
+    service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    service.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const sortedServices = [...filteredServices].sort((a, b) => {
+    switch (sortBy) {
+      case "price_asc":
+        return a.price - b.price;
+      case "price_desc":
+        return b.price - a.price;
+      case "name_asc":
+        return a.name.localeCompare(b.name);
+      case "name_desc":
+        return b.name.localeCompare(a.name);
+      default:
+        return 0;
+    }
+  });
+
+  // Pagination Logic
+  const totalPages = Math.ceil(sortedServices.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedServices = sortedServices.slice(startIndex, startIndex + itemsPerPage);
+
+  // Reset page when search or sort changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortBy]);
+
   const handleBookNow = (service: Subcategory) => {
-    // Check if user is authenticated
     if (!isAuthenticated) {
-      // Store the service details in sessionStorage before redirecting
       const serviceDataForLater = {
         serviceId: service._id,
         serviceName: service.name,
@@ -473,29 +506,19 @@ const CategoryPage = () => {
         categoryId: category?._id,
         categoryName: category?.name,
       };
-      sessionStorage.setItem(
-        "pendingService",
-        JSON.stringify(serviceDataForLater),
-      );
-
-      // Show toast message
+      sessionStorage.setItem("pendingService", JSON.stringify(serviceDataForLater));
       toast.error("Please login to continue with booking", {
         duration: 3000,
         position: "top-center",
         icon: "🔐",
       });
-
-      // Store current path to return after login
       sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
-
-      // Redirect to login page
       setTimeout(() => {
         router.push("/login");
       }, 1000);
       return;
     }
 
-    // If authenticated, proceed with booking
     setSelectedService(service);
     setShowForm(true);
   };
@@ -512,7 +535,6 @@ const CategoryPage = () => {
   }) => {
     if (!selectedService || !category) return;
 
-    // Store complete data for payment page
     const serviceData = {
       serviceId: selectedService._id,
       serviceName: selectedService.name,
@@ -521,7 +543,6 @@ const CategoryPage = () => {
       serviceDescription: selectedService.description,
       categoryId: category._id,
       categoryName: category.name,
-      // User details
       name: userData.name,
       email: userData.email,
       phone: userData.phone,
@@ -537,7 +558,6 @@ const CategoryPage = () => {
     router.push("/header/payment-methods");
   };
 
-  // Check for pending service after login
   useEffect(() => {
     const pendingService = sessionStorage.getItem("pendingService");
     const redirectPath = sessionStorage.getItem("redirectAfterLogin");
@@ -547,18 +567,15 @@ const CategoryPage = () => {
       pendingService &&
       redirectPath === window.location.pathname
     ) {
-      // Clear the pending service and redirect
       const parsedService = JSON.parse(pendingService);
       sessionStorage.removeItem("pendingService");
       sessionStorage.removeItem("redirectAfterLogin");
 
-      // Show success toast
       toast.success("Login successful! You can now book the service.", {
         duration: 3000,
         position: "top-center",
       });
 
-      // Find the service in the list and open booking form
       const serviceToBook = activeSubcategories.find(
         (s) => s._id === parsedService.serviceId,
       );
@@ -567,7 +584,7 @@ const CategoryPage = () => {
         setShowForm(true);
       }
     }
-  }, [isAuthenticated, activeSubcategories, window.location.pathname]);
+  }, [isAuthenticated, activeSubcategories]);
 
   if (loading) {
     return <CategorySkeleton />;
@@ -602,13 +619,13 @@ const CategoryPage = () => {
           background:
             "linear-gradient(to bottom, #FBB5E7 0%, #FBB5E7 20%, #C4F9FF 100%)",
         }}
-        className="min-h-screen bg-gradient-to-b pt-28 pb-20"
+        className="min-h-screen bg-gradient-to-b pt-28 pb-12"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button */}
           <button
             onClick={() => router.push("/services/ourpackages")}
-            className="group flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium mb-6 transition-all hover:translate-x-[-4px] pt-8"
+            className="group flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium mb-2 pt-4 transition-all hover:translate-x-[-4px]"
           >
             <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" />
             Back to All Services
@@ -649,14 +666,14 @@ const CategoryPage = () => {
                         Available Services
                       </span>
                       <span className="text-2xl font-bold text-purple-600">
-                        {activeSubcategories.length}
+                        {filteredServices.length}
                       </span>
                     </div>
                     <div className="h-2 bg-purple-100 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
                         style={{
-                          width: `${Math.min(activeSubcategories.length * 10, 100)}%`,
+                          width: `${Math.min((filteredServices.length / activeSubcategories.length) * 100, 100)}%`,
                         }}
                       />
                     </div>
@@ -696,40 +713,163 @@ const CategoryPage = () => {
               </div>
             </div>
 
-            {/* Right Side - Services Grid */}
+            {/* Right Side - Services Grid with Search and Pagination */}
             <div className="lg:w-[70%]">
-              {activeSubcategories.length > 0 ? (
+              {/* Search and Filter Bar */}
+              <div className="mb-6 space-y-4">
+                <div className="flex gap-3">
+                  <div className="flex-1 relative">
+                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search services by name or description..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl hover:bg-purple-50 transition-colors flex items-center gap-2"
+                  >
+                    <FiFilter />
+                    <span className="hidden sm:inline">Sort</span>
+                  </button>
+                </div>
+
+                {/* Sort Options */}
+                {showFilters && (
+                  <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100">
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        onClick={() => setSortBy("name_asc")}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          sortBy === "name_asc"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                      >
+                        Name A-Z
+                      </button>
+                      <button
+                        onClick={() => setSortBy("name_desc")}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          sortBy === "name_desc"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                      >
+                        Name Z-A
+                      </button>
+                      <button
+                        onClick={() => setSortBy("price_asc")}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-all flex items-center gap-1 ${
+                          sortBy === "price_asc"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                      >
+                        Price: Low to High <FaSortAmountDown />
+                      </button>
+                      <button
+                        onClick={() => setSortBy("price_desc")}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-all flex items-center gap-1 ${
+                          sortBy === "price_desc"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                      >
+                        Price: High to Low <FaSortAmountUp />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {filteredServices.length > 0 ? (
                 <>
-                  <div className="mb-6">
-                    <h2 className="text-xl font-bold text-gray-800">
-                      Available Services
-                    </h2>
-                    <p className="text-gray-500 text-sm mt-1">
-                      Choose the service that resonates with you
+                  {/* Results Count */}
+                  <div className="mb-4 flex justify-between items-center">
+                    <p className="text-sm text-gray-500">
+                      Showing {startIndex + 1} - {Math.min(startIndex + itemsPerPage, filteredServices.length)} of {filteredServices.length} services
                     </p>
                   </div>
 
-                  <div className="max-h-[calc(100vh-180px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-purple-100">
-                    <div className="grid sm:grid-cols-2 gap-5 pb-4">
-                      {activeSubcategories.map((subcategory) => (
-                        <ServiceCard
-                          key={subcategory._id}
-                          service={subcategory}
-                          categoryId={category._id}
-                          categoryName={category.name}
-                          onBookNow={handleBookNow}
-                        />
-                      ))}
-                    </div>
+                  {/* Services Grid */}
+                  <div className="grid sm:grid-cols-2 gap-5">
+                    {paginatedServices.map((subcategory) => (
+                      <ServiceCard
+                        key={subcategory._id}
+                        service={subcategory}
+                        categoryId={category._id}
+                        categoryName={category.name}
+                        onBookNow={handleBookNow}
+                      />
+                    ))}
                   </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="mt-8 flex justify-center items-center gap-2">
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                        className="px-3 py-2 bg-white border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-50 transition-colors"
+                      >
+                        <FiChevronLeft />
+                      </button>
+                      
+                      <div className="flex gap-2">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                          // Show only current page, first, last, and pages around current
+                          if (
+                            page === 1 ||
+                            page === totalPages ||
+                            (page >= currentPage - 1 && page <= currentPage + 1)
+                          ) {
+                            return (
+                              <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`px-3 py-2 rounded-lg transition-all ${
+                                  currentPage === page
+                                    ? "bg-purple-600 text-white"
+                                    : "bg-white border border-gray-200 hover:bg-purple-50"
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            );
+                          } else if (page === currentPage - 2 || page === currentPage + 2) {
+                            return <span key={page} className="px-2 py-2">...</span>;
+                          }
+                          return null;
+                        })}
+                      </div>
+
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-2 bg-white border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-50 transition-colors"
+                      >
+                        <FiChevronRight />
+                      </button>
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="text-center py-16 bg-white/50 rounded-3xl backdrop-blur-sm">
-                  <div className="text-6xl mb-4">🔮</div>
+                  <div className="text-6xl mb-4">🔍</div>
                   <p className="text-gray-600 text-lg">
-                    No services available at the moment.
+                    No services match your search
                   </p>
-                  <p className="text-gray-500 mt-2">Please check back later.</p>
+                  <p className="text-gray-500 mt-2">Try adjusting your search term</p>
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="mt-4 text-purple-600 hover:text-purple-700 font-medium"
+                  >
+                    Clear Search
+                  </button>
                 </div>
               )}
             </div>
