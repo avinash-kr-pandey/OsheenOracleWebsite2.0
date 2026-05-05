@@ -245,6 +245,7 @@ const Login = () => {
   };
 
   // Handle Registration
+  // Handle Registration
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -285,15 +286,15 @@ const Login = () => {
         };
 
         login(response.token, userDataForContext);
-        toast.success("Registration successful! You are now logged in.", {
+        toast.success("Registration successful! Welcome aboard!", {
           id: toastId,
-          duration: 3000,
+          duration: 2000,
         });
 
-        // Redirect to home
+        // ✅ Redirect to dashboard/home immediately
         setTimeout(() => {
           router.push("/");
-        }, 1000);
+        }, 500);
       } else if (response.data?.token && response.data?.user) {
         // Case 2: Token and user in data object
         const userDataForContext = {
@@ -302,42 +303,98 @@ const Login = () => {
         };
 
         login(response.data.token, userDataForContext);
-        toast.success("Registration successful! You are now logged in.", {
+        toast.success("Registration successful! Welcome aboard!", {
           id: toastId,
-          duration: 3000,
+          duration: 2000,
         });
 
+        // ✅ Redirect to dashboard/home immediately
         setTimeout(() => {
           router.push("/");
-        }, 1000);
-      } else if (response.success) {
-        // Case 3: Registration successful but no auto-login
-        toast.success(
-          "Registration successful! Please login with your credentials.",
-          {
-            id: toastId,
-            duration: 3000,
-          },
-        );
-
-        // Clear form and switch to login
-        setName("");
-        setEmail("");
-        setPassword("");
-        setConfirmPassword("");
-        setIsLogin(true);
-      } else if (response.message) {
-        // Case 4: Success message but different format
-        toast.success(response.message, {
+        }, 500);
+      } else if (response.verified === false || response.requiresOtp) {
+        // Case 3: Registration successful but requires OTP verification
+        toast.success("Account created! Please verify your email with OTP.", {
           id: toastId,
           duration: 3000,
         });
 
-        setName("");
-        setEmail("");
-        setPassword("");
-        setConfirmPassword("");
-        setIsLogin(true);
+        // Store OTP ID if provided
+        if (response.otpId) {
+          setOtpId(response.otpId);
+        }
+
+        // Store email for OTP verification
+        // Switch to OTP verification step
+        setAuthStep("otp");
+      } else if (response.message) {
+        // Case 4: Success message but different format
+        // If it's a success message without auto-login, try to login
+        if (
+          response.message.toLowerCase().includes("success") ||
+          response.message.toLowerCase().includes("created")
+        ) {
+          // Try to auto-login after registration
+          toast.loading("Auto-logging you in...", { id: toastId });
+
+          try {
+            const loginResponse = await postData<AuthResponse>("/auth/login", {
+              email,
+              password,
+            });
+
+            if (loginResponse.token && loginResponse.user) {
+              const userDataForContext = {
+                ...loginResponse.user,
+                id: loginResponse.user._id || loginResponse.user.id || "",
+              };
+
+              login(loginResponse.token, userDataForContext);
+              toast.success(
+                "Registration successful! Logged in automatically.",
+                {
+                  id: toastId,
+                  duration: 2000,
+                },
+              );
+
+              // ✅ Redirect to dashboard/home
+              setTimeout(() => {
+                router.push("/");
+              }, 500);
+            } else {
+              throw new Error("Auto-login failed");
+            }
+          } catch (loginError) {
+            console.error("Auto-login after registration failed:", loginError);
+            toast.success(
+              "Registration successful! Please login with your credentials.",
+              {
+                id: toastId,
+                duration: 3000,
+              },
+            );
+
+            // Clear form and switch to login
+            setName("");
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
+            setIsLogin(true);
+          }
+        } else {
+          toast.success(response.message, {
+            id: toastId,
+            duration: 3000,
+          });
+
+          // Clear form and switch to login
+          setName("");
+          setEmail("");
+          setPassword("");
+          setConfirmPassword("");
+          setIsLogin(true);
+        }
       } else {
         throw new Error("Registration failed - Invalid response format");
       }
@@ -358,7 +415,6 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-
   // Handle Forgot Password
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1265,7 +1321,6 @@ const Login = () => {
             htmlFor="terms"
             className="text-xs md:text-sm text-gray-600 leading-relaxed"
           >
-            
             I agree to the{" "}
             <button
               type="button"

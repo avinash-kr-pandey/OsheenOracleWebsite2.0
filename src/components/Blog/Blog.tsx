@@ -3,7 +3,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import CommonPageHeader from "../CommonPages/CommonPageHeader";
-import { Blog as BlogType, blogAPI } from "@/utils/api/blog.api"; // ✅ Type-only import with alias
+import { Blog as BlogType, blogAPI } from "@/utils/api/blog.api";
 import { useRouter } from "next/navigation";
 
 // ✅ Same interface but data ab API se aayega
