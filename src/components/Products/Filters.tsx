@@ -2,8 +2,10 @@
 import React from "react";
 
 interface FiltersProps {
-  priceRange: number;
-  setPriceRange: (value: number) => void;
+  minPrice: number;
+  setMinPrice: (value: number) => void;
+  maxPrice: number;
+  setMaxPrice: (value: number) => void;
   selectedGenders: string[];
   onGenderChange: (gender: string) => void;
   selectedBrands: string[];
@@ -28,8 +30,10 @@ interface FiltersProps {
 }
 
 const Filters: React.FC<FiltersProps> = ({
-  priceRange,
-  setPriceRange,
+  minPrice,
+  setMinPrice,
+  maxPrice,
+  setMaxPrice,
   selectedGenders,
   onGenderChange,
   selectedBrands,
@@ -84,7 +88,8 @@ const Filters: React.FC<FiltersProps> = ({
   ],
 }) => {
   const hasActiveFilters =
-    priceRange < 10000 ||
+    minPrice > 0 ||
+    maxPrice < 10000 ||
     selectedGenders.length > 0 ||
     selectedBrands.length > 0 ||
     selectedSizes.length > 0 ||
@@ -116,33 +121,76 @@ const Filters: React.FC<FiltersProps> = ({
             Price Range
           </h3>
           <div className="space-y-4">
-            <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+            <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg mb-6">
               <span className="text-sm text-gray-600">Range:</span>
               <span className="text-sm font-semibold text-gray-900">
-                ₹50 - ₹{priceRange}
+                ₹{minPrice} - ₹{maxPrice}
               </span>
             </div>
 
-            <input
-              type="range"
-              min={50}
-              max={10000}
-              step={50}
-              value={priceRange}
-              onChange={(e) => setPriceRange(Number(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer 
-                [&::-webkit-slider-thumb]:appearance-none 
-                [&::-webkit-slider-thumb]:h-5 
-                [&::-webkit-slider-thumb]:w-5 
-                [&::-webkit-slider-thumb]:rounded-full 
-                [&::-webkit-slider-thumb]:bg-red-500 
-                [&::-webkit-slider-thumb]:border-2 
-                [&::-webkit-slider-thumb]:border-white 
-                [&::-webkit-slider-thumb]:shadow-lg"
-            />
+            <div className="relative h-10 flex items-center">
+              {/* Slider Track */}
+              <div className="absolute w-full h-1.5 bg-gray-200 rounded-lg"></div>
+              
+              {/* Highlighted Track (Active Range) */}
+              <div 
+                className="absolute h-1.5 bg-red-500 rounded-lg transition-all duration-200"
+                style={{
+                  left: `${(minPrice / 10000) * 100}%`,
+                  right: `${100 - (maxPrice / 10000) * 100}%`
+                }}
+              ></div>
 
-            <div className="flex justify-between text-sm text-gray-600 font-medium">
-              <span>₹50</span>
+              {/* Dual Range Inputs */}
+              <input
+                type="range"
+                min={0}
+                max={10000}
+                step={50}
+                value={minPrice}
+                onChange={(e) => {
+                  const value = Math.min(Number(e.target.value), maxPrice - 500);
+                  setMinPrice(value);
+                }}
+                className="absolute w-full appearance-none bg-transparent pointer-events-none z-10
+                  [&::-webkit-slider-thumb]:appearance-none 
+                  [&::-webkit-slider-thumb]:pointer-events-auto
+                  [&::-webkit-slider-thumb]:h-5 
+                  [&::-webkit-slider-thumb]:w-5 
+                  [&::-webkit-slider-thumb]:rounded-full 
+                  [&::-webkit-slider-thumb]:bg-white
+                  [&::-webkit-slider-thumb]:border-2 
+                  [&::-webkit-slider-thumb]:border-red-500
+                  [&::-webkit-slider-thumb]:shadow-md
+                  [&::-webkit-slider-thumb]:cursor-pointer"
+              />
+              <input
+                type="range"
+                min={0}
+                max={10000}
+                step={50}
+                value={maxPrice}
+                onChange={(e) => {
+                  const value = Math.max(Number(e.target.value), minPrice + 500);
+                  setMaxPrice(value);
+                }}
+                className="absolute w-full appearance-none bg-transparent pointer-events-none z-20
+                  [&::-webkit-slider-thumb]:appearance-none 
+                  [&::-webkit-slider-thumb]:pointer-events-auto
+                  [&::-webkit-slider-thumb]:h-5 
+                  [&::-webkit-slider-thumb]:w-5 
+                  [&::-webkit-slider-thumb]:rounded-full 
+                  [&::-webkit-slider-thumb]:bg-white
+                  [&::-webkit-slider-thumb]:border-2 
+                  [&::-webkit-slider-thumb]:border-red-500
+                  [&::-webkit-slider-thumb]:shadow-md
+                  [&::-webkit-slider-thumb]:cursor-pointer"
+              />
+            </div>
+
+            <div className="flex justify-between text-xs text-gray-500 font-medium px-1">
+              <span>₹0</span>
+              <span>₹5,000</span>
               <span>₹10,000</span>
             </div>
           </div>

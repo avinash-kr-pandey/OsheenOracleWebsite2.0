@@ -344,8 +344,11 @@ export default function HeroHeader() {
 
   if (loading) {
     return (
-      <header className="fixed top-0 left-0 w-full z-50 bg-[#FBB5E7] py-4">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
+      <header className="fixed top-0 left-0 w-full z-50 bg-[#FBB5E7]">
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 h-[36px] w-full flex items-center px-4">
+          <div className="h-4 w-3/4 max-w-lg bg-white/20 rounded animate-pulse"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="cursor-pointer flex-shrink-0">
             <Image
               src="/logo.png"
@@ -376,7 +379,7 @@ export default function HeroHeader() {
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? "bg-[#FBB5E7] py-4" : "bg-[#FBB5E7] py-4"
+        scrolled ? "bg-[#FBB5E7]" : "bg-[#FBB5E7]"
       }`}
       key={`header-${forceUpdate}`}
     >
@@ -388,7 +391,24 @@ export default function HeroHeader() {
         }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between relative">
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(100vw); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+          display: inline-block;
+          animation: marquee 15s linear infinite;
+          white-space: nowrap;
+        }
+      `}</style>
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm py-2 overflow-hidden w-full flex items-center">
+        <div className="animate-marquee font-medium tracking-wide">
+          ✨ Special Offer: Get 20% off on your first astrology session! Use code: STARS20 ✨ Book your consultation today and unlock your cosmic path! 🌟
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between relative">
         {/* Logo */}
         <div
           className="cursor-pointer flex-shrink-0"

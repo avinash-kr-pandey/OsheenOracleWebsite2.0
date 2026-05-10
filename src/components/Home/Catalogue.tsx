@@ -65,39 +65,25 @@ const staticCatalogueItems: CatalogueItem[] = mapZodiacToCatalogue(
 
 // Define type for slider row
 const SliderRow = ({ rowData }: { rowData: CatalogueItem[] }) => {
-  const [index, setIndex] = useState(0);
-  const [cardWidth, setCardWidth] = useState(0);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const fullData = [...rowData, ...rowData, ...rowData];
 
-  useEffect(() => {
-    const update = () => {
-      if (containerRef.current) {
-        const firstCard = containerRef.current.querySelector(".card");
-        if (firstCard) {
-          const gap = 16;
-          setCardWidth((firstCard as HTMLElement).offsetWidth + gap);
-        }
-      }
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  const handleNext = () => setIndex((prev) => prev + 1);
-  const handlePrev = () => setIndex((prev) => prev - 1);
-
-  useEffect(() => {
-    const total = rowData.length;
-    if (index < 0) {
-      setTimeout(() => setIndex(total - 1), 0);
-    } else if (index >= total * 2) {
-      setTimeout(() => setIndex(total), 0);
+  const handleNext = () => {
+    if (containerRef.current) {
+      const cardWidth = containerRef.current.querySelector(".card")?.clientWidth || 300;
+      const gap = 24; // approx 1.5rem
+      containerRef.current.scrollBy({ left: cardWidth + gap, behavior: "smooth" });
     }
-  }, [index, rowData.length]);
+  };
+
+  const handlePrev = () => {
+    if (containerRef.current) {
+      const cardWidth = containerRef.current.querySelector(".card")?.clientWidth || 300;
+      const gap = 24;
+      containerRef.current.scrollBy({ left: -(cardWidth + gap), behavior: "smooth" });
+    }
+  };
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -174,25 +160,15 @@ const SliderRow = ({ rowData }: { rowData: CatalogueItem[] }) => {
         </div>
       </div>
 
-      <div ref={containerRef} className="overflow-hidden w-full mt-8 sm:mt-10">
-        <motion.div
-          className="flex gap-4 sm:gap-6 py-2 cursor-grab active:cursor-grabbing"
-          animate={{ x: -index * cardWidth }}
-          transition={{ type: "spring", stiffness: 90, damping: 20 }}
-          style={{ width: "max-content" }}
-          drag="x"
-          dragConstraints={{ left: -200, right: 200 }}
-          dragElastic={0.25}
-          onDragEnd={(e, info) => {
-            const threshold = 60;
-            if (info.offset.x < -threshold) handleNext();
-            else if (info.offset.x > threshold) handlePrev();
-          }}
-        >
-          {fullData.map((item, i) => (
+      <div 
+        ref={containerRef} 
+        className="flex gap-4 sm:gap-6 py-4 overflow-x-auto snap-x snap-mandatory mt-8 sm:mt-10 scrollbar-hide w-full"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+          {rowData.map((item, i) => (
             <div
               key={item._id || i}
-              className="card flex-shrink-0 rounded-2xl transition-all bg-white overflow-hidden
+              className="card flex-shrink-0 snap-start rounded-2xl transition-all bg-white overflow-hidden
                          shadow-md hover:shadow-xl duration-300
                          w-[260px] sm:w-[280px] lg:w-[300px] h-[520px] flex flex-col"
             >
@@ -267,7 +243,6 @@ const SliderRow = ({ rowData }: { rowData: CatalogueItem[] }) => {
               </div>
             </div>
           ))}
-        </motion.div>
       </div>
     </div>
   );

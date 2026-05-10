@@ -63,6 +63,7 @@ interface PaymentMethodsProps {
     name: string;
     email: string;
     phone: string;
+    address?: string;
   };
 }
 
@@ -257,6 +258,11 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
             <p className="text-gray-800">{customerDetails.name}</p>
             <p className="text-gray-500 text-xs">{customerDetails.email}</p>
             <p className="text-gray-500 text-xs">{customerDetails.phone}</p>
+            {customerDetails.address && (
+              <p className="text-gray-400 text-[10px] mt-1 border-t border-gray-200 pt-1">
+                📍 {customerDetails.address}
+              </p>
+            )}
           </div>
         </div>
       )}

@@ -46,68 +46,36 @@ import CommonPageHeader from "@/components/CommonPages/CommonPageHeader";
 const BookingPage = () => {
   const router = useRouter();
   const [selectedService, setSelectedService] = useState<number | null>(null);
-  const [selectedAstrologer, setSelectedAstrologer] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedExpertise, setSelectedExpertise] = useState<string>("all");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [showAllAstrologers, setShowAllAstrologers] = useState(false);
   const [showAllServices, setShowAllServices] = useState(false);
 
-  // Filter astrologers based on search
-  const filteredAstrologers = astrologers.filter(astrologer => {
-    const matchesSearch = 
-      astrologer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      astrologer.specialization.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      astrologer.expertise.some(exp => exp.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const matchesExpertise = 
-      selectedExpertise === "all" || 
-      astrologer.expertise.includes(selectedExpertise);
-    
-    return matchesSearch && matchesExpertise;
-  });
-
-  // Filter services based on category
-  const filteredServices = servicesData.filter(service => {
-    const matchesCategory = 
-      selectedCategory === "all" || 
-      service.category === selectedCategory;
-    
-    return matchesCategory;
-  });
-
-  // Display only 6 astrologers initially
-  const displayedAstrologers = showAllAstrologers ? filteredAstrologers : filteredAstrologers.slice(0, 6);
-  const displayedServices = showAllServices ? filteredServices : filteredServices.slice(0, 6);
+  const displayedServices = showAllServices ? servicesData : servicesData.slice(0, 6);
 
   const handleWhatsAppBooking = (astrologer: (typeof astrologers)[0], serviceName?: string) => {
-    const message = serviceName 
+    const message = serviceName
       ? `Hello ${astrologer.name}, I would like to book a ${serviceName} session. Please provide available time slots and pricing details.`
       : `Hello ${astrologer.name}, I would like to book an astrology reading session. Please provide available time slots and pricing details.`;
-    
-    const whatsappUrl = `https://wa.me/${
-      astrologer.whatsappNumber
-    }?text=${encodeURIComponent(message)}`;
+
+    const whatsappUrl = `https://wa.me/${astrologer.whatsappNumber
+      }?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
 
   const handleServiceBooking = (service: typeof servicesData[0]) => {
-    const bestAstrologer = astrologers.find(a => a.expertise.some(exp => 
-      service.features.some(feature => 
+    const bestAstrologer = astrologers.find(a => a.expertise.some(exp =>
+      service.features.some(feature =>
         exp.toLowerCase().includes(feature.toLowerCase())
       )
     )) || astrologers[0];
-    
+
     const message = `Hello ${bestAstrologer.name}, I would like to book a ${service.name} session for ₹${service.price}. Please provide available time slots and more details about the service.`;
-    
-    const whatsappUrl = `https://wa.me/${
-      bestAstrologer.whatsappNumber
-    }?text=${encodeURIComponent(message)}`;
+
+    const whatsappUrl = `https://wa.me/${bestAstrologer.whatsappNumber
+      }?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
 
   const getServiceIcon = (serviceName: string) => {
-    switch(serviceName.toLowerCase()) {
+    switch (serviceName.toLowerCase()) {
       case 'angel card reading':
         return <Eye className="w-6 h-6 text-white" />;
       case 'on call consultation':
@@ -128,9 +96,9 @@ const BookingPage = () => {
   };
 
   return (
-    <div className="min-h-screen ">
-      <CommonPageHeader 
-        title="Book Your Spiritual Services" 
+    <div className="min-h-screen pt-32">
+      <CommonPageHeader
+        title="Book Your Spiritual Services"
         subtitle="Home - Services - All Experts"
       />
 
@@ -141,32 +109,32 @@ const BookingPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          
-        
-         
+
+
+
           {/* Stats Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-16">
             {[
-              { 
-                value: "7+", 
+              {
+                value: "7+",
                 label: "Expert Services",
                 icon: Sparkles,
                 color: "bg-purple-50 text-purple-600"
               },
-              { 
-                value: "10K+", 
+              {
+                value: "10K+",
                 label: "Satisfied Clients",
                 icon: ThumbsUp,
                 color: "bg-green-50 text-green-600"
               },
-              { 
-                value: "96%", 
+              {
+                value: "96%",
                 label: "Success Rate",
                 icon: TrendingUp,
                 color: "bg-blue-50 text-blue-600"
               },
-              { 
-                value: "24/7", 
+              {
+                value: "24/7",
                 label: "Availability",
                 icon: Clock,
                 color: "bg-orange-50 text-orange-600"
@@ -189,106 +157,6 @@ const BookingPage = () => {
           </div>
         </motion.div>
 
-        {/* Advanced Search and Filter Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-16"
-        >
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Search className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900">Find Your Spiritual Expert</h3>
-                <p className="text-gray-500 text-sm">Filter by expertise, experience, and more</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Search Input */}
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search astrologers or services..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                />
-              </div>
-
-              {/* Expertise Filter */}
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Filter className="h-5 w-5 text-gray-400" />
-                </div>
-                <select
-                  value={selectedExpertise}
-                  onChange={(e) => setSelectedExpertise(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none transition-all"
-                >
-                  <option value="all">All Expertise Areas</option>
-                  {expertiseCategories.map((expertise) => (
-                    <option key={expertise} value={expertise}>
-                      {expertise}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Service Category Filter */}
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Bookmark className="h-5 w-5 text-gray-400" />
-                </div>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none transition-all"
-                >
-                  {serviceCategories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name} ({category.count})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Language Filter */}
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Globe className="h-5 w-5 text-gray-400" />
-                </div>
-                <select
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none transition-all"
-                >
-                  <option>All Languages</option>
-                  <option>English</option>
-                  <option>Hindi</option>
-                  <option>Tamil</option>
-                  <option>Telugu</option>
-                </select>
-              </div>
-            </div>
-            
-            <div className="mt-6 flex flex-wrap gap-3">
-              <span className="text-sm text-gray-500 font-medium">Quick filters:</span>
-              {["Available Now", "Top Rated", "Budget Friendly", "Instant Booking"].map((filter) => (
-                <button
-                  key={filter}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-all"
-                >
-                  {filter}
-                </button>
-              ))}
-            </div>
-          </div>
-        </motion.div>
       </section>
 
       {/* Services Section */}
@@ -308,23 +176,6 @@ const BookingPage = () => {
               </p>
             </div>
 
-            {/* Service Categories */}
-            <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {serviceCategories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
-                    selectedCategory === category.id
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  {category.name} ({category.count})
-                </button>
-              ))}
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {displayedServices.map((service, index) => (
                 <motion.div
@@ -334,11 +185,10 @@ const BookingPage = () => {
                   transition={{ delay: 0.4 + index * 0.1 }}
                   whileHover={{ y: -5 }}
                   onClick={() => setSelectedService(service.id)}
-                  className={`bg-white rounded-2xl shadow-lg overflow-hidden border-2 transition-all duration-300 flex flex-col h-full group cursor-pointer ${
-                    selectedService === service.id
-                      ? "border-purple-500 shadow-xl"
-                      : "border-white hover:border-purple-100"
-                  }`}
+                  className={`bg-white rounded-2xl shadow-lg overflow-hidden border-2 transition-all duration-300 flex flex-col h-full group cursor-pointer ${selectedService === service.id
+                    ? "border-purple-500 shadow-xl"
+                    : "border-white hover:border-purple-100"
+                    }`}
                 >
                   {/* Service Header */}
                   <div className="relative p-6 bg-gradient-to-br from-purple-50 to-pink-50">
@@ -361,7 +211,7 @@ const BookingPage = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1">
@@ -380,7 +230,7 @@ const BookingPage = () => {
                   {/* Service Details */}
                   <div className="p-6 flex-grow">
                     <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
-                    
+
                     <div className="space-y-4 mb-6">
                       <div>
                         <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
@@ -398,7 +248,7 @@ const BookingPage = () => {
                           ))}
                         </div>
                       </div>
-                      
+
                       <div>
                         <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
@@ -434,7 +284,7 @@ const BookingPage = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
@@ -451,13 +301,13 @@ const BookingPage = () => {
               ))}
             </div>
 
-            {filteredServices.length > 6 && !showAllServices && (
+            {servicesData.length > 6 && !showAllServices && (
               <div className="text-center mt-12">
                 <button
                   onClick={() => setShowAllServices(true)}
                   className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-purple-600 hover:text-purple-600 hover:bg-purple-50 transition-all duration-300"
                 >
-                  View All {filteredServices.length} Services
+                  View All {servicesData.length} Services
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
@@ -475,7 +325,7 @@ const BookingPage = () => {
                       {getServiceIcon(servicesData.find(s => s.id === selectedService)!.name)}
                     </div>
                   </div>
-                  
+
                   <div className="flex-1 text-center lg:text-left">
                     <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
                       <h3 className="text-3xl font-bold text-gray-900">
@@ -485,11 +335,11 @@ const BookingPage = () => {
                         {servicesData.find(s => s.id === selectedService)!.duration}
                       </div>
                     </div>
-                    
+
                     <p className="text-gray-600 mb-6 text-lg leading-relaxed">
                       {servicesData.find(s => s.id === selectedService)!.description}
                     </p>
-                    
+
                     <div className="space-y-4">
                       <div>
                         <h4 className="font-semibold text-gray-800 mb-2">What's Included:</h4>
@@ -504,7 +354,7 @@ const BookingPage = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex-shrink-0">
                     <div className="text-center mb-4">
                       <div className="text-3xl font-bold text-gray-900">
@@ -534,223 +384,6 @@ const BookingPage = () => {
                   </div>
                 </div>
               </motion.div>
-            )}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Astrologers Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
-              <div>
-                <h2 className="text-4xl text-gray-900 mb-3">
-                  Meet Our <span className="text-purple-600">Expert Guides</span>
-                </h2>
-                <p className="text-gray-600 text-lg">
-                  Certified spiritual experts with proven track records
-                </p>
-              </div>
-              
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg">
-                    <Shield className="w-4 h-4 text-green-500" />
-                    <span className="text-sm font-medium text-gray-700">Verified Experts</span>
-                  </div>
-                  <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg">
-                    <Crown className="w-4 h-4 text-yellow-500" />
-                    <span className="text-sm font-medium text-gray-700">Top Rated</span>
-                  </div>
-                </div>
-                <div className="text-gray-500 text-sm">
-                  Showing {displayedAstrologers.length} of {filteredAstrologers.length} experts
-                </div>
-              </div>
-            </div>
-
-            {displayedAstrologers.length === 0 ? (
-              <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
-                <Search className="w-16 h-16 text-gray-300 mx-auto mb-6" />
-                <h3 className="text-2xl font-bold text-gray-700 mb-3">No experts found</h3>
-                <p className="text-gray-500 mb-8 max-w-md mx-auto">
-                  Try adjusting your search criteria or browse all our experts
-                </p>
-                <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedExpertise("all");
-                    setShowAllAstrologers(true);
-                  }}
-                  className="px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  View All Experts
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                  {displayedAstrologers.map((astrologer, index) => (
-                    <motion.div
-                      key={astrologer.id}
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.6 + index * 0.1 }}
-                      whileHover={{ y: -5 }}
-                      className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
-                    >
-                      {/* Astrologer Card Header */}
-                      <div className="relative p-6">
-                        <div className="flex items-start gap-5">
-                          <div className="relative">
-                            <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex items-center justify-center border-4 border-white shadow-lg">
-                              <Users className="w-10 h-10 text-purple-600" />
-                            </div>
-                            {astrologer.featured && (
-                              <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center shadow-md">
-                                <Crown className="w-4 h-4 text-white" />
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start mb-2">
-                              <div>
-                                <h3 className="text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
-                                  {astrologer.name}
-                                </h3>
-                                <p className="text-gray-600 text-sm">{astrologer.title}</p>
-                                <p className="text-purple-600 text-sm font-medium">{astrologer.specialization}</p>
-                              </div>
-                              <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
-                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                <span className="font-bold text-gray-900">{astrologer.rating}</span>
-                                <span className="text-gray-500 text-sm">({astrologer.reviews})</span>
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                              <div className="flex items-center gap-1">
-                                <Award className="w-4 h-4" />
-                                <span>{astrologer.experience}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Globe className="w-4 h-4" />
-                                <span>{astrologer.languages.length} languages</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Astrologer Details */}
-                      <div className="px-6 pb-6 flex-grow">
-                        <p className="text-gray-600 mb-6 line-clamp-3">{astrologer.about}</p>
-                        
-                        <div className="space-y-4 mb-6">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-gray-700">
-                              <Users className="w-4 h-4 text-green-500" />
-                              <span className="text-sm font-medium">{astrologer.clientsHelped} Clients</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-gray-700">
-                              <TrendingUp className="w-4 h-4 text-purple-500" />
-                              <span className="text-sm font-medium">{astrologer.successRate} Success Rate</span>
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <div className="flex items-center gap-2 mb-2">
-                              <Target className="w-4 h-4 text-orange-500" />
-                              <span className="text-sm font-medium text-gray-700">Expertise Areas</span>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              {astrologer.expertise.slice(0, 4).map((exp, idx) => (
-                                <span
-                                  key={idx}
-                                  className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium"
-                                >
-                                  {exp}
-                                </span>
-                              ))}
-                              {astrologer.expertise.length > 4 && (
-                                <span className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium">
-                                  +{astrologer.expertise.length - 4} more
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Stats and Badges */}
-                        <div className="flex flex-wrap gap-3 mb-6">
-                          <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg">
-                            <Shield className="w-4 h-4 text-green-600" />
-                            <span className="text-sm font-medium text-gray-700">Verified</span>
-                          </div>
-                          <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg">
-                            <Clock className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm font-medium text-gray-700">{astrologer.responseTime}</span>
-                          </div>
-                        </div>
-
-                        {/* Booking Actions */}
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="text-2xl font-bold text-gray-900">{astrologer.consultationFee}</div>
-                            <div className="text-sm text-gray-500">Consultation fee</div>
-                          </div>
-                          
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => handleWhatsAppBooking(astrologer)}
-                            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold py-3.5 px-6 rounded-xl hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-3 group"
-                          >
-                            <MessageCircle className="w-5 h-5" />
-                            <span>Book Consultation</span>
-                            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                          </motion.button>
-                          
-                          {selectedService && (
-                            <button
-                              onClick={() => {
-                                const serviceName = servicesData.find(s => s.id === selectedService)?.name;
-                                if (serviceName) {
-                                  handleWhatsAppBooking(astrologer, serviceName);
-                                }
-                              }}
-                              className="w-full bg-white border-2 border-purple-600 text-purple-600 font-semibold py-3 px-6 rounded-xl hover:bg-purple-50 transition-all duration-300 flex items-center justify-center gap-3"
-                            >
-                              <Sparkles className="w-4 h-4" />
-                              <span>
-                                {servicesData.find(s => s.id === selectedService)?.name}
-                              </span>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {filteredAstrologers.length > 6 && !showAllAstrologers && (
-                  <div className="text-center mt-12">
-                    <button
-                      onClick={() => setShowAllAstrologers(true)}
-                      className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-purple-600 hover:text-purple-600 hover:bg-purple-50 transition-all duration-300"
-                    >
-                      View All {filteredAstrologers.length} Experts
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                )}
-              </>
             )}
           </motion.div>
         </div>
@@ -815,7 +448,7 @@ const BookingPage = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   {index < 2 && (
                     <div className="hidden md:block absolute top-1/2 right-0 transform translate-x-1/2 -translate-y-1/2">
                       <div className="w-8 h-0.5 bg-gray-300"></div>
@@ -843,15 +476,15 @@ const BookingPage = () => {
                   <Gift className="w-4 h-4 text-purple-600" />
                   <span className="text-sm font-medium text-purple-700">Limited Time Offer</span>
                 </div>
-                
+
                 <h2 className="text-4xl text-gray-900 mb-6">
                   Ready for Your Spiritual Transformation?
                 </h2>
-                
+
                 <p className="text-gray-600 text-xl mb-10 leading-relaxed">
                   Take the first step towards clarity, healing, and guidance. Our expert spiritual guides are here to help you navigate life's challenges and opportunities.
                 </p>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
                   <div className="bg-white p-6 rounded-xl border border-gray-200">
                     <div className="flex items-center gap-3 mb-3">
@@ -862,7 +495,7 @@ const BookingPage = () => {
                     </div>
                     <p className="text-gray-600 text-sm">Connect directly with experts for immediate assistance</p>
                   </div>
-                  
+
                   <div className="bg-white p-6 rounded-xl border border-gray-200">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -873,7 +506,7 @@ const BookingPage = () => {
                     <p className="text-gray-600 text-sm">Your privacy and spiritual journey are sacred to us</p>
                   </div>
                 </div>
-                
+
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <button
                     onClick={() => {
@@ -886,7 +519,7 @@ const BookingPage = () => {
                     <span>Book Top Service Now</span>
                     <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </button>
-                  
+
                   <button
                     onClick={() => {
                       document.querySelector('#services-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -897,7 +530,7 @@ const BookingPage = () => {
                     Browse All Services
                   </button>
                 </div>
-                
+
                 <p className="text-gray-500 text-sm mt-8 flex items-center justify-center gap-3">
                   <span className="flex items-center gap-1">
                     <Shield className="w-4 h-4 text-green-500" />

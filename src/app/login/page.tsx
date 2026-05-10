@@ -259,8 +259,9 @@ const Login = () => {
       return;
     }
 
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters long");
+    const passwordRegex = /^(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      toast.error("Password must be at least 8 characters and contain 1 special character");
       return;
     }
 
@@ -712,8 +713,9 @@ const Login = () => {
       return;
     }
 
-    if (newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters long");
+    const passwordRegex = /^(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      toast.error("Password must be at least 8 characters and contain 1 special character");
       return;
     }
 
@@ -1186,13 +1188,13 @@ const Login = () => {
 
       <div className="relative">
         <input
-          placeholder="New Password (min. 6 characters)"
+          placeholder="New Password (min. 8 chars, 1 special)"
           type={showNewPassword ? "text" : "password"}
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           className="w-full p-3 pr-12 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-sm md:text-base"
           required
-          minLength={6}
+          minLength={8}
         />
 
         <button
@@ -1213,7 +1215,7 @@ const Login = () => {
           onChange={(e) => setConfirmPassword(e.target.value)}
           className="w-full p-3 pr-12 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-sm md:text-base"
           required
-          minLength={6}
+          minLength={8}
         />
 
         <button
@@ -1268,13 +1270,13 @@ const Login = () => {
         />
         <div className="relative">
           <input
-            placeholder="Password (min. 6 characters)"
+            placeholder="Password (min. 8 chars, 1 special)"
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 pr-12 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300"
             required
-            minLength={6}
+            minLength={8}
           />
           <button
             type="button"
@@ -1294,7 +1296,7 @@ const Login = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full p-3 pr-12 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300"
             required
-            minLength={6}
+            minLength={8}
           />
           <button
             type="button"
@@ -1380,20 +1382,20 @@ const Login = () => {
           </span>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between gap-3">
+        <div className="flex flex-col sm:flex-row justify-between gap-3 w-1/2 mx-auto">
           {/* Google Login Button */}
           <div className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 text-sm md:text-base font-medium cursor-pointer">
             <GoogleLoginButton />
           </div>
 
-          <button
+          {/* <button
             type="button"
             onClick={handleAppleLogin}
             className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 text-sm md:text-base font-medium cursor-pointer"
           >
             <FaApple size={18} className="text-[#0078D4]" />
             <span>Apple</span>
-          </button>
+          </button> */}
         </div>
 
         <p className="text-xs text-gray-500 text-center mt-4 md:mt-6 leading-5">
@@ -1501,9 +1503,10 @@ const Login = () => {
             </h1>
 
             <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 mb-4 lg:mb-6 text-justify">
-              We are lorem ipsum team dolor sit amet, consectetur adipiscing
-              elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-              aliqua.
+              Join thousands of people who trust our
+              spiritual guidance to find clarity in love, career,
+              and life. Sign in to access your personal
+              readings and continue your journeyWe are lo.
             </p>
 
             {/* Avatars + text */}

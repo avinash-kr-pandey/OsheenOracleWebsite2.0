@@ -29,7 +29,7 @@ const CommonPageHeader: React.FC<CommonPageHeaderProps> = ({
           "linear-gradient(to bottom, #FBB5E7 20%, #FBB5E7 30%, #C4F9FF 90%)",
       }}
     >
-      <div className="flex flex-col justify-center text-center pt-10">
+      <div className="flex flex-col justify-center text-center pt-20">
         <h1 className="text-5xl animate-fade-in-up">{title}</h1>
         {subtitle && (
           <p className="text-lg animate-fade-in-up mt-4">{subtitle}</p>

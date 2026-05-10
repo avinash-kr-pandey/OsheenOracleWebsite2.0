@@ -4,30 +4,16 @@ export interface ContactFormData {
   name: string;
   email: string;
   phone: string;
-  desiredDate: string;
-  desiredTime: string;
-  additionalMessage?: string;
-  preferredAstrologer?: string;
-  astrologerSpecialization?: string;
-  consultationType?: "chat" | "call" | "video" | "in_person";
-  consultationDuration?: number;
+  message: string;
 }
 
 export interface ContactResponse {
   success: boolean;
   message: string;
-  data?: {
-    _id: string;
-    name: string;
-    email: string;
-    phone: string;
-    desiredDate: string;
-    desiredTime: string;
-    status: string;
-  };
+  data?: any;
 }
 
-// Create new consultation booking
+// Create new contact inquiry
 export const createConsultation = async (
   data: ContactFormData,
 ): Promise<ContactResponse> => {
@@ -38,7 +24,7 @@ export const createConsultation = async (
     );
     return response;
   } catch (error) {
-    console.error("Error creating consultation:", error);
+    console.error("Error creating contact inquiry:", error);
     throw error;
   }
 };

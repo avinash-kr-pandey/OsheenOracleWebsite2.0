@@ -5,13 +5,13 @@ import { Rishi, rishiAPI } from "@/utils/api/rishi.api";
 import { Zodiac, zodiacAPI } from "@/utils/api/zodiac.api";
 import React, { useState, useEffect, useCallback } from "react";
 
-type TimeFrame = "daily" | "weekly" | "monthly" | "yearly";
+type TimeFrame = "weekly" | "monthly" | "yearly";
 type Language = "english" | "hindi";
 type ViewMode = "zodiacs" | "predictions";
 
 const Horoscope = () => {
   const [selectedTimeFrame, setSelectedTimeFrame] =
-    useState<TimeFrame>("daily");
+    useState<TimeFrame>("weekly");
   const [language, setLanguage] = useState<Language>("english");
   const [selectedZodiac, setSelectedZodiac] = useState<Zodiac | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -117,7 +117,6 @@ const Horoscope = () => {
   }, [fetchPredictions]);
 
   const timeFrames = [
-    { key: "daily" as TimeFrame, en: "Daily", hi: "दैनिक" },
     { key: "weekly" as TimeFrame, en: "Weekly", hi: "साप्ताहिक" },
     { key: "monthly" as TimeFrame, en: "Monthly", hi: "मासिक" },
     { key: "yearly" as TimeFrame, en: "Yearly", hi: "वार्षिक" },

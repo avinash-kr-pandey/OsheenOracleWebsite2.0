@@ -43,8 +43,13 @@ export default function LayoutWrapper({
                 }}
               />
 
-              {!hideHeaderFooter && <HeroHeader />}
+              {!hideHeaderFooter && (
+                <>
+                  <HeroHeader />
+                </>
+              )}
 
+              {!hideHeaderFooter && <div className="h-[44px] sm:h-[48px]"></div>}
               <main className="flex-1">{children}</main>
 
               {!hideHeaderFooter && <Footer />}

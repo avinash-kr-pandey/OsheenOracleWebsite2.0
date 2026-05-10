@@ -35,7 +35,8 @@ const ProductListing: React.FC = () => {
   });
 
   // Filter states
-  const [priceRange, setPriceRange] = useState<number>(10000);
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(10000);
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -68,7 +69,7 @@ const ProductListing: React.FC = () => {
         setFilterOptions(options);
 
         if (options.maxPrice) {
-          setPriceRange(options.maxPrice);
+          setMaxPrice(options.maxPrice);
         }
       } catch (error) {
         console.error("Error loading products:", error);
@@ -89,7 +90,7 @@ const ProductListing: React.FC = () => {
       if (!product) return false;
 
       // Price filter
-      if (product.price > priceRange) return false;
+      if (product.price < minPrice || product.price > maxPrice) return false;
 
       // Gender filter
       if (selectedGenders.length > 0) {
@@ -173,7 +174,8 @@ const ProductListing: React.FC = () => {
     return filtered;
   }, [
     allProducts,
-    priceRange,
+    minPrice,
+    maxPrice,
     selectedGenders,
     selectedBrands,
     selectedSizes,
@@ -265,7 +267,8 @@ const ProductListing: React.FC = () => {
   const handleSortChange = (option: string) => setSortOption(option);
 
   const clearAllFilters = () => {
-    setPriceRange(filterOptions.maxPrice || 10000);
+    setMinPrice(0);
+    setMaxPrice(filterOptions.maxPrice || 10000);
     setSelectedGenders([]);
     setSelectedBrands([]);
     setSelectedSizes([]);
@@ -359,8 +362,10 @@ const ProductListing: React.FC = () => {
         >
           <div className="h-full overflow-y-auto">
             <Filters
-              priceRange={priceRange}
-              setPriceRange={setPriceRange}
+              minPrice={minPrice}
+              setMinPrice={setMinPrice}
+              maxPrice={maxPrice}
+              setMaxPrice={setMaxPrice}
               selectedGenders={selectedGenders}
               onGenderChange={handleGenderChange}
               selectedBrands={selectedBrands}
