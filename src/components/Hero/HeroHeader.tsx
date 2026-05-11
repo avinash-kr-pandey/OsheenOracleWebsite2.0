@@ -22,6 +22,7 @@ import {
 } from "react-icons/fi";
 
 import { servicePackageAPI, Category } from "@/utils/api/service.package.api";
+import announcementAPI, { Announcement } from "@/utils/api/announcement.api";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -55,6 +56,7 @@ export default function HeroHeader() {
   // ✅ Dynamic Services State
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingServices, setLoadingServices] = useState(true);
+  const [announcement, setAnnouncement] = useState<Announcement | null>(null);
 
   const router = useRouter();
   const { getTotalItems, clearCart } = useCart();
@@ -87,6 +89,22 @@ export default function HeroHeader() {
     };
 
     fetchCategories();
+  }, []);
+
+  // ✅ Fetch dynamic announcement from API
+  useEffect(() => {
+    const fetchAnnouncement = async () => {
+      try {
+        const data = await announcementAPI.getLatestAnnouncement();
+        if (data && data.isActive && data.content) {
+          setAnnouncement(data);
+        }
+      } catch (error) {
+        console.error("Error fetching announcement:", error);
+      }
+    };
+
+    fetchAnnouncement();
   }, []);
 
   // Force re-render when auth state changes
@@ -402,11 +420,19 @@ export default function HeroHeader() {
           white-space: nowrap;
         }
       `}</style>
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm py-2 overflow-hidden w-full flex items-center">
-        <div className="animate-marquee font-medium tracking-wide">
-          ✨ Special Offer: Get 20% off on your first astrology session! Use code: STARS20 ✨ Book your consultation today and unlock your cosmic path! 🌟
+      {announcement && (
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm py-2 overflow-hidden w-full flex items-center">
+          <div className="animate-marquee font-medium tracking-wide">
+            {announcement.link ? (
+              <Link href={announcement.link} className="hover:underline">
+                {announcement.content}
+              </Link>
+            ) : (
+              announcement.content
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between relative">
         {/* Logo */}
