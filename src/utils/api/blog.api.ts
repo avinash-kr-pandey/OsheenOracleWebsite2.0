@@ -15,6 +15,8 @@ export interface Blog {
   views: number;
   tags?: string[];
   excerpt?: string;
+  content?: string;
+  coverImage?: string;
   createdAt?: string;
   updatedAt?: string;
 }

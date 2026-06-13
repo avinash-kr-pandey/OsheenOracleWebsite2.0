@@ -146,6 +146,25 @@ const Login = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const [policyViewed, setPolicyViewed] = useState(false);
+
+  const handlePolicyAgree = () => {
+    setPolicyViewed(true);
+    setTermsAgreed(true);
+  };
+
+  const handleTermsCheckboxClick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    if (checked && !policyViewed) {
+      setTermsAgreed(false);
+      setOpenModal("privacy");
+    } else {
+      setTermsAgreed(checked);
+    }
+  };
+
   const { user, isAuthenticated, login, logout } = useAuth();
   const router = useRouter();
 
@@ -447,30 +466,20 @@ const Login = () => {
         response.message?.includes("sent") ||
         response.message?.includes("check your email")
       ) {
-        // Store OTP ID if provided
-        if (response.otpId) {
-          setOtpId(response.otpId);
-        }
-
-        // Store reset token if provided
-        if (response.resetToken) {
-          setResetToken(response.resetToken);
-        }
-
-        toast.success("Reset email sent! Please check your inbox.", {
+        toast.success("Reset link sent! Please check your email inbox.", {
           id: toastId,
-          duration: 4000,
+          duration: 6000,
         });
 
-        // Move to OTP verification step
-        setAuthStep("reset");
+        // Go back to login screen since the user resets password via link in email
+        setAuthStep("login");
       } else if (response.message) {
         // Some APIs return message instead of success flag
         toast.success(response.message, {
           id: toastId,
-          duration: 4000,
+          duration: 6000,
         });
-        setAuthStep("reset");
+        setAuthStep("login");
       } else {
         toast.error("Failed to send reset email. Please try again.", {
           id: toastId,
@@ -484,6 +493,15 @@ const Login = () => {
         err.response?.data?.message ||
         err.message ||
         "Failed to send reset email. Please check if email is registered.";
+
+      if (
+        errorMessage.toLowerCase().includes("google accounts use google login") ||
+        errorMessage.toLowerCase().includes("please login with google")
+      ) {
+        toast.dismiss(toastId);
+        setShowGoogleModal(true);
+        return;
+      }
 
       toast.error(errorMessage, {
         id: toastId,
@@ -1316,6 +1334,8 @@ const Login = () => {
           <input
             type="checkbox"
             id="terms"
+            checked={termsAgreed}
+            onChange={handleTermsCheckboxClick}
             className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-all duration-300 mt-1"
             required
           />
@@ -1570,13 +1590,41 @@ const Login = () => {
       <PolicyModal
         isOpen={openModal === "privacy"}
         onClose={() => setOpenModal(null)}
+        onAgree={handlePolicyAgree}
         defaultTab="privacy"
       />
       <PolicyModal
         isOpen={openModal === "terms"}
         onClose={() => setOpenModal(null)}
+        onAgree={handlePolicyAgree}
         defaultTab="terms"
       />
+
+      {showGoogleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white max-w-md w-full p-6 sm:p-8 rounded-2xl shadow-2xl relative border-t-4 border-blue-500">
+            <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <span className="text-blue-500">ℹ️</span>
+              Google Account Detected
+            </h3>
+            <p className="text-gray-600 mb-6 text-sm sm:text-base">
+              It looks like you previously registered or logged in using your Google account (<strong>{email}</strong>). 
+              Please log in using the <strong>Sign in with Google</strong> button.
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => {
+                  setShowGoogleModal(false);
+                  setAuthStep("login");
+                }}
+                className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:opacity-90 transition-all text-sm font-semibold shadow-md cursor-pointer"
+              >
+                Go to Sign In
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

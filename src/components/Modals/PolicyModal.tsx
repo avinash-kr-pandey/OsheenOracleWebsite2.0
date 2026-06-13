@@ -4,10 +4,12 @@ import React, { useEffect, useState } from "react";
 const PolicyModal = ({
   isOpen,
   onClose,
+  onAgree,
   defaultTab = "privacy",
 }: {
   isOpen: boolean;
   onClose: () => void;
+  onAgree?: () => void;
   defaultTab?: "privacy" | "terms";
 }) => {
   const [activeTab, setActiveTab] = useState<"privacy" | "terms">(defaultTab);
@@ -488,7 +490,26 @@ const PolicyModal = ({
           )}
         </div>
 
-      
+        {/* Footer */}
+        {onAgree && (
+          <div className="border-t p-4 flex justify-end gap-3 bg-gray-50 rounded-b-2xl">
+            <button
+              onClick={onClose}
+              className="px-6 py-2 border rounded-xl hover:bg-gray-100 transition-all text-sm font-semibold text-gray-700 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                onAgree();
+                onClose();
+              }}
+              className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:opacity-90 transition-all text-sm font-semibold shadow-md cursor-pointer"
+            >
+              I Agree
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

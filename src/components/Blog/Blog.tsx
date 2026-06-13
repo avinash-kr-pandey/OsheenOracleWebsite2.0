@@ -48,17 +48,18 @@ const transformBlogForUI = (blog: BlogType): BlogPost => {
   return {
     id: blog._id,
     title: blog.title,
-    description: blog.excerpt || blog.content.substring(0, 150) + "...",
+    description: blog.excerpt || (blog.content ? blog.content.substring(0, 150) + "..." : blog.description) || "",
     image:
       blog.coverImage ||
+      blog.image ||
       "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format",
     category: blog.category,
-    date: formatBlogDate(blog.createdAt),
+    date: formatBlogDate(blog.createdAt || ""),
     comments: blog.comments,
     views: blog.views,
     author: blog.author,
     authorInitials: getAuthorInitials(blog.author),
-    content: blog.content,
+    content: blog.content || blog.description || "",
     tags: blog.tags || [],
   };
 };

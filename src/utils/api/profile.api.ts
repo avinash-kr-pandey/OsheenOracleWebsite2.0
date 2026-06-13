@@ -328,6 +328,25 @@ export const cancelOrder = async (id: number): Promise<ApiResponse> => {
   }
 };
 
+/**
+ * Create a new order
+ * POST /api/orders
+ */
+export const createOrder = async (orderData: {
+  productName: string;
+  price: number;
+  status: string;
+  image?: string;
+}): Promise<ApiResponse<Order>> => {
+  try {
+    const response = await postData<ApiResponse<Order>>("/orders", orderData);
+    return response;
+  } catch (error) {
+    console.error("Error creating order:", error);
+    throw error;
+  }
+};
+
 // ==================== WISHLIST APIs ====================
 
 /**
@@ -503,6 +522,7 @@ const profileApi = {
   getOrders,
   getOrderById,
   cancelOrder,
+  createOrder,
 
   // Wishlist
   getWishlist,

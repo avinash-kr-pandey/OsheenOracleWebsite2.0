@@ -22,6 +22,7 @@ export interface Product {
   // ✅ Optional fields
   id?: string; // For compatibility
   originalPrice?: number;
+  discount?: string;
   description?: string;
   inStock?: boolean;
   rating?: number;
@@ -80,14 +81,15 @@ export function normalizeProduct(product: any): Product {
     // Optional fields
     id: product.id || product._id,
     originalPrice: product.originalPrice ? Number(product.originalPrice) : undefined,
+    discount: product.discount,
     description: product.description,
     inStock: product.inStock ?? true,
     rating: product.rating ? Number(product.rating) : 0,
     gender: Array.isArray(product.gender) ? product.gender : [],
     isNew: product.isNew ?? false,
     images: Array.isArray(product.images) ? product.images : [product.image || '/placeholder.jpg'],
-    size: Array.isArray(product.size) ? product.size : [],
-    color: Array.isArray(product.color) ? product.color : [],
+    size: Array.isArray(product.size) ? product.size : (Array.isArray(product.sizeOptions) ? product.sizeOptions.map(String) : []),
+    color: Array.isArray(product.color) ? product.color : (Array.isArray(product.colors) ? product.colors : []),
     reviews: Array.isArray(product.reviews) ? product.reviews : [],
     tags: Array.isArray(product.tags) ? product.tags : [],
     stock: product.stock ? Number(product.stock) : undefined,

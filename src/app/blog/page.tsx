@@ -25,7 +25,7 @@ const transformBlogForCard = (blog: BlogType) => {
     image:
       blog.image ||
       "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format",
-    date: formatDate(blog.createdAt),
+    date: formatDate(blog.createdAt || ""),
     category: blog.category,
     author: blog.author,
   };

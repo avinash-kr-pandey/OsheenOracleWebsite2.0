@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import AddressSection from "@/components/Cart/AddressSection";
 import { toast } from "react-hot-toast";
+import profileApi from "@/utils/api/profile.api";
 
 export default function CartPage() {
   const {
@@ -33,13 +34,33 @@ export default function CartPage() {
   const handlePaymentSuccess = async () => {
     console.log("✅ Payment successful!");
 
+    try {
+      setProcessing(true);
+      // Register each cart item as a database order in the backend
+      const orderPromises = cartItems.map(async (item) => {
+        return profileApi.createOrder({
+          productName: item.name,
+          price: item.price * item.quantity,
+          status: "Pending",
+          image: item.image,
+        });
+      });
+
+      await Promise.all(orderPromises);
+      console.log("✅ All orders created successfully in backend database!");
+    } catch (error) {
+      console.error("❌ Error creating database orders:", error);
+    } finally {
+      setProcessing(false);
+    }
+
     // Clear cart after successful payment
     clearCart();
 
     // Show success message
     alert("🎉 Payment Successful! Your order has been placed.");
 
-    // Redirect to order confirmation or products page
+    // Redirect to order confirmation page
     window.location.href = "/order-confirmation";
   };
 
