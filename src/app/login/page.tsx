@@ -156,13 +156,7 @@ const Login = () => {
   };
 
   const handleTermsCheckboxClick = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-    if (checked && !policyViewed) {
-      setTermsAgreed(false);
-      setOpenModal("privacy");
-    } else {
-      setTermsAgreed(checked);
-    }
+    setTermsAgreed(e.target.checked);
   };
 
   const { user, isAuthenticated, login, logout } = useAuth();
