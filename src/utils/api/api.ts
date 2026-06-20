@@ -11,7 +11,11 @@ import {
 // const API_BASE_URL = "https://osheenoraclebackend02.onrender.com/api";
 // const API_BASE_URL = "https://api.osheenoracle.com/api";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://api.osheenoracle.com/api"
+    : "http://localhost:5000/api");
 
 // Google Auth API object
 export const googleAuthApi = {
