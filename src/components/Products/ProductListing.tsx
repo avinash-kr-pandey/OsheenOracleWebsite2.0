@@ -15,7 +15,7 @@ interface ExtendedProduct extends Product {
   gender?: string[];
   catalogue?: string;
   subCategory?: string;
-  sizeOptions?: number[];
+  sizeOptions?: string[];
   createdAt?: string;
 }
 
@@ -110,8 +110,8 @@ const ProductListing: React.FC = () => {
       if (selectedSizes.length > 0) {
         const productSizes = product.sizeOptions || [];
         if (productSizes.length === 0) return false;
-        const hasMatchingSize = productSizes.some((size: number) =>
-          selectedSizes.includes(size.toString()),
+        const hasMatchingSize = productSizes.some((size: string) =>
+          selectedSizes.includes(size),
         );
         if (!hasMatchingSize) return false;
       }

@@ -15,7 +15,7 @@ interface ProductApiResponse<T = unknown> {
 export interface FilterOptions {
   brands: string[];
   categories: string[];
-  sizes: number[];
+  sizes: string[];
   colors: string[];
   minPrice: number;
   maxPrice: number;
@@ -26,7 +26,7 @@ interface ExtendedProduct extends Product {
   gender?: string[];
   catalogue?: string;
   subCategory?: string;
-  sizeOptions?: number[];
+  sizeOptions?: string[];
   createdAt?: string;
 }
 
@@ -404,7 +404,7 @@ export const fetchFilterOptions = async (): Promise<FilterOptions> => {
     const filterOptions: FilterOptions = {
       brands: brands.sort(),
       categories: categories.sort(),
-      sizes: sizes.sort((a, b) => a - b),
+      sizes: sizes.sort(),
       colors: colors.sort(),
       minPrice,
       maxPrice,
