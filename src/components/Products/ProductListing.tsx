@@ -40,6 +40,7 @@ const ProductListing: React.FC = () => {
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedProductCatalogues, setSelectedProductCatalogues] = useState<
     string[]
   >([]);
@@ -115,6 +116,12 @@ const ProductListing: React.FC = () => {
         if (!hasMatchingSize) return false;
       }
 
+      // Category filter
+      if (selectedCategories.length > 0) {
+        if (!product.category || !selectedCategories.includes(product.category))
+          return false;
+      }
+
       // Product Catalogue filter
       if (selectedProductCatalogues.length > 0) {
         const productCatalogue = product.catalogue;
@@ -172,6 +179,7 @@ const ProductListing: React.FC = () => {
     selectedGenders,
     selectedBrands,
     selectedSizes,
+    selectedCategories,
     selectedProductCatalogues,
     selectedSubCategories,
     sortOption,
@@ -232,6 +240,14 @@ const ProductListing: React.FC = () => {
     );
   };
 
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category],
+    );
+  };
+
   const handleProductCatalogueChange = (catalogue: string) => {
     setSelectedProductCatalogues((prev) =>
       prev.includes(catalogue)
@@ -256,6 +272,7 @@ const ProductListing: React.FC = () => {
     setSelectedGenders([]);
     setSelectedBrands([]);
     setSelectedSizes([]);
+    setSelectedCategories([]);
     setSelectedProductCatalogues([]);
     setSelectedSubCategories([]);
     setSortOption("newest");
@@ -355,6 +372,8 @@ const ProductListing: React.FC = () => {
               onBrandChange={handleBrandChange}
               selectedSizes={selectedSizes}
               onSizeChange={handleSizeChange}
+              selectedCategories={selectedCategories}
+              onCategoryChange={handleCategoryChange}
               selectedProductCatalogues={selectedProductCatalogues}
               onProductCatalogueChange={handleProductCatalogueChange}
               selectedSubCategories={selectedSubCategories}
@@ -363,6 +382,7 @@ const ProductListing: React.FC = () => {
               availableGenders={availableGenders}
               availableBrands={filterOptions.brands}
               availableSizes={availableSizesAsString}
+              availableCategories={filterOptions.categories}
               availableProductCatalogues={availableProductCatalogues}
               availableSubCategories={availableSubCategories}
             />
