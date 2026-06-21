@@ -713,6 +713,19 @@ export const getFilterOptions = async (): Promise<{
 export const getFullImageUrl = (imagePath?: string): string => {
   if (!imagePath) return "/images/default.jpg";
   
+  // If the path is an absolute URL pointing to a backend uploads folder (e.g. from local testing or older domain)
+  if (imagePath.includes("/uploads/")) {
+    const uploadIndex = imagePath.indexOf("/uploads/");
+    const relativeUploadPath = imagePath.substring(uploadIndex);
+    const apiBaseUrl =
+      process.env.NEXT_PUBLIC_API_URL ||
+      (process.env.NODE_ENV === "production"
+        ? "https://api.osheenoracle.com/api"
+        : "http://localhost:5000/api");
+    const baseUrl = apiBaseUrl.replace(/\/api\/?$/, "");
+    return `${baseUrl}${relativeUploadPath}`;
+  }
+  
   if (
     imagePath.startsWith("/images/") ||
     imagePath.startsWith("http://") ||
