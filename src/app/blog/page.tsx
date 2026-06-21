@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { blogAPI, Blog as BlogType } from "@/utils/api/blog.api";
+import { getFullImageUrl } from "@/utils/api/api";
 
 // Transform API blog to component format
 const transformBlogForCard = (blog: BlogType) => {
@@ -22,9 +23,9 @@ const transformBlogForCard = (blog: BlogType) => {
     id: blog._id,
     title: blog.title,
     description: blog.excerpt || blog.content?.substring(0, 100) + "..." || "",
-    image:
-      blog.image ||
-      "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format",
+    image: blog.image
+      ? getFullImageUrl(blog.image)
+      : "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format",
     date: formatDate(blog.createdAt || ""),
     category: blog.category,
     author: blog.author,
@@ -130,6 +131,7 @@ const BlogSlider: React.FC = () => {
                     alt={cardBlog.title}
                     fill
                     className="rounded-xl object-cover"
+                    unoptimized={process.env.NODE_ENV === "production"}
                   />
                 </div>
 

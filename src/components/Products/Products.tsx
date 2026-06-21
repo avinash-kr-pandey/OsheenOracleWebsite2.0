@@ -3,6 +3,7 @@ import Image from "next/image";
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Product } from "@/types/product";
+import { getFullImageUrl } from "@/utils/api/api";
 
 interface ProductsProps {
   products: Product[];
@@ -337,7 +338,7 @@ const Products: React.FC<ProductsProps> = ({
                   {/* Image Container with Overlay Effects */}
                   <div className="relative w-full h-72 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
                     <Image
-                      src={item.image || "/placeholder.jpg"}
+                      src={getFullImageUrl(item.image) || "/placeholder.jpg"}
                       alt={item.name || "Product"}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

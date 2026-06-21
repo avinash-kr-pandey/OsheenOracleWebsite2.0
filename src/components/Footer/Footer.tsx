@@ -12,12 +12,30 @@ import {
 import Image from "next/image";
 import { FaYoutube } from "react-icons/fa";
 import Link from "next/link";
+import { servicePackageAPI, Category } from "@/utils/api/service.package.api";
 
 const Footer = () => {
   const [isClient, setIsClient] = useState(false);
   const [floatingElements, setFloatingElements] = useState<
     React.ReactElement[]
   >([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await servicePackageAPI.getAllCategories({
+          isActive: true,
+        });
+        if (response.success && response.data) {
+          setCategories(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching categories for footer:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     setIsClient(true);
@@ -49,7 +67,7 @@ const Footer = () => {
 
   const links = [
     { name: "About Us", link: "/about" },
-    { name: "Services", link: "/services/spells" },
+    { name: "Services", link: "/services/ourpackages" },
     { name: "Horoscope", link: "/horoscope" },
   ];
 
@@ -93,13 +111,15 @@ const Footer = () => {
 
               <div className="flex items-center space-x-3">
                 {[
-                  { icon: FaFacebookF, hover: "hover:text-blue-400" },
-                  { icon: FaInstagram, hover: "hover:text-pink-300" },
-                  { icon: FaYoutube, hover: "hover:text-red-600" },
-                ].map(({ icon: Icon, hover }, index) => (
+                  { icon: FaFacebookF, hover: "hover:text-blue-400", url: "https://www.facebook.com/p/Osheen-Oracle-100093359632992/" },
+                  { icon: FaInstagram, hover: "hover:text-pink-300", url: "https://www.instagram.com/osheen_oracle?igsh=MTVienBkNjI0ZzhteQ%3D%3D" },
+                  { icon: FaYoutube, hover: "hover:text-red-600", url: "https://www.youtube.com/@Osheenoracle" },
+                ].map(({ icon: Icon, hover, url }, index) => (
                   <a
                     key={index}
-                    href="#"
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={`bg-gradient-to-br from-gray-800 to-gray-900 p-3 rounded-full text-white transition-all duration-500 transform hover:scale-110 hover:bg-gradient-to-br hover:from-[#FBB5E7] hover:to-[#c6e400] ${hover} group shadow-lg hover:shadow-xl`}
                   >
                     <Icon className="text-lg group-hover:scale-110 group-hover:rotate-12 transition-transform" />
@@ -147,26 +167,42 @@ const Footer = () => {
                 </span>
               </h3>
               <ul className="space-y-3">
-                {[
-                  "Natal Chart Readings",
-                  "Compatibility Analysis",
-                  "Future Progression",
-                  "Specialty Readings",
-                  "Career Guidance",
-                  "Relationship Insights",
-                ].map((service, index) => (
-                  <li key={index}>
-                    <a
-                      href="#"
-                      className="text-gray-300 hover:text-white transition-all duration-500 flex items-center space-x-3 group"
-                    >
-                      <div className="w-2 h-2 bg-gradient-to-r from-[#c6e400] to-[#FBB5E7] rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-150"></div>
-                      <span className="group-hover:translate-x-3 transition-transform duration-500 text-sm group-hover:font-medium">
-                        {service}
-                      </span>
-                    </a>
-                  </li>
-                ))}
+                {categories.length > 0 ? (
+                  categories.slice(0, 6).map((category, index) => (
+                    <li key={category._id || index}>
+                      <Link
+                        href={`/services/category/${category._id}?name=${encodeURIComponent(category.name)}`}
+                        className="text-gray-300 hover:text-white transition-all duration-500 flex items-center space-x-3 group"
+                      >
+                        <div className="w-2 h-2 bg-gradient-to-r from-[#c6e400] to-[#FBB5E7] rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-150"></div>
+                        <span className="group-hover:translate-x-3 transition-transform duration-500 text-sm group-hover:font-medium">
+                          {category.name}
+                        </span>
+                      </Link>
+                    </li>
+                  ))
+                ) : (
+                  [
+                    "Natal Chart Readings",
+                    "Compatibility Analysis",
+                    "Future Progression",
+                    "Specialty Readings",
+                    "Career Guidance",
+                    "Relationship Insights",
+                  ].map((service, index) => (
+                    <li key={index}>
+                      <Link
+                        href="/services/ourpackages"
+                        className="text-gray-300 hover:text-white transition-all duration-500 flex items-center space-x-3 group"
+                      >
+                        <div className="w-2 h-2 bg-gradient-to-r from-[#c6e400] to-[#FBB5E7] rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-150"></div>
+                        <span className="group-hover:translate-x-3 transition-transform duration-500 text-sm group-hover:font-medium">
+                          {service}
+                        </span>
+                      </Link>
+                    </li>
+                  ))
+                )}
               </ul>
             </div>
 
@@ -179,8 +215,11 @@ const Footer = () => {
               </h3>
               <div className="space-y-4">
                 {[
-                  { icon: "✉️", text: "Oracleosheen2@gmail.com" },
-                  { icon: "📞", text: "+91 99158 10965" },
+                  { icon: "✉️", text: "oracleosheen1@gmail.com" },
+                  { icon: "✉️", text: "oracleosheen2@gmail.com" },
+                  { icon: "📞", text: "+91 81466 68328" },
+                  { icon: "📞", text: "+91 98770 97916" },
+                  { icon: "📞", text: "+91 81469 77206" },
                   { icon: "⏰", text: "9am to 6pm" },
                 ].map((item, index) => (
                   <div
@@ -223,6 +262,12 @@ const Footer = () => {
                   className="text-gray-400 hover:text-white transition-all duration-500 hover:font-medium transform hover:translate-y-1"
                 >
                   Terms of Service
+                </Link>
+                <Link
+                  href="/refundpolicy"
+                  className="text-gray-400 hover:text-white transition-all duration-500 hover:font-medium transform hover:translate-y-1"
+                >
+                  Refund Policy
                 </Link>
               </div>
             </div>

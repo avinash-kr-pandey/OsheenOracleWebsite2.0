@@ -74,7 +74,7 @@ const ContactUs: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="font-medium text-gray-800 text-lg">Our Location</h4>
-                  <p className="text-gray-500 text-sm">Zurich, CH</p>
+                  <p className="text-gray-500 text-sm">Mohali, Punjab, India</p>
                 </div>
               </div>
 
@@ -84,7 +84,7 @@ const ContactUs: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="font-medium text-gray-800 text-lg">Phone</h4>
-                  <p className="text-gray-500 text-sm">+961 348 6845</p>
+                  <p className="text-gray-500 text-sm">+91 81466 68328, +91 98770 97916, +91 81469 77206</p>
                 </div>
               </div>
 
@@ -94,7 +94,7 @@ const ContactUs: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="font-medium text-gray-800 text-lg">Email</h4>
-                  <p className="text-gray-500 text-sm">Support@osheen.com</p>
+                  <p className="text-gray-500 text-sm">oracleosheen1@gmail.com, oracleosheen2@gmail.com</p>
                 </div>
               </div>
             </div>

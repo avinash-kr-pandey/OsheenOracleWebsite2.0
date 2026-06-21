@@ -12,8 +12,6 @@ interface FiltersProps {
   onBrandChange: (brand: string) => void;
   selectedSizes: string[];
   onSizeChange: (size: string) => void;
-  selectedCategories: string[];
-  onCategoryChange: (category: string) => void;
   selectedProductCatalogues: string[];
   onProductCatalogueChange: (catalogue: string) => void;
   selectedSubCategories: string[];
@@ -24,7 +22,7 @@ interface FiltersProps {
   availableGenders?: string[];
   availableBrands?: string[];
   availableSizes?: string[];
-  availableCategories?: string[];
+
   availableProductCatalogues?: string[];
   availableSubCategories?: string[];
 }
@@ -40,8 +38,6 @@ const Filters: React.FC<FiltersProps> = ({
   onBrandChange,
   selectedSizes,
   onSizeChange,
-  selectedCategories,
-  onCategoryChange,
   selectedProductCatalogues,
   onProductCatalogueChange,
   selectedSubCategories,
@@ -62,13 +58,7 @@ const Filters: React.FC<FiltersProps> = ({
     "Zara",
     "Chanel",
   ],
-  availableCategories = [
-    "Dresses",
-    "Tops",
-    "Lingerie & Lounge Wear",
-    "Blouse",
-    "Vintage",
-  ],
+
   availableSizes = ["Medium", "Large", "Plus Size", "Sexy Plus Size"],
   availableProductCatalogues = [
     "Spell",
@@ -93,7 +83,6 @@ const Filters: React.FC<FiltersProps> = ({
     selectedGenders.length > 0 ||
     selectedBrands.length > 0 ||
     selectedSizes.length > 0 ||
-    selectedCategories.length > 0 ||
     selectedProductCatalogues.length > 0 ||
     selectedSubCategories.length > 0;
 
@@ -331,32 +320,7 @@ const Filters: React.FC<FiltersProps> = ({
           </div>
         )}
 
-        {/* 🔹 Categories - Now dynamic */}
-        {availableCategories.length > 0 && (
-          <div className="space-y-4">
-            <h3 className="font-semibold text-gray-900 text-base border-b pb-2">
-              Categories
-            </h3>
-            <div className="space-y-3">
-              {availableCategories.map((category) => (
-                <label
-                  key={category}
-                  className="flex items-center gap-3 text-gray-700 cursor-pointer group p-2 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(category)}
-                    onChange={() => onCategoryChange(category)}
-                    className="w-5 h-5 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2 cursor-pointer"
-                  />
-                  <span className="text-sm font-medium group-hover:text-red-600 transition-colors">
-                    {category}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
+
       </div>
     </div>
   );

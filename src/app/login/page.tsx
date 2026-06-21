@@ -6,7 +6,7 @@ import { FaApple, FaArrowLeft } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { toast, Toaster } from "react-hot-toast";
 import { fetchData, postData, putData } from "../../utils/api/api";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   AuthResponse,
   GoogleUserData,
@@ -38,6 +38,8 @@ interface ErrorResponse {
 const GoogleLoginButton = () => {
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect") || "/";
 
   const handleGoogleLogin = async (credentialResponse: CredentialResponse) => {
     const toastId = toast.loading("Signing in with Google...");
@@ -99,9 +101,9 @@ const GoogleLoginButton = () => {
             duration: 2000,
           });
 
-          // Redirect to home
+          // Redirect to target URL
           setTimeout(() => {
-            router.push("/");
+            router.push(redirectUrl);
           }, 1000);
         }
       }
@@ -161,6 +163,8 @@ const Login = () => {
 
   const { user, isAuthenticated, login, logout } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect") || "/";
 
   // Handle Apple Login (placeholder)
   const handleAppleLogin = () => {
@@ -170,10 +174,11 @@ const Login = () => {
   // Check if user is already logged in
   useEffect(() => {
     if (isAuthenticated && user) {
-      console.log("User already authenticated, redirecting...");
-      router.push("/");
+      const target = !redirectUrl || redirectUrl === "/login" || redirectUrl === "/register" ? "/" : redirectUrl;
+      console.log("User already authenticated, redirecting to:", target);
+      window.location.href = target;
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, redirectUrl]);
 
   // Handle OTP input
   const handleOtpChange = (element: HTMLInputElement, index: number) => {
@@ -238,7 +243,7 @@ const Login = () => {
 
         // Redirect immediately
         setTimeout(() => {
-          router.push("/");
+          router.push(redirectUrl);
         }, 500);
       } else {
         throw new Error("Invalid response format");
@@ -307,7 +312,7 @@ const Login = () => {
 
         // ✅ Redirect to dashboard/home immediately
         setTimeout(() => {
-          router.push("/");
+          router.push(redirectUrl);
         }, 500);
       } else if (response.data?.token && response.data?.user) {
         // Case 2: Token and user in data object
@@ -324,7 +329,7 @@ const Login = () => {
 
         // ✅ Redirect to dashboard/home immediately
         setTimeout(() => {
-          router.push("/");
+          router.push(redirectUrl);
         }, 500);
       } else if (response.verified === false || response.requiresOtp) {
         // Case 3: Registration successful but requires OTP verification
@@ -374,7 +379,7 @@ const Login = () => {
 
               // ✅ Redirect to dashboard/home
               setTimeout(() => {
-                router.push("/");
+                router.push(redirectUrl);
               }, 500);
             } else {
               throw new Error("Auto-login failed");
@@ -456,17 +461,18 @@ const Login = () => {
       console.log("Forgot password response:", response);
 
       if (
+        response.requiresOtp ||
         response.success ||
         response.message?.includes("sent") ||
         response.message?.includes("check your email")
       ) {
-        toast.success("Reset link sent! Please check your email inbox.", {
+        toast.success("OTP sent! Please check your email inbox.", {
           id: toastId,
           duration: 6000,
         });
 
-        // Go back to login screen since the user resets password via link in email
-        setAuthStep("login");
+        // Prompt for OTP inputs to reset password
+        setAuthStep("reset");
       } else if (response.message) {
         // Some APIs return message instead of success flag
         toast.success(response.message, {
@@ -681,7 +687,7 @@ const Login = () => {
           toast.success("Login successful!");
 
           setTimeout(() => {
-            router.push("/"); // ✅ SAME redirect for login & register
+            router.push(redirectUrl); // ✅ SAME redirect for login & register
           }, 500);
         } else {
           throw new Error("Login failed");
@@ -1441,14 +1447,8 @@ const Login = () => {
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-700 font-medium">
-            Already logged in! Redirecting to homepage...
+            Redirecting...
           </p>
-          <button
-            onClick={() => router.push("/")}
-            className="mt-4 text-blue-600 hover:text-blue-800 underline"
-          >
-            Click here if not redirected
-          </button>
         </div>
       </div>
     );
@@ -1567,14 +1567,16 @@ const Login = () => {
         {/* Right Form Section */}
         <div className="w-full max-w-md lg:max-w-none lg:w-auto">
           <div className="bg-white/40 backdrop-blur-md p-6 sm:p-8 md:p-10 md:px-14 rounded-2xl md:rounded-3xl shadow-2xl w-full lg:w-[550px] h-auto max-h-[90vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            {isLogin ? (
-              <>
-                {authStep === "login" && renderLoginForm()}
-                {authStep === "otp" && renderOtpForm("login")}
-                {authStep === "forgot" && renderForgotPasswordForm()}
-                {authStep === "reset" && renderOtpForm("reset")}
-                {authStep === "newPassword" && renderNewPasswordForm()}
-              </>
+            {authStep === "otp" ? (
+              renderOtpForm("login")
+            ) : authStep === "forgot" ? (
+              renderForgotPasswordForm()
+            ) : authStep === "reset" ? (
+              renderOtpForm("reset")
+) : authStep === "newPassword" ? (
+              renderNewPasswordForm()
+            ) : isLogin ? (
+              renderLoginForm()
             ) : (
               renderSignupForm()
             )}
@@ -1630,12 +1632,25 @@ const LoginWithGoogleProvider = () => {
 
   if (!googleClientId) {
     console.error("Google Client ID is not set in environment variables");
-    return <Login />;
+    return (
+      <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <Login />
+      </React.Suspense>
+    );
   }
 
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
-      <Login />
+      <React.Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FBB5E7] to-[#C4F9FF]">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-700 font-medium">Loading...</p>
+          </div>
+        </div>
+      }>
+        <Login />
+      </React.Suspense>
     </GoogleOAuthProvider>
   );
 };

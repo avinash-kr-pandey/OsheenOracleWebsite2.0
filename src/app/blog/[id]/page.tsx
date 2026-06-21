@@ -1,8 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import CommonPageHeader from "@/components/CommonPages/CommonPageHeader";
 import { blogAPI, Blog as BlogType, Comment } from "@/utils/api/blog.api";
+import { getFullImageUrl } from "@/utils/api/api";
 
 interface BlogPost {
   id: string;
@@ -74,9 +76,9 @@ const transformBlogForUI = (blog: BlogType): BlogPost => {
     id: blog._id,
     title: blog.title,
     description: blog.excerpt || fullContent.substring(0, 150) + "...",
-    image:
-      blog.image ||
-      "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format",
+    image: blog.image
+      ? getFullImageUrl(blog.image)
+      : "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format",
     category: blog.category,
     date: formatBlogDate(blog.date || blog.createdAt),
     comments: blog.comments || 0,
@@ -266,12 +268,16 @@ const SingleBlogPage = () => {
         <div className="lg:col-span-2">
           <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-[#6a5f57] to-[#8a7967] text-white shadow-2xl">
             {/* Blog Image */}
-            <div className="relative h-96 bg-cover bg-[center_30%]">
-              <div
-                className="h-full w-full bg-cover bg-[center_30%]"
-                style={{ backgroundImage: `url(${blog.image})` }}
+            <div className="relative h-96 w-full overflow-hidden">
+              <Image
+                src={blog.image}
+                alt={blog.title}
+                fill
+                className="object-cover"
+                unoptimized={process.env.NODE_ENV === "production"}
               />
-              <div className="absolute top-4 left-4 bg-gradient-to-r from-orange-500 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+              <div className="absolute inset-0 bg-black/10" />
+              <div className="absolute top-4 left-4 bg-gradient-to-r from-orange-500 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold z-10">
                 {blog.category}
               </div>
             </div>
@@ -359,10 +365,15 @@ const SingleBlogPage = () => {
                     onClick={() => router.push(`/blog/${post.id}`)}
                     className="flex items-center gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 group cursor-pointer"
                   >
-                    <div
-                      className="w-16 h-16 rounded-xl bg-cover bg-center flex-shrink-0"
-                      style={{ backgroundImage: `url(${post.image})` }}
-                    />
+                    <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                      <Image
+                        src={post.image}
+                        alt={post.title}
+                        fill
+                        className="object-cover"
+                        unoptimized={process.env.NODE_ENV === "production"}
+                      />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-orange-300 mb-1">
                         {post.date}

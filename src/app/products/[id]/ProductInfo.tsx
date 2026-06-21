@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useRef, useMemo, useEffect } from "react";
+import { getFullImageUrl } from "@/utils/api/api";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { Product } from "@/types/product";
@@ -69,12 +70,12 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     return cartItems.some((item) => item.id === productId);
   }, [cartItems, product._id, product.id]);
 
-  // ✅ Get all images from product
+  // Get all images from product resolved with getFullImageUrl
   const allImages = useMemo(() => {
     if (!product) return ["/placeholder.jpg"];
 
-    const mainImage = product?.image || "/placeholder.jpg";
-    const additionalImages = product?.images || [];
+    const mainImage = product?.image ? getFullImageUrl(product.image) : "/placeholder.jpg";
+    const additionalImages = (product?.images || []).map((img) => getFullImageUrl(img));
 
     // Create unique array of images
     const images = [mainImage, ...additionalImages].filter(Boolean);
@@ -91,7 +92,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   // ✅ Initialize selected image
   useEffect(() => {
     if (product?.image) {
-      setSelectedImage(product.image);
+      setSelectedImage(getFullImageUrl(product.image));
     } else if (allImages.length > 0) {
       setSelectedImage(allImages[0]);
     }

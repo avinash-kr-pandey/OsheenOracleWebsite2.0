@@ -98,7 +98,8 @@ api.interceptors.response.use(
     if (status === 401 && typeof window !== "undefined") {
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
-      window.location.href = "/login";
+      const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
+      window.location.href = `/login?redirect=${currentPath}`;
     }
     return Promise.reject(error);
   },
@@ -706,6 +707,30 @@ export const getFilterOptions = async (): Promise<{
     console.error("Error fetching filter options:", error);
     throw error;
   }
+};
+
+// Get full URL for relative image paths uploaded to the backend
+export const getFullImageUrl = (imagePath?: string): string => {
+  if (!imagePath) return "/images/default.jpg";
+  
+  if (
+    imagePath.startsWith("/images/") ||
+    imagePath.startsWith("http://") ||
+    imagePath.startsWith("https://") ||
+    imagePath.startsWith("data:")
+  ) {
+    return imagePath;
+  }
+  
+  const apiBaseUrl =
+    process.env.NEXT_PUBLIC_API_URL ||
+    (process.env.NODE_ENV === "production"
+      ? "https://api.osheenoracle.com/api"
+      : "http://localhost:5000/api");
+      
+  const baseUrl = apiBaseUrl.replace(/\/api\/?$/, "");
+  const formattedPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+  return `${baseUrl}${formattedPath}`;
 };
 
 export default api;

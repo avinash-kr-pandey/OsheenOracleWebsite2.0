@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/types/product";
+import { getFullImageUrl } from "@/utils/api/api";
 
 
 interface RecommendedProductsProps {
@@ -71,7 +72,7 @@ export default function RecommendedProducts({
                   {/* Product Image */}
                   <div className="relative w-full h-44 md:h-56 overflow-hidden">
                     <Image
-                      src={product.image || "/placeholder.jpg"}
+                      src={getFullImageUrl(product.image) || "/placeholder.jpg"}
                       alt={product.name || "Product"}
                       width={400}
                       height={400}
