@@ -112,11 +112,6 @@ export default function RecommendedProducts({
 
                   {/* Product Info */}
                   <div className="p-4 flex flex-col items-start">
-                    {/* Brand */}
-                    <p className="text-xs text-blue-600 font-semibold mb-1">
-                      {product.brand || "Unknown Brand"}
-                    </p>
-
                     {/* Product Name */}
                     <p className="font-semibold text-gray-800 text-sm md:text-base mb-1 group-hover:text-pink-600 transition-colors line-clamp-2">
                       {product.name || "Unnamed Product"}

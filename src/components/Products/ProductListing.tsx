@@ -26,7 +26,6 @@ const ProductListing: React.FC = () => {
 
   // Filter options from API
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    brands: [],
     categories: [],
     sizes: [],
     colors: [],
@@ -38,7 +37,6 @@ const ProductListing: React.FC = () => {
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(10000);
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedProductCatalogues, setSelectedProductCatalogues] = useState<
@@ -100,11 +98,7 @@ const ProductListing: React.FC = () => {
           return false;
       }
 
-      // Brand filter
-      if (selectedBrands.length > 0) {
-        if (!product.brand || !selectedBrands.includes(product.brand))
-          return false;
-      }
+
 
       // Size filter
       if (selectedSizes.length > 0) {
@@ -177,7 +171,6 @@ const ProductListing: React.FC = () => {
     minPrice,
     maxPrice,
     selectedGenders,
-    selectedBrands,
     selectedSizes,
     selectedCategories,
     selectedProductCatalogues,
@@ -228,11 +221,7 @@ const ProductListing: React.FC = () => {
     );
   };
 
-  const handleBrandChange = (brand: string) => {
-    setSelectedBrands((prev) =>
-      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
-    );
-  };
+
 
   const handleSizeChange = (size: string) => {
     setSelectedSizes((prev) =>
@@ -270,7 +259,6 @@ const ProductListing: React.FC = () => {
     setMinPrice(0);
     setMaxPrice(filterOptions.maxPrice || 10000);
     setSelectedGenders([]);
-    setSelectedBrands([]);
     setSelectedSizes([]);
     setSelectedCategories([]);
     setSelectedProductCatalogues([]);
@@ -368,8 +356,6 @@ const ProductListing: React.FC = () => {
               setMaxPrice={setMaxPrice}
               selectedGenders={selectedGenders}
               onGenderChange={handleGenderChange}
-              selectedBrands={selectedBrands}
-              onBrandChange={handleBrandChange}
               selectedSizes={selectedSizes}
               onSizeChange={handleSizeChange}
               selectedCategories={selectedCategories}
@@ -380,7 +366,6 @@ const ProductListing: React.FC = () => {
               onSubCategoryChange={handleSubCategoryChange}
               onClearFilters={clearAllFilters}
               availableGenders={availableGenders}
-              availableBrands={filterOptions.brands}
               availableSizes={availableSizesAsString}
               availableCategories={filterOptions.categories}
               availableProductCatalogues={availableProductCatalogues}

@@ -369,7 +369,7 @@ const Products: React.FC<ProductsProps> = ({
                     {/* Brand & Name */}
                     <div className="mb-3">
                       <p className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">
-                        {item.brand || "PREMIUM BRAND"}
+                        {item.category || "GENERAL PRODUCT"}
                       </p>
                       <h3 className="font-bold text-gray-900 text-base mb-2 line-clamp-2">
                         {item.name || "Product Name"}

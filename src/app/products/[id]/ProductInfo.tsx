@@ -388,7 +388,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
             {/* Right: Product Details */}
             <div className="flex flex-col justify-center space-y-6">
-              {/* Category & Brand */}
+              {/* Category */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="bg-pink-500/10 text-pink-700 px-3 py-1 rounded-full text-xs font-bold border border-pink-200">
@@ -403,9 +403,6 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                     </span>
                   ))}
                 </div>
-                <p className="text-blue-600 font-semibold text-sm tracking-wide">
-                  {product.brand || "Unknown Brand"}
-                </p>
               </div>
 
               {/* Product Name */}
@@ -704,12 +701,6 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-3 text-sm sm:text-base">
-                      <div className="flex justify-between border-b border-gray-100 pb-2">
-                        <span className="font-medium text-gray-600">Brand</span>
-                        <span className="text-gray-900">
-                          {product.brand || "Unknown"}
-                        </span>
-                      </div>
                       <div className="flex justify-between border-b border-gray-100 pb-2">
                         <span className="font-medium text-gray-600">
                           Category

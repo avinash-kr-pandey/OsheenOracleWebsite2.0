@@ -13,7 +13,6 @@ interface ProductApiResponse<T = unknown> {
 }
 
 export interface FilterOptions {
-  brands: string[];
   categories: string[];
   sizes: string[];
   colors: string[];
@@ -39,7 +38,6 @@ interface ExtendedProduct extends Product {
  */
 export const fetchProducts = async (filters?: {
   category?: string;
-  brand?: string;
   minPrice?: number;
   maxPrice?: number;
   sort?: "price-low" | "price-high" | "newest" | "rating";
@@ -51,7 +49,6 @@ export const fetchProducts = async (filters?: {
 
     const params: Record<string, string | number | undefined> = {};
     if (filters?.category) params.category = filters.category;
-    if (filters?.brand) params.brand = filters.brand;
     if (filters?.minPrice) params.minPrice = filters.minPrice;
     if (filters?.maxPrice) params.maxPrice = filters.maxPrice;
     if (filters?.sort) params.sort = filters.sort;
@@ -207,38 +204,7 @@ export const fetchProductsByCategory = async (
   }
 };
 
-/**
- * Get products by brand
- */
-export const fetchProductsByBrand = async (
-  brand: string,
-): Promise<ExtendedProduct[]> => {
-  try {
-    console.log(`🏷️ Fetching products by brand: ${brand}`);
 
-    const response = await fetchData<unknown>("/products/brand", { brand });
-
-    let productsArray: unknown[] = [];
-
-    if (Array.isArray(response)) {
-      productsArray = response;
-    } else if (response && typeof response === "object") {
-      const res = response as ProductApiResponse;
-      if (Array.isArray(res.data)) productsArray = res.data;
-      else if (Array.isArray(res.products)) productsArray = res.products;
-    }
-
-    const products = productsArray.map(
-      (item: unknown) => normalizeProduct(item) as ExtendedProduct,
-    );
-    console.log(`✅ Found ${products.length} products from ${brand}`);
-
-    return products;
-  } catch (error) {
-    console.error(`❌ Error fetching products by brand:`, error);
-    return [];
-  }
-};
 
 /**
  * Get featured products for homepage
@@ -354,7 +320,6 @@ export const fetchFilterOptions = async (): Promise<FilterOptions> => {
 
     if (!products.length) {
       return {
-        brands: [],
         categories: [],
         sizes: [],
         colors: [],
@@ -362,13 +327,6 @@ export const fetchFilterOptions = async (): Promise<FilterOptions> => {
         maxPrice: 10000,
       };
     }
-
-    // Extract unique values - Fixed type issue
-    const brands = [
-      ...new Set(
-        products.map((p) => p.brand).filter((b): b is string => Boolean(b)),
-      ),
-    ];
     const categories = [
       ...new Set(
         products.map((p) => p.category).filter((c): c is string => Boolean(c)),
@@ -402,7 +360,6 @@ export const fetchFilterOptions = async (): Promise<FilterOptions> => {
     const maxPrice = prices.length ? Math.max(...prices) : 10000;
 
     const filterOptions: FilterOptions = {
-      brands: brands.sort(),
       categories: categories.sort(),
       sizes: sizes.sort(),
       colors: colors.sort(),
@@ -415,7 +372,6 @@ export const fetchFilterOptions = async (): Promise<FilterOptions> => {
   } catch (error) {
     console.error("❌ Error fetching filter options:", error);
     return {
-      brands: [],
       categories: [],
       sizes: [],
       colors: [],
@@ -431,7 +387,6 @@ export const fetchFilterOptions = async (): Promise<FilterOptions> => {
 export const fetchRelatedProducts = async (
   productId: string | number,
   category?: string,
-  brand?: string,
   limit: number = 4,
 ): Promise<ExtendedProduct[]> => {
   try {
@@ -444,15 +399,7 @@ export const fetchRelatedProducts = async (
     );
 
     if (category) {
-      const byCategory = related.filter((p) => p.category === category);
-      if (byCategory.length >= limit) {
-        related = byCategory;
-      } else if (brand) {
-        const byBrand = related.filter((p) => p.brand === brand);
-        related = [...byCategory, ...byBrand];
-      }
-    } else if (brand) {
-      related = related.filter((p) => p.brand === brand);
+      related = related.filter((p) => p.category === category);
     }
 
     const finalRelated = related.slice(0, limit);
@@ -471,7 +418,6 @@ export const productApi = {
   fetchProductById,
   searchProducts,
   fetchProductsByCategory,
-  fetchProductsByBrand,
   fetchFeaturedProducts,
   fetchNewArrivals,
   fetchProductsByPriceRange,

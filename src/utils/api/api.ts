@@ -437,31 +437,6 @@ export const fetchProductsByCategory = async (
   }
 };
 
-// Get products by brand
-export const fetchProductsByBrand = async (
-  brand: string,
-): Promise<Product[]> => {
-  try {
-    const response = await fetchData<ApiResponse>("/products/brand", { brand });
-
-    let productsArray: unknown[] = [];
-    if (Array.isArray(response)) {
-      productsArray = response;
-    } else if (response && typeof response === "object") {
-      const responseObj = response as ApiResponse;
-      if (Array.isArray(responseObj.data)) {
-        productsArray = responseObj.data;
-      } else if (Array.isArray(responseObj.products)) {
-        productsArray = responseObj.products;
-      }
-    }
-
-    return productsArray.map((item: unknown) => normalizeProduct(item));
-  } catch (error) {
-    console.error(`Error fetching products by brand ${brand}:`, error);
-    throw error;
-  }
-};
 
 // Get featured products
 export const fetchFeaturedProducts = async (
@@ -665,7 +640,6 @@ export const addProductReview = async (
 export const getProductStats = async (): Promise<{
   totalProducts: number;
   totalCategories: number;
-  totalBrands: number;
   averagePrice: number;
   averageRating: number;
 }> => {
@@ -673,7 +647,6 @@ export const getProductStats = async (): Promise<{
     const stats = await fetchData<{
       totalProducts: number;
       totalCategories: number;
-      totalBrands: number;
       averagePrice: number;
       averageRating: number;
     }>("/products/stats");
@@ -686,7 +659,6 @@ export const getProductStats = async (): Promise<{
 
 // Get unique values for filters
 export const getFilterOptions = async (): Promise<{
-  brands: string[];
   categories: string[];
   sizes: string[];
   colors: string[];
@@ -695,7 +667,6 @@ export const getFilterOptions = async (): Promise<{
 }> => {
   try {
     const options = await fetchData<{
-      brands: string[];
       categories: string[];
       sizes: string[];
       colors: string[];

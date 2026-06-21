@@ -244,9 +244,6 @@ const Wishlist: React.FC = () => {
                       {/* Product Info */}
                       <div className="flex-1">
                         <div className="mb-2">
-                          <p className="text-xs text-gray-500 uppercase font-medium">
-                            {item.brand || "Brand"}
-                          </p>
                           <h3 className="font-medium text-gray-900 text-base mb-1">
                             {item.name || "Product Name"}
                           </h3>

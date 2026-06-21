@@ -8,8 +8,6 @@ interface FiltersProps {
   setMaxPrice: (value: number) => void;
   selectedGenders: string[];
   onGenderChange: (gender: string) => void;
-  selectedBrands: string[];
-  onBrandChange: (brand: string) => void;
   selectedSizes: string[];
   onSizeChange: (size: string) => void;
   selectedCategories: string[];
@@ -22,7 +20,6 @@ interface FiltersProps {
 
   // Add these new props for dynamic data
   availableGenders?: string[];
-  availableBrands?: string[];
   availableSizes?: string[];
   availableCategories?: string[];
   availableProductCatalogues?: string[];
@@ -36,8 +33,6 @@ const Filters: React.FC<FiltersProps> = ({
   setMaxPrice,
   selectedGenders,
   onGenderChange,
-  selectedBrands,
-  onBrandChange,
   selectedSizes,
   onSizeChange,
   selectedCategories,
@@ -49,19 +44,6 @@ const Filters: React.FC<FiltersProps> = ({
   onClearFilters,
   // New props with default values (fallback to static arrays)
   availableGenders = ["Women", "Ladies", "Girls", "Babies"],
-  availableBrands = [
-    "H&M",
-    "Mark & Spencer",
-    "Victoria's Secret",
-    "Dior",
-    "Gucci",
-    "Fendi",
-    "Prada",
-    "Versace",
-    "Dolce & Gabbana",
-    "Zara",
-    "Chanel",
-  ],
   availableCategories = [
     "Dresses",
     "Tops",
@@ -91,7 +73,6 @@ const Filters: React.FC<FiltersProps> = ({
     minPrice > 0 ||
     maxPrice < 10000 ||
     selectedGenders.length > 0 ||
-    selectedBrands.length > 0 ||
     selectedSizes.length > 0 ||
     selectedCategories.length > 0 ||
     selectedProductCatalogues.length > 0 ||
@@ -277,32 +258,7 @@ const Filters: React.FC<FiltersProps> = ({
           </div>
         )}
 
-        {/* 🔹 Brands - Now dynamic */}
-        {availableBrands.length > 0 && (
-          <div className="space-y-4">
-            <h3 className="font-semibold text-gray-900 text-base border-b pb-2">
-              Brands
-            </h3>
-            <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
-              {availableBrands.map((brand) => (
-                <label
-                  key={brand}
-                  className="flex items-center gap-3 text-gray-700 cursor-pointer group p-2 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedBrands.includes(brand)}
-                    onChange={() => onBrandChange(brand)}
-                    className="w-5 h-5 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2 cursor-pointer"
-                  />
-                  <span className="text-sm font-medium group-hover:text-red-600 transition-colors">
-                    {brand}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
+
 
         {/* 🔹 Size - Now dynamic */}
         {availableSizes.length > 0 && (
