@@ -7,6 +7,8 @@ const nextConfig = {
     unoptimized: true,
     remotePatterns: [
       { protocol: "https", hostname: "osheenoracle.com" },
+      { protocol: "https", hostname: "api.osheenoracle.com" },
+      { protocol: "http", hostname: "localhost" },
       { protocol: "https", hostname: "encrypted-tbn0.gstatic.com" },
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "https", hostname: "via.placeholder.com" },
