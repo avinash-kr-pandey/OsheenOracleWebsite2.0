@@ -123,6 +123,15 @@ const UserDetailsModal = ({
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => {
+    const { name, value } = e.target;
+    if (name === "phone") {
+      const cleaned = value.replace(/\D/g, "").slice(0, 10);
+      setFormData((prev) => ({
+        ...prev,
+        [name]: cleaned,
+      }));
+      return;
+    }
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -140,6 +149,12 @@ const UserDetailsModal = ({
       !formData.description
     ) {
       toast.error("Please fill all required fields");
+      return;
+    }
+
+    const phoneDigits = formData.phone.replace(/\D/g, "");
+    if (phoneDigits.length !== 10) {
+      toast.error("Phone number must be exactly 10 digits");
       return;
     }
 
@@ -227,6 +242,7 @@ const UserDetailsModal = ({
                   required
                   value={formData.phone}
                   onChange={handleChange}
+                  maxLength={10}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Enter your phone number"
                 />

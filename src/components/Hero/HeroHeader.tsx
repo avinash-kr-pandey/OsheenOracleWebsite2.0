@@ -78,8 +78,23 @@ export default function HeroHeader() {
           isActive: true,
         });
         if (response.success && response.data) {
-          setCategories(response.data);
-          console.log("✅ Dynamic categories loaded:", response.data);
+          const getOrder = (name: string): number => {
+            const lower = name.toLowerCase().trim();
+            if (lower.includes("energy")) return 1;
+            if (lower.includes("tarot")) return 2;
+            if (lower.includes("reiki")) return 3;
+            if (lower.includes("therapy")) return 4;
+            if (lower.includes("affirmation")) return 5;
+            return 999;
+          };
+          const sorted = [...response.data].sort((a, b) => {
+            const aOrder = getOrder(a.name);
+            const bOrder = getOrder(b.name);
+            if (aOrder !== bOrder) return aOrder - bOrder;
+            return (a.order || 0) - (b.order || 0);
+          });
+          setCategories(sorted);
+          console.log("✅ Dynamic categories loaded sorted:", sorted);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);

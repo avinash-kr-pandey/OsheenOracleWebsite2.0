@@ -20,6 +20,14 @@ const ContactUs: React.FC = () => {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
+    if (name === "phone") {
+      const cleaned = value.replace(/\D/g, "").slice(0, 10);
+      setFormData((prev) => ({
+        ...prev,
+        [name]: cleaned,
+      }));
+      return;
+    }
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -28,6 +36,13 @@ const ContactUs: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const phoneDigits = formData.phone.replace(/\D/g, "");
+    if (phoneDigits.length !== 10) {
+      toast.error("Phone number must be exactly 10 digits");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -140,6 +155,7 @@ const ContactUs: React.FC = () => {
                   onChange={handleChange}
                   placeholder="Enter your phone number"
                   required
+                  maxLength={10}
                   className="w-full px-4 py-2 bg-white rounded-full text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>

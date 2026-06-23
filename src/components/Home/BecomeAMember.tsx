@@ -99,8 +99,8 @@ const BecomeAMember: React.FC = () => {
     }
 
     const phoneDigits = formData.phone.replace(/\D/g, "");
-    if (formData.phone && phoneDigits.length < 10) {
-      newErrors.phone = "Phone number must be at least 10 digits";
+    if (formData.phone && phoneDigits.length !== 10) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
     }
 
     if (!formData.plan) {
@@ -116,6 +116,19 @@ const BecomeAMember: React.FC = () => {
   ): void => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
+
+    if (name === "phone") {
+      const cleaned = value.replace(/\D/g, "").slice(0, 10);
+      setFormData((prev: MembershipFormData) => ({
+        ...prev,
+        [name]: cleaned,
+      }));
+      if (errors.phone) {
+        setErrors((prev: FormErrors) => ({ ...prev, phone: undefined }));
+      }
+      if (submitError) setSubmitError("");
+      return;
+    }
 
     setFormData((prev: MembershipFormData) => ({
       ...prev,
@@ -779,6 +792,7 @@ const BecomeAMember: React.FC = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
+                      maxLength={10}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all duration-300 bg-white/50 text-sm ${
                         errors.phone ? "border-red-300" : "border-gray-300"
                       }`}

@@ -160,7 +160,7 @@ const BookingPage = () => {
       </section>
 
       {/* Services Section */}
-      <section className=" py-16">
+      <section id="services-section" className=" py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
