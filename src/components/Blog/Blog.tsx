@@ -201,9 +201,9 @@ const Blog = () => {
 
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 flex items-center justify-center text-xs">
-                        {post.authorInitials}
+                        OM
                       </div>
-                      <span className="text-sm opacity-70">{post.author}</span>
+                      <span className="text-sm opacity-70">Osheen MAA</span>
                     </div>
                   </div>
                 </div>

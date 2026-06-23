@@ -299,7 +299,7 @@ const SingleBlogPage = () => {
                 </div>
                 <div className="flex items-center gap-1">
                   <span>✍️</span>
-                  <span>By {blog.author}</span>
+                  <span>By Osheen MAA</span>
                 </div>
               </div>
 
@@ -341,11 +341,11 @@ const SingleBlogPage = () => {
           {/* Author Info */}
           <div className="bg-gradient-to-br from-[#362f2b] to-[#4a4038] p-6 rounded-2xl text-white shadow-xl border border-white/10 text-center">
             <div className="w-20 h-20 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-              {blog.authorInitials}
+              OM
             </div>
-            <h3 className="text-xl font-bold mb-2">{blog.author}</h3>
+            <h3 className="text-xl font-bold mb-2">Osheen MAA</h3>
             <p className="text-gray-300 text-sm">
-              Spiritual Guide & Astrologer
+              Follow for guidance
             </p>
             <button className="mt-4 w-full bg-gradient-to-r from-orange-500 to-purple-600 py-2 rounded-xl text-sm font-semibold hover:shadow-lg transition-all">
               Follow Author

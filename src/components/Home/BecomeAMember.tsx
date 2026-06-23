@@ -291,7 +291,7 @@ const BecomeAMember: React.FC = () => {
           <div className="inline-flex items-center px-5 py-2.5 rounded-full bg-white/80 backdrop-blur-sm border border-purple-200/50 mb-8 animate-fade-in">
             <span className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mr-2 animate-ping"></span>
             <span className="text-purple-700 font-medium text-sm">
-              Join {stats[0]?.number || "5,000+"} Spiritual Seekers
+              Join {stats.find(s => s.number === "5000+")?.number || "5000+"} Happy Lives
             </span>
           </div>
 
@@ -328,34 +328,34 @@ const BecomeAMember: React.FC = () => {
               <>
                 <div className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl">
                   <div className="text-3xl md:text-4xl font-bold text-purple-600">
-                    5,000+
-                  </div>
-                  <div className="text-gray-600 mt-2 text-sm">
-                    Spiritual Seekers
-                  </div>
-                </div>
-                <div className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl">
-                  <div className="text-3xl md:text-4xl font-bold text-purple-600">
-                    98%
-                  </div>
-                  <div className="text-gray-600 mt-2 text-sm">
-                    Client Satisfaction
-                  </div>
-                </div>
-                <div className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl">
-                  <div className="text-3xl md:text-4xl font-bold text-purple-600">
                     10+
                   </div>
                   <div className="text-gray-600 mt-2 text-sm">
-                    Years Experience
+                    Years of Experience
                   </div>
                 </div>
                 <div className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl">
                   <div className="text-3xl md:text-4xl font-bold text-purple-600">
-                    24/7
+                    5000+
                   </div>
                   <div className="text-gray-600 mt-2 text-sm">
-                    Energy Support
+                    Happy Lives
+                  </div>
+                </div>
+                <div className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl">
+                  <div className="text-3xl md:text-4xl font-bold text-purple-600">
+                    1000+
+                  </div>
+                  <div className="text-gray-600 mt-2 text-sm">
+                    Kundli Analysis Completed
+                  </div>
+                </div>
+                <div className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl">
+                  <div className="text-3xl md:text-4xl font-bold text-purple-600">
+                    95%
+                  </div>
+                  <div className="text-gray-600 mt-2 text-sm">
+                    Client Satisfaction Rate
                   </div>
                 </div>
               </>

@@ -188,7 +188,7 @@ const BlogSlider: React.FC = () => {
                     </Link>
 
                     <div className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">
-                      ✍️ {cardBlog.author}
+                      ✍️ Osheen MAA
                     </div>
                   </div>
                 </div>

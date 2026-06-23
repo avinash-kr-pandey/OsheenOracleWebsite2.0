@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Star,
@@ -39,14 +39,380 @@ import {
   HandHeart
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast, Toaster } from "react-hot-toast";
+import { servicePackageAPI } from "@/utils/api/service.package.api";
+import { FiX } from "react-icons/fi";
 
 import { servicesData, astrologers, serviceCategories, expertiseCategories } from "@/utils/AstroData";
 import CommonPageHeader from "@/components/CommonPages/CommonPageHeader";
 
+const getDbMapping = (serviceName: string, dbCategories: any[]) => {
+  const name = serviceName.toLowerCase();
+
+  // Try to find exact or partial match first
+  for (const cat of dbCategories) {
+    for (const sub of cat.subcategories) {
+      if (sub.name.toLowerCase().includes(name) || name.includes(sub.name.toLowerCase())) {
+        return { categoryId: cat._id, subcategoryId: sub._id, name: sub.name, price: sub.price, duration: sub.duration, description: sub.description };
+      }
+    }
+  }
+
+  // Fallback defaults mapping:
+  if (name.includes("angel")) {
+    const tarotCat = dbCategories.find(c => c.name.toLowerCase().includes("tarot"));
+    const angelSub = tarotCat?.subcategories.find(s => s.name.toLowerCase().includes("angel"));
+    if (angelSub) return { categoryId: tarotCat._id, subcategoryId: angelSub._id, name: angelSub.name, price: angelSub.price, duration: angelSub.duration, description: angelSub.description };
+  }
+
+  if (name.includes("tarot")) {
+    const tarotCat = dbCategories.find(c => c.name.toLowerCase().includes("tarot"));
+    const audioSub = tarotCat?.subcategories.find(s => s.name.toLowerCase().includes("audio call"));
+    if (audioSub) return { categoryId: tarotCat._id, subcategoryId: audioSub._id, name: audioSub.name, price: audioSub.price, duration: audioSub.duration, description: audioSub.description };
+  }
+
+  if (name.includes("on call") || name.includes("consultation")) {
+    const tarotCat = dbCategories.find(c => c.name.toLowerCase().includes("tarot"));
+    const audioSub = tarotCat?.subcategories.find(s => s.name.toLowerCase().includes("audio call"));
+    if (audioSub) return { categoryId: tarotCat._id, subcategoryId: audioSub._id, name: audioSub.name, price: audioSub.price, duration: audioSub.duration, description: audioSub.description };
+  }
+
+  if (name.includes("relationship")) {
+    const energyCat = dbCategories.find(c => c.name.toLowerCase().includes("energy"));
+    const loveSub = energyCat?.subcategories.find(s => s.name.toLowerCase().includes("love commitment"));
+    if (loveSub) return { categoryId: energyCat._id, subcategoryId: loveSub._id, name: loveSub.name, price: loveSub.price, duration: loveSub.duration, description: loveSub.description };
+  }
+
+  if (name.includes("career")) {
+    const energyCat = dbCategories.find(c => c.name.toLowerCase().includes("energy"));
+    const careerSub = energyCat?.subcategories.find(s => s.name.toLowerCase().includes("career growth"));
+    if (careerSub) return { categoryId: energyCat._id, subcategoryId: careerSub._id, name: careerSub.name, price: careerSub.price, duration: careerSub.duration, description: careerSub.description };
+  }
+
+  if (name.includes("success") || name.includes("jars")) {
+    const energyCat = dbCategories.find(c => c.name.toLowerCase().includes("energy"));
+    const successSub = energyCat?.subcategories.find(s => s.name.toLowerCase().includes("one wish"));
+    if (successSub) return { categoryId: energyCat._id, subcategoryId: successSub._id, name: successSub.name, price: successSub.price, duration: successSub.duration, description: successSub.description };
+  }
+
+  if (name.includes("reiki")) {
+    const reikiCat = dbCategories.find(c => c.name.toLowerCase().includes("reiki"));
+    const reikiSub = reikiCat?.subcategories[0];
+    if (reikiSub) return { categoryId: reikiCat._id, subcategoryId: reikiSub._id, name: reikiSub.name, price: reikiSub.price, duration: reikiSub.duration, description: reikiSub.description };
+  }
+
+  if (dbCategories.length > 0 && dbCategories[0].subcategories.length > 0) {
+    const firstCat = dbCategories[0];
+    const firstSub = firstCat.subcategories[0];
+    return { categoryId: firstCat._id, subcategoryId: firstSub._id, name: firstSub.name, price: firstSub.price, duration: firstSub.duration, description: firstSub.description };
+  }
+
+  return null;
+};
+
+const UserDetailsModal = ({
+  service,
+  onClose,
+  onProceedToPayment,
+}: {
+  service: any;
+  onClose: () => void;
+  onProceedToPayment: (userData: any) => void;
+}) => {
+  const isVideoCall = service.name.toLowerCase().includes("video") || service.description.toLowerCase().includes("video");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    description: "",
+    communicationMode: isVideoCall ? "video_call" : "voice_call",
+    preferredTimeSlot: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      }));
+    }
+  }, [user]);
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    const { name, value } = e.target;
+    if (name === "phone") {
+      const cleaned = value.replace(/\D/g, "").slice(0, 10);
+      setFormData((prev) => ({
+        ...prev,
+        [name]: cleaned,
+      }));
+      return;
+    }
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.address ||
+      !formData.description
+    ) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
+    const phoneDigits = formData.phone.replace(/\D/g, "");
+    if (phoneDigits.length !== 10) {
+      toast.error("Phone number must be exactly 10 digits");
+      return;
+    }
+
+    setSubmitting(true);
+    onProceedToPayment(formData);
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto text-left">
+      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 rounded-t-2xl">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold">Complete Your Details</h2>
+              <p className="text-purple-100 mt-1">{service.name}</p>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-white hover:text-gray-200 text-3xl leading-none"
+            >
+              <FiX />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="mb-6 p-4 bg-purple-50 rounded-xl">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm text-gray-600 font-medium">Package Price</p>
+                <p className="text-2xl font-bold text-purple-700">
+                  ₹{service.price.toLocaleString()}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-600 font-medium">Duration</p>
+                <p className="text-lg font-semibold text-gray-700">
+                  {service.duration}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800"
+                  placeholder="Enter your name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800"
+                  placeholder="Enter your email"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  required
+                  value={formData.phone}
+                  onChange={handleChange}
+                  maxLength={10}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800"
+                  placeholder="Enter your phone number"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Communication Mode *
+                </label>
+                <select
+                  name="communicationMode"
+                  required
+                  value={formData.communicationMode}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-800"
+                >
+                  {isVideoCall ? (
+                    <option value="video_call">📹 Video Call Session</option>
+                  ) : (
+                    <option value="voice_call">📞 Voice Call</option>
+                  )}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Address *
+              </label>
+              <textarea
+                name="address"
+                required
+                rows={2}
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-800"
+                placeholder="Enter your full address"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description / Requirements *
+              </label>
+              <textarea
+                name="description"
+                required
+                rows={3}
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-800"
+                placeholder="Please describe your requirements..."
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Preferred Time Slot (Optional)
+                </label>
+                <select
+                  name="preferredTimeSlot"
+                  value={formData.preferredTimeSlot}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-800"
+                >
+                  <option value="">Select time slot</option>
+                  <option value="11:00 AM - 01:00 PM">11:00 AM - 01:00 PM</option>
+                  <option value="02:00 PM - 04:00 PM">02:00 PM - 04:00 PM</option>
+                  <option value="04:00 PM - 06:00 PM">04:00 PM - 06:00 PM</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+              >
+                {submitting ? "Processing..." : "Continue to Payment →"}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const BookingPage = () => {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [showAllServices, setShowAllServices] = useState(false);
+  const [dbCategories, setDbCategories] = useState<any[]>([]);
+  const [loadingDb, setLoadingDb] = useState(true);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [bookingModalService, setBookingModalService] = useState<any | null>(null);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await servicePackageAPI.getAllCategories();
+        if (response && response.success && response.data) {
+          setDbCategories(response.data);
+        }
+      } catch (err) {
+        console.error("Error loading categories:", err);
+      } finally {
+        setLoadingDb(false);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
+    const pendingService = sessionStorage.getItem("pendingService");
+    const redirectPath = sessionStorage.getItem("redirectAfterLogin");
+
+    if (
+      isAuthenticated &&
+      pendingService &&
+      redirectPath === window.location.pathname
+    ) {
+      const parsedService = JSON.parse(pendingService);
+      sessionStorage.removeItem("pendingService");
+      sessionStorage.removeItem("redirectAfterLogin");
+
+      toast.success("Login successful! You can now book the service.", {
+        duration: 3000,
+        position: "top-center",
+      });
+
+      setBookingModalService(parsedService);
+      setShowFormModal(true);
+    }
+  }, [isAuthenticated]);
 
   const displayedServices = showAllServices ? servicesData : servicesData.slice(0, 6);
 
@@ -60,18 +426,59 @@ const BookingPage = () => {
     window.open(whatsappUrl, "_blank");
   };
 
+  const handleProceedToPayment = (userData: any) => {
+    if (!bookingModalService) return;
+
+    const serviceData = {
+      serviceId: bookingModalService._id,
+      serviceName: bookingModalService.name,
+      servicePrice: bookingModalService.price,
+      serviceDuration: bookingModalService.duration,
+      serviceDescription: bookingModalService.description,
+      categoryId: bookingModalService.categoryId,
+      categoryName: bookingModalService.categoryName,
+      name: userData.name,
+      email: userData.email,
+      phone: userData.phone,
+      address: userData.address,
+      description: userData.description,
+      communicationMode: userData.communicationMode,
+      preferredTimeSlot: userData.preferredTimeSlot,
+    };
+
+    sessionStorage.setItem("selectedService", JSON.stringify(serviceData));
+    setShowFormModal(false);
+    router.push("/header/payment-methods");
+  };
+
   const handleServiceBooking = (service: typeof servicesData[0]) => {
-    const bestAstrologer = astrologers.find(a => a.expertise.some(exp =>
-      service.features.some(feature =>
-        exp.toLowerCase().includes(feature.toLowerCase())
-      )
-    )) || astrologers[0];
+    const match = getDbMapping(service.name, dbCategories);
+    const serviceDataForLater = {
+      _id: match?.subcategoryId || service.id.toString(),
+      name: service.name,
+      price: match?.price || parseFloat(service.price.replace(/[^\d.]/g, "")),
+      duration: match?.duration || service.duration,
+      description: match?.description || service.description,
+      categoryId: match?.categoryId || "",
+      categoryName: service.category,
+    };
 
-    const message = `Hello ${bestAstrologer.name}, I would like to book a ${service.name} session for ₹${service.price}. Please provide available time slots and more details about the service.`;
+    if (!isAuthenticated) {
+      sessionStorage.setItem("pendingService", JSON.stringify(serviceDataForLater));
+      toast.error("Please login to continue with booking", {
+        duration: 3000,
+        position: "top-center",
+        icon: "🔐",
+      });
+      sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
+      setTimeout(() => {
+        router.push("/login");
+      }, 1000);
+      return;
+    }
 
-    const whatsappUrl = `https://wa.me/${bestAstrologer.whatsappNumber
-      }?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
+    setBookingModalService(serviceDataForLater);
+    setShowFormModal(true);
   };
 
   const getServiceIcon = (serviceName: string) => {
@@ -549,6 +956,14 @@ const BookingPage = () => {
           </motion.div>
         </div>
       </section>
+      {showFormModal && bookingModalService && (
+        <UserDetailsModal
+          service={bookingModalService}
+          onClose={() => setShowFormModal(false)}
+          onProceedToPayment={handleProceedToPayment}
+        />
+      )}
+      <Toaster />
     </div>
   );
 };

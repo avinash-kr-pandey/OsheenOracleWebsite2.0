@@ -466,6 +466,7 @@ const ZodiacDetails = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
+          style={{ fontFamily: "var(--font-montserrat)" }}
         >
           <div className="text-center mb-12">
             <motion.h2
@@ -544,7 +545,7 @@ const ZodiacDetails = () => {
                       <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1 rounded-full">
                         <TrendingUp className="w-4 h-4" />
                         <span className="font-semibold text-sm">
-                          {guide.satisfactionRate}%
+                          95%
                         </span>
                       </div>
                     </div>
@@ -557,17 +558,19 @@ const ZodiacDetails = () => {
                       <div className="flex items-center gap-3 text-sm sm:text-base text-gray-600">
                         <Clock className="w-5 h-5 text-purple-500" />
                         <span>
-                          <strong>{guide.experience}</strong> Professional
-                          Experience
+                          <strong>10+ Years</strong> Professional Experience
                         </span>
                       </div>
                       <div className="flex items-center gap-3 text-sm sm:text-base text-gray-600">
                         <Users className="w-5 h-5 text-pink-500" />
                         <span>
-                          <strong>
-                            {guide.stats?.satisfiedClients || "4200+"}
-                          </strong>{" "}
-                          Satisfied Clients
+                          <strong>5000+</strong> Happy Lives
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm sm:text-base text-gray-600">
+                        <Target className="w-5 h-5 text-orange-500" />
+                        <span>
+                          <strong>1000+</strong> Kundli Analysis Completed
                         </span>
                       </div>
                       <div className="flex items-center gap-3 text-sm sm:text-base text-gray-600">
@@ -575,17 +578,6 @@ const ZodiacDetails = () => {
                         <span>
                           <strong>Languages:</strong>{" "}
                           {guide.languages?.join(", ") || "English, Hindi"}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm sm:text-base text-gray-600">
-                        <Target className="w-5 h-5 text-orange-500" />
-                        <span>
-                          <strong>Expertise:</strong>{" "}
-                          {guide.expertiseAreas?.slice(0, 3).join(", ") ||
-                            "Spiritual Guidance"}
-                          {guide.expertiseAreas &&
-                            guide.expertiseAreas.length > 3 &&
-                            " +"}
                         </span>
                       </div>
                     </div>

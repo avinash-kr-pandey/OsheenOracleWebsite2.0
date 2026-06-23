@@ -113,6 +113,8 @@ const PaymentMethodsPage = () => {
         communicationMode: selectedService.communicationMode || "voice_call",
         description:
           selectedService.description || selectedService.serviceDescription,
+        preferredDate: selectedService.preferredDate,
+        preferredTimeSlot: selectedService.preferredTimeSlot,
       });
 
       console.log("📦 Service request response:", response);
@@ -326,12 +328,10 @@ const PaymentMethodsPage = () => {
                           <div className="flex items-center gap-1">
                             <span className="text-gray-500">Time Slot:</span>
                             <span className="text-purple-600">
-                              {selectedService.preferredTimeSlot ===
-                                "morning" && "Morning (9 AM - 12 PM)"}
-                              {selectedService.preferredTimeSlot ===
-                                "afternoon" && "Afternoon (12 PM - 4 PM)"}
-                              {selectedService.preferredTimeSlot ===
-                                "evening" && "Evening (4 PM - 8 PM)"}
+                              {selectedService.preferredTimeSlot === "morning" && "Morning (9 AM - 12 PM)"}
+                              {selectedService.preferredTimeSlot === "afternoon" && "Afternoon (12 PM - 4 PM)"}
+                              {selectedService.preferredTimeSlot === "evening" && "Evening (4 PM - 8 PM)"}
+                              {!["morning", "afternoon", "evening"].includes(selectedService.preferredTimeSlot) && selectedService.preferredTimeSlot}
                             </span>
                           </div>
                         )}

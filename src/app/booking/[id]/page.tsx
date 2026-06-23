@@ -303,7 +303,7 @@ const ZodiacDetails = () => {
       </section>
 
       {/* Astrologers Section */}
-      <section className="container w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+      <section className="container w-7xl mx-auto px-4 sm:px-6 lg:px-8 " style={{ fontFamily: "var(--font-montserrat)" }}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -378,7 +378,7 @@ const ZodiacDetails = () => {
                       <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1 rounded-full">
                         <TrendingUp className="w-4 h-4" />
                         <span className="font-semibold text-sm">
-                          {astrologer.successRate}
+                          95%
                         </span>
                       </div>
                     </div>
@@ -391,15 +391,19 @@ const ZodiacDetails = () => {
                       <div className="flex items-center gap-3 text-sm sm:text-base text-gray-600">
                         <Clock className="w-5 h-5 text-purple-500" />
                         <span>
-                          <strong>{astrologer.experience}</strong> Professional
-                          Experience
+                          <strong>10+ Years</strong> Professional Experience
                         </span>
                       </div>
                       <div className="flex items-center gap-3 text-sm sm:text-base text-gray-600">
                         <Users className="w-5 h-5 text-pink-500" />
                         <span>
-                          <strong>{astrologer.clientsHelped}</strong> Satisfied
-                          Clients
+                          <strong>5000+</strong> Happy Lives
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm sm:text-base text-gray-600">
+                        <Target className="w-5 h-5 text-orange-500" />
+                        <span>
+                          <strong>1000+</strong> Kundli Analysis Completed
                         </span>
                       </div>
                       <div className="flex items-center gap-3 text-sm sm:text-base text-gray-600">
@@ -407,13 +411,6 @@ const ZodiacDetails = () => {
                         <span>
                           <strong>Languages:</strong>{" "}
                           {astrologer.languages.join(", ")}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm sm:text-base text-gray-600">
-                        <Target className="w-5 h-5 text-orange-500" />
-                        <span>
-                          <strong>Expertise:</strong>{" "}
-                          {astrologer.expertise.join(", ")}
                         </span>
                       </div>
                     </div>

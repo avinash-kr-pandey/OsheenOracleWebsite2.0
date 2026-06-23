@@ -197,7 +197,13 @@ export default function AboutPage() {
               <p className="text-xl font-semibold text-gray-800 mb-4">
                 For a direct consultation with Osheen Ma
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a
+                  href="tel:+919877097916"
+                  className="bg-yellow-400 text-white px-8 py-3 rounded-full hover:bg-yellow-500 transition-colors"
+                >
+                  Call +91 9877097916
+                </a>
                 <a
                   href="tel:+918146668328"
                   className="bg-yellow-400 text-white px-8 py-3 rounded-full hover:bg-yellow-500 transition-colors"

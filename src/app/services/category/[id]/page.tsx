@@ -94,13 +94,14 @@ const UserDetailsModal = ({
     preferredTimeSlot?: string;
   }) => void;
 }) => {
+  const isVideoCall = service.name.toLowerCase().includes("video") || service.description.toLowerCase().includes("video");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
     description: "",
-    communicationMode: "voice_call",
+    communicationMode: isVideoCall ? "video_call" : "voice_call",
     preferredDate: "",
     preferredTimeSlot: "",
   });
@@ -258,9 +259,11 @@ const UserDetailsModal = ({
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                 >
-                  <option value="voice_call">📞 Voice Call</option>
-                  <option value="video_call">📹 Video Call</option>
-                  <option value="voice_note">🎤 Voice Note</option>
+                  {isVideoCall ? (
+                    <option value="video_call">📹 Video Call Session</option>
+                  ) : (
+                    <option value="voice_call">📞 Voice Call</option>
+                  )}
                 </select>
               </div>
             </div>
@@ -295,19 +298,7 @@ const UserDetailsModal = ({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Preferred Date (Optional)
-                </label>
-                <input
-                  type="date"
-                  name="preferredDate"
-                  value={formData.preferredDate}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
+            <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Preferred Time Slot (Optional)
@@ -319,9 +310,9 @@ const UserDetailsModal = ({
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="">Select time slot</option>
-                  <option value="morning">Morning (9 AM - 12 PM)</option>
-                  <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
-                  <option value="evening">Evening (4 PM - 8 PM)</option>
+                  <option value="11:00 AM - 01:00 PM">11:00 AM - 01:00 PM</option>
+                  <option value="02:00 PM - 04:00 PM">02:00 PM - 04:00 PM</option>
+                  <option value="04:00 PM - 06:00 PM">04:00 PM - 06:00 PM</option>
                 </select>
               </div>
             </div>

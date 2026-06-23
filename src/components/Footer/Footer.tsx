@@ -235,7 +235,7 @@ const Footer = () => {
                   { icon: "📞", text: "+91 81466 68328" },
                   { icon: "📞", text: "+91 98770 97916" },
                   { icon: "📞", text: "+91 81469 77206" },
-                  { icon: "⏰", text: "9am to 6pm" },
+                  { icon: "⏰", text: "10am to 6pm" },
                 ].map((item, index) => (
                   <div
                     key={index}
