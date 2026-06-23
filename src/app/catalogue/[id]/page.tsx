@@ -160,7 +160,7 @@ const ZodiacDetails = () => {
 
   const handleWhatsAppBooking = (guide: ExpertGuide) => {
     const message = `Hello ${guide.name}, I would like to book a ${catalogueItem?.name} reading session.`;
-    const whatsappUrl = `https://wa.me/1234567890?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/918146668328?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
 

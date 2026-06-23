@@ -670,7 +670,7 @@ export const astrologers = [
     ],
     languages: ["Hindi", "English", "Punjabi"],
     image: "/images/astrologers/priya-sharma.jpg",
-    whatsappNumber: "+919876543210",
+    whatsappNumber: "918146668328",
     about:
       "Renowned Vedic astrologer with over 12 years of experience in helping people find their true path through ancient astrological principles. Specialized in career guidance and relationship compatibility with a proven track record of accurate predictions.",
     successRate: "95%",
@@ -715,7 +715,7 @@ export const astrologers = [
     ],
     languages: ["Hindi", "Tamil", "English", "Telugu"],
     image: "/images/astrologers/rajesh-kumar.jpg",
-    whatsappNumber: "+919876543211",
+    whatsappNumber: "918146668328",
     about:
       "Expert in numerology and KP astrology system with 15+ years of experience. Specializing in accurate predictions and practical solutions for life challenges. Known for precise business and marriage predictions with high client satisfaction.",
     successRate: "92%",
@@ -761,7 +761,7 @@ export const astrologers = [
     ],
     languages: ["English", "Marathi", "Hindi", "Gujarati"],
     image: "/images/astrologers/anita-desai.jpg",
-    whatsappNumber: "+919876543212",
+    whatsappNumber: "918146668328",
     about:
       "Combining tarot wisdom with crystal healing to provide holistic guidance and transformative solutions for modern life challenges. Special focus on spiritual and personal growth, helping clients find their true purpose.",
     successRate: "90%",
@@ -807,7 +807,7 @@ export const astrologers = [
     ],
     languages: ["Hindi", "English", "Sanskrit"],
     image: "/images/astrologers/vikram-singh.jpg",
-    whatsappNumber: "+919876543213",
+    whatsappNumber: "918146668328",
     about:
       "Doctorate in Vedic astrology with specialization in medical astrology and Prashna. Known for accurate health predictions and effective remedial solutions. Combines ancient wisdom with modern understanding of health and wellness.",
     successRate: "96%",
@@ -852,7 +852,7 @@ export const astrologers = [
     ],
     languages: ["Hindi", "English", "Gujarati", "Marathi"],
     image: "/images/astrologers/meera-patel.jpg",
-    whatsappNumber: "+919876543214",
+    whatsappNumber: "918146668328",
     about:
       "Specialized in love and relationship astrology with a proven track record of helping thousands find love and resolve relationship issues. Compassionate and understanding approach with focus on practical solutions.",
     successRate: "94%",
@@ -898,7 +898,7 @@ export const astrologers = [
     ],
     languages: ["Hindi", "English", "Bengali"],
     image: "/images/astrologers/arjun-mehta.jpg",
-    whatsappNumber: "+919876543215",
+    whatsappNumber: "918146668328",
     about:
       "Young and dynamic astrologer specializing in career and business predictions. Known for practical advice and modern approach to traditional astrology. Helps clients make informed decisions about career and business opportunities.",
     successRate: "91%",

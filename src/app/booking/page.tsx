@@ -96,7 +96,7 @@ const BookingPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-32">
+    <div className="min-h-screen">
       <CommonPageHeader
         title="Book Your Spiritual Services"
         subtitle="Home - Services - All Experts"
@@ -522,8 +522,7 @@ const BookingPage = () => {
 
                   <button
                     onClick={() => {
-                      document.querySelector('#services-section')?.scrollIntoView({ behavior: 'smooth' });
-                      setSelectedService(1);
+                      router.push("/services/ourpackages");
                     }}
                     className="bg-white text-purple-600 font-semibold py-4 px-10 rounded-xl border-2 border-purple-600 hover:bg-purple-50 transition-all duration-300"
                   >
