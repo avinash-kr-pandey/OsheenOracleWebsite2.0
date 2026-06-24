@@ -115,30 +115,30 @@ const BlogSlider: React.FC = () => {
       className="px-8 py-12 relative"
       style={{ fontFamily: "var(--font-montserrat)" }}
     >
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+      <div className="flex justify-between items-end mb-8 w-full gap-4">
         <div>
-          <p className="md:text-lg text-md mb-2 text-[#3D2E4F]">BLOG</p>
-          <h2 className="md:text-5xl text-2xl text-[#3D2E4F] py-1 font-bold">
-            Cosmic <span className="italic font-serif">Stories</span> from Celestial
+          <p className="md:text-lg text-sm mb-1 text-[#3D2E4F] font-semibold tracking-wider uppercase">BLOG</p>
+          <h2 className="md:text-5xl text-xl sm:text-2xl text-[#3D2E4F] py-1 font-bold leading-tight">
+            Cosmic <span className="italic font-serif text-[#62aec5]">Stories</span> <span className="hidden sm:inline">from Celestial</span>
           </h2>
         </div>
 
         {/* Scroll Buttons - Only show if there are blogs */}
         {blogs.length > 0 && (
-          <div className="flex gap-3 pb-2">
+          <div className="flex gap-2 sm:gap-3 pb-1 sm:pb-2 flex-shrink-0">
             <button
               onClick={() => scroll("prev")}
-              className="bg-white hover:bg-yellow-400 hover:text-white p-3 rounded-full shadow-md border border-gray-150 transition-all duration-300 active:scale-95 text-[#3D2E4F]"
+              className="bg-white/95 hover:bg-yellow-400 hover:text-white p-2.5 sm:p-3 rounded-full shadow-md border border-purple-100/30 transition-all duration-300 active:scale-95 text-[#3D2E4F] cursor-pointer hover:shadow-lg"
               aria-label="Previous post"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <button
               onClick={() => scroll("next")}
-              className="bg-white hover:bg-yellow-400 hover:text-white p-3 rounded-full shadow-md border border-gray-150 transition-all duration-300 active:scale-95 text-[#3D2E4F]"
+              className="bg-white/95 hover:bg-yellow-400 hover:text-white p-2.5 sm:p-3 rounded-full shadow-md border border-purple-100/30 transition-all duration-300 active:scale-95 text-[#3D2E4F] cursor-pointer hover:shadow-lg"
               aria-label="Next post"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         )}
