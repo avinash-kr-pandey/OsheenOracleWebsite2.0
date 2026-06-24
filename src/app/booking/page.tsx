@@ -61,43 +61,43 @@ const getDbMapping = (serviceName: string, dbCategories: any[]) => {
 
   // Fallback defaults mapping:
   if (name.includes("angel")) {
-    const tarotCat = dbCategories.find(c => c.name.toLowerCase().includes("tarot"));
-    const angelSub = tarotCat?.subcategories.find(s => s.name.toLowerCase().includes("angel"));
+    const tarotCat = dbCategories.find((c: any) => c.name.toLowerCase().includes("tarot"));
+    const angelSub = tarotCat?.subcategories.find((s: any) => s.name.toLowerCase().includes("angel"));
     if (angelSub) return { categoryId: tarotCat._id, subcategoryId: angelSub._id, name: angelSub.name, price: angelSub.price, duration: angelSub.duration, description: angelSub.description };
   }
 
   if (name.includes("tarot")) {
-    const tarotCat = dbCategories.find(c => c.name.toLowerCase().includes("tarot"));
-    const audioSub = tarotCat?.subcategories.find(s => s.name.toLowerCase().includes("audio call"));
+    const tarotCat = dbCategories.find((c: any) => c.name.toLowerCase().includes("tarot"));
+    const audioSub = tarotCat?.subcategories.find((s: any) => s.name.toLowerCase().includes("audio call"));
     if (audioSub) return { categoryId: tarotCat._id, subcategoryId: audioSub._id, name: audioSub.name, price: audioSub.price, duration: audioSub.duration, description: audioSub.description };
   }
 
   if (name.includes("on call") || name.includes("consultation")) {
-    const tarotCat = dbCategories.find(c => c.name.toLowerCase().includes("tarot"));
-    const audioSub = tarotCat?.subcategories.find(s => s.name.toLowerCase().includes("audio call"));
+    const tarotCat = dbCategories.find((c: any) => c.name.toLowerCase().includes("tarot"));
+    const audioSub = tarotCat?.subcategories.find((s: any) => s.name.toLowerCase().includes("audio call"));
     if (audioSub) return { categoryId: tarotCat._id, subcategoryId: audioSub._id, name: audioSub.name, price: audioSub.price, duration: audioSub.duration, description: audioSub.description };
   }
 
   if (name.includes("relationship")) {
-    const energyCat = dbCategories.find(c => c.name.toLowerCase().includes("energy"));
-    const loveSub = energyCat?.subcategories.find(s => s.name.toLowerCase().includes("love commitment"));
+    const energyCat = dbCategories.find((c: any) => c.name.toLowerCase().includes("energy"));
+    const loveSub = energyCat?.subcategories.find((s: any) => s.name.toLowerCase().includes("love commitment"));
     if (loveSub) return { categoryId: energyCat._id, subcategoryId: loveSub._id, name: loveSub.name, price: loveSub.price, duration: loveSub.duration, description: loveSub.description };
   }
 
   if (name.includes("career")) {
-    const energyCat = dbCategories.find(c => c.name.toLowerCase().includes("energy"));
-    const careerSub = energyCat?.subcategories.find(s => s.name.toLowerCase().includes("career growth"));
+    const energyCat = dbCategories.find((c: any) => c.name.toLowerCase().includes("energy"));
+    const careerSub = energyCat?.subcategories.find((s: any) => s.name.toLowerCase().includes("career growth"));
     if (careerSub) return { categoryId: energyCat._id, subcategoryId: careerSub._id, name: careerSub.name, price: careerSub.price, duration: careerSub.duration, description: careerSub.description };
   }
 
   if (name.includes("success") || name.includes("jars")) {
-    const energyCat = dbCategories.find(c => c.name.toLowerCase().includes("energy"));
-    const successSub = energyCat?.subcategories.find(s => s.name.toLowerCase().includes("one wish"));
+    const energyCat = dbCategories.find((c: any) => c.name.toLowerCase().includes("energy"));
+    const successSub = energyCat?.subcategories.find((s: any) => s.name.toLowerCase().includes("one wish"));
     if (successSub) return { categoryId: energyCat._id, subcategoryId: successSub._id, name: successSub.name, price: successSub.price, duration: successSub.duration, description: successSub.description };
   }
 
   if (name.includes("reiki")) {
-    const reikiCat = dbCategories.find(c => c.name.toLowerCase().includes("reiki"));
+    const reikiCat = dbCategories.find((c: any) => c.name.toLowerCase().includes("reiki"));
     const reikiSub = reikiCat?.subcategories[0];
     if (reikiSub) return { categoryId: reikiCat._id, subcategoryId: reikiSub._id, name: reikiSub.name, price: reikiSub.price, duration: reikiSub.duration, description: reikiSub.description };
   }

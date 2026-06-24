@@ -84,6 +84,7 @@ const Footer = () => {
     { name: "About Us", link: "/about" },
     { name: "Services", link: "/services/ourpackages" },
     { name: "Horoscope", link: "/horoscope" },
+    { name: "Contact Us", link: "/contact" },
   ];
 
   return (
@@ -224,33 +225,54 @@ const Footer = () => {
             {/* Contact - Enhanced */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold mb-4">
-                <span className="bg-gradient-to-r from-[#FBB5E7] via-[#c6e400] to-[#FBB5E7] bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
-                  Contact Us
-                </span>
+                <Link href="/contact" className="hover:opacity-80 transition-opacity block w-fit">
+                  <span className="bg-gradient-to-r from-[#FBB5E7] via-[#c6e400] to-[#FBB5E7] bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+                    Contact Us
+                  </span>
+                </Link>
               </h3>
               <div className="space-y-4">
                 {[
-                  { icon: "✉️", text: "oracleosheen1@gmail.com" },
-                  { icon: "✉️", text: "oracleosheen2@gmail.com" },
-                  { icon: "📞", text: "+91 81466 68328" },
-                  { icon: "📞", text: "+91 98770 97916" },
-                  { icon: "📞", text: "+91 81469 77206" },
-                  { icon: "⏰", text: "10am to 6pm" },
-                ].map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start space-x-3 group cursor-pointer transform hover:translate-x-2 transition-transform duration-500"
-                  >
-                    <div className="w-7 h-7 bg-[#FBB5E7] rounded-full flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-lg">
-                      <span className="text-black text-xs font-bold">
-                        {item.icon}
+                  { icon: "✉️", text: "oracleosheen1@gmail.com", type: "email" },
+                  { icon: "✉️", text: "oracleosheen2@gmail.com", type: "email" },
+                  { icon: "📞", text: "+91 81466 68328", type: "tel" },
+                  { icon: "📞", text: "+91 98770 97916", type: "tel" },
+                  { icon: "📞", text: "+91 81469 77206", type: "tel" },
+                  { icon: "⏰", text: "10am to 6pm", type: "text" },
+                ].map((item, index) => {
+                  const content = (
+                    <div className="flex items-start space-x-3 group cursor-pointer transform hover:translate-x-2 transition-transform duration-500">
+                      <div className="w-7 h-7 bg-[#FBB5E7] rounded-full flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-lg">
+                        <span className="text-black text-xs font-bold">
+                          {item.icon}
+                        </span>
+                      </div>
+                      <span className="text-gray-300 group-hover:text-white transition-colors duration-500 group-hover:font-medium text-sm">
+                        {item.text}
                       </span>
                     </div>
-                    <span className="text-gray-300 group-hover:text-white transition-colors duration-500 group-hover:font-medium">
-                      {item.text}
-                    </span>
-                  </div>
-                ))}
+                  );
+
+                  if (item.type === "email") {
+                    return (
+                      <a key={index} href={`mailto:${item.text}`} className="block">
+                        {content}
+                      </a>
+                    );
+                  }
+                  if (item.type === "tel") {
+                    return (
+                      <a key={index} href={`tel:${item.text.replace(/\s+/g, "")}`} className="block">
+                        {content}
+                      </a>
+                    );
+                  }
+                  return (
+                    <div key={index} className="block">
+                      {content}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

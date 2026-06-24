@@ -29,6 +29,7 @@ interface RazorpayOptions {
     ondismiss: () => void;
   };
   handler: (response: RazorpayResponse) => void;
+  config?: any;
 }
 
 interface RazorpayResponse {
@@ -184,6 +185,24 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
         modal: {
           ondismiss: () => {
             setProcessing(false);
+          },
+        },
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "UPI / QR Code",
+                instruments: [
+                  {
+                    method: "upi",
+                  },
+                ],
+              },
+            },
+            sequence: ["block.upi", "block.other"],
+            preferences: {
+              show_default_blocks: true,
+            },
           },
         },
       };

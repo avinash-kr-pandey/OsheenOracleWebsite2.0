@@ -370,7 +370,7 @@ export default function HeroHeader() {
     { name: "Services", href: "#", icon: "🔮" },
     {
       name: "Help & Support",
-      href: "/support",
+      href: "/header/support",
       icon: <FiHelpCircle className="text-lg" />,
     },
   ];
