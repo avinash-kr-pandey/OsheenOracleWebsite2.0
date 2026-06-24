@@ -1,12 +1,11 @@
-// app/spells/page.tsx
+// app/services/spells/page.tsx
 "use client";
 
 import { iconEmojiMap, spellsAPI, SpellType } from "@/utils/api/spells.api";
 import React, { useState, useEffect } from "react";
 
-
 // Loading Skeleton Component
-const SpellsSkeleton = () => (
+const HealingSkeleton = () => (
   <div className="animate-pulse">
     {/* Hero Section Skeleton */}
     <div className="text-center mb-16">
@@ -14,7 +13,7 @@ const SpellsSkeleton = () => (
       <div className="w-24 h-1 bg-purple-200 mx-auto"></div>
     </div>
 
-    {/* What are spells? Section Skeleton */}
+    {/* What is energy healing? Section Skeleton */}
     <div className="bg-white/50 rounded-3xl p-8 md:p-12 mb-16">
       <div className="h-10 bg-purple-200 rounded w-96 mx-auto mb-6"></div>
       <div className="space-y-4">
@@ -26,41 +25,41 @@ const SpellsSkeleton = () => (
   </div>
 );
 
-const SpellsPage = () => {
-  const [spellTypes, setSpellTypes] = useState<SpellType[]>([]);
+const EnergyHealingPage = () => {
+  const [healingTypes, setHealingTypes] = useState<SpellType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSpellTypes = async () => {
+    const fetchHealingTypes = async () => {
       try {
         setLoading(true);
         const data = await spellsAPI.getAllSpellTypes();
-        setSpellTypes(data);
+        setHealingTypes(data);
       } catch (err) {
-        setError("Failed to load spell types");
+        setError("Failed to load energy healing types");
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSpellTypes();
+    fetchHealingTypes();
   }, []);
 
-  // Group spell types by category based on their type field
-  const getSpellsByCategory = (category: string) => {
-    return spellTypes.filter(
-      (spell) =>
-        spell.type
+  // Group healing types by category based on their type field
+  const getHealingByCategory = (category: string) => {
+    return healingTypes.filter(
+      (item) =>
+        item.type
           .toLowerCase()
-          .includes(category.toLowerCase().replace(" spells", "")) ||
-        spell.type.toLowerCase().includes(category.toLowerCase()),
+          .includes(category.toLowerCase().replace(" healing", "")) ||
+        item.type.toLowerCase().includes(category.toLowerCase())
     );
   };
 
-  // Get icon for spell
-  const getSpellIcon = (icon: string): string => {
+  // Get icon for healing
+  const getHealingIcon = (icon: string): string => {
     return iconEmojiMap[icon] || iconEmojiMap.default;
   };
 
@@ -93,58 +92,54 @@ const SpellsPage = () => {
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold text-purple-900 mb-6">
-            SPELLS
+          <h1 className="text-4xl md:text-5xl font-bold text-purple-900 mb-6 uppercase tracking-wider">
+            Energy Healing
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-purple-400 to-pink-400 mx-auto mb-8"></div>
         </div>
 
         {loading ? (
-          <SpellsSkeleton />
+          <HealingSkeleton />
         ) : (
           <>
-            {/* What are spells? Section */}
+            {/* What is Energy Healing Section */}
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-16 border border-purple-100">
               <h2 className="text-3xl md:text-4xl font-bold text-purple-800 mb-6 text-center">
-                What Are Spells?
+                What Is Energy Healing?
               </h2>
               <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
                 <p className="text-xl font-semibold text-pink-600 text-center mb-8">
-                  Spells Are Sacred, Not Scary
+                  Energy Healing Is Pure, Divine, and Transformative
                 </p>
                 <p>
-                  Forget the myths of &quot;dark magic&quot; or manipulation.
-                  Real, ethical spellwork is based on love, healing,
-                  empowerment, and protection. It honors free will, respects
-                  boundaries, and uplifts your soul.
+                  Energy healing is a holistic practice that clears blockages, balances energy centers, 
+                  and aligns your aura with the flow of the universe. It is rooted in love, light, 
+                  compassion, and divine intentions.
                 </p>
                 <p className="bg-purple-50 border-l-4 border-purple-500 pl-6 py-4 italic">
-                  When done with integrity and spiritual awareness, spells can
-                  open doors you didn&apos;t even know existed
+                  When performed with spiritual awareness and alignment, energy healing can revitalize 
+                  your spirit and manifest profound shifts in your physical and emotional reality.
                 </p>
                 <p>
-                  A spell is a focused intention sent into the universe, often
-                  supported by words, rituals, and energy tools like candles,
-                  herbs, crystals, or symbols. Spells aren&apos;t about forcing
-                  outcomes — they&apos;re about aligning your energy with your
-                  desires and inviting the universe to co-create with you.
+                  Our sessions are designed to redirect flow of positive energy towards specific areas 
+                  of your life like relationships, health, or career. Using sacred tools like crystals, 
+                  guided intent, affirmations, and distance reiki energy, we co-create a powerful 
+                  shield and grid of high-vibration light for you.
                 </p>
                 <p>
-                  At its core, a spell is energy work. It helps you shift
-                  vibrations, clear blockages, and manifest what your soul is
-                  calling in — whether it&apos;s love, healing, success, or
-                  protection.
+                  At its core, energy healing shifts your personal vibration so you naturally attract 
+                  what your soul is calling in — love, healing, success, clarity, or protection.
                 </p>
               </div>
             </div>
 
-            {/* What Makes a Spell Powerful? */}
+            {/* What Makes Energy Healing Powerful? */}
             <div className="bg-gradient-to-br from-purple-600 to-pink-500 rounded-3xl shadow-2xl p-8 md:p-12 mb-16 text-white">
               <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">
-                What Makes a Spell Powerful?
+                What Makes Energy Healing Powerful?
               </h2>
               <p className="text-xl text-center mb-12 opacity-90">
-                A spell becomes powerful when three key things align:
+                Healing becomes powerful when three key spiritual pillars align:
               </p>
 
               <div className="grid md:grid-cols-3 gap-8">
@@ -152,17 +147,17 @@ const SpellsPage = () => {
                   {
                     title: "Clarity of Intention",
                     description:
-                      "Knowing exactly what you want and why you want it",
+                      "Knowing exactly what areas of your life require alignment and openness",
                   },
                   {
-                    title: "Emotional Energy",
+                    title: "Emotional Receptivity",
                     description:
-                      "Feeling your desire with belief, passion, and presence",
+                      "Being open to receive divine light with faith, peace, and absolute presence",
                   },
                   {
                     title: "Spiritual Alignment",
                     description:
-                      "Calling on divine forces to co-create with you",
+                      "Connecting with universal energy grids and guides to elevate your vibration",
                   },
                 ].map((item, index) => (
                   <div
@@ -179,37 +174,36 @@ const SpellsPage = () => {
               </div>
             </div>
 
-            {/* Types of Spells */}
+            {/* Types of Energy Healing */}
             <div className="mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-purple-900 mb-12 text-center">
-                Types of Spells
+              <h2 className="text-3xl md:text-4xl font-bold text-purple-900 mb-12 text-center">
+                Spiritual Energy Modalities
               </h2>
 
-              {/* Black Magic Card - Static (not from API) */}
+              {/* Distant blockages Card - Static */}
               <div className="bg-gray-800 text-white rounded-3xl shadow-2xl p-8 md:p-10 mb-8 border-2 border-red-500">
                 <div className="flex items-center mb-6">
                   <div className="w-3 h-8 bg-red-500 rounded-full mr-4"></div>
                   <h3 className="text-2xl md:text-3xl font-bold text-red-400">
-                    Black Magic (Negative or Harmful Spells)
+                    Lower Vibration Risks (Negative Intended Energies)
                   </h3>
                 </div>
                 <p className="text-lg mb-6 opacity-90">
-                  Black magic is often used with forceful or selfish intent — to
-                  manipulate someone&apos;s free will, cause harm, or control a
-                  situation unnaturally. These spells may deliver fast results,
-                  but they usually come with heavy karmic consequences.
+                  Manipulative energetic work aimed at overriding another person&apos;s free will or 
+                  casting harmful projections is ethically detrimental and causes long-term energetic blockages. 
+                  True healing works purely in light and never uses control.
                 </p>
 
                 <div className="bg-gray-700/50 rounded-2xl p-6 mb-6">
                   <h4 className="text-xl font-bold text-red-300 mb-4">
-                    Common traits of black magic include:
+                    Forms of energetic interference include:
                   </h4>
                   <ul className="space-y-3">
                     {[
-                      "Obsession-based love spells",
-                      "Revenge or curse rituals",
-                      "Psychic manipulation or energy drain",
-                      "Control over someone&apos;s mind, will, or decisions",
+                      "Forceful attachment cords",
+                      "Negative energetic blocks or projections",
+                      "Psychic manipulation or auric drains",
+                      "Interfering with someone else&apos;s spiritual path",
                     ].map((item, index) => (
                       <li key={index} className="flex items-start">
                         <span className="text-red-400 mr-3">•</span>
@@ -221,46 +215,43 @@ const SpellsPage = () => {
 
                 <div className="bg-red-900/30 border border-red-700 rounded-2xl p-6">
                   <p className="text-xl font-bold text-center">
-                    ⚠️ At Osheen Oracle, we do not practice black magic in any
-                    form. Our path is rooted in ethical, divine, and protective
-                    energy work only.
+                    ⚠️ At Osheen Oracle, we only practice pure, light-based energy healing. 
+                    We do not engage in any controlling, harmful, or manipulative practices under any circumstances.
                   </p>
                 </div>
               </div>
 
-              {/* White Magic Card - Dynamic from API */}
-              {spellTypes.length > 0 ? (
+              {/* Divine Light Healing Card - Dynamic from API */}
+              {healingTypes.length > 0 ? (
                 <div className="bg-gradient-to-br from-blue-50 to-cyan-100 rounded-3xl shadow-2xl p-8 md:p-10 border-2 border-blue-300">
                   <div className="flex items-center mb-6">
                     <div className="w-3 h-8 bg-blue-500 rounded-full mr-4"></div>
                     <h3 className="text-2xl md:text-3xl font-bold text-blue-600">
-                      White Magic (Positive Energy Spells)
+                      Light Modalities (Positive Healing Energies)
                     </h3>
                   </div>
                   <p className="text-lg mb-6 text-gray-700">
-                    White magic is all about healing, love, protection,
-                    abundance, and personal growth. These spells are rooted in
-                    high vibration, compassion, and alignment with divine will.
+                    Positive energy healing focuses on aura expansion, chakra balancing, alignment with 
+                    higher intelligence, protection, and manifesting light.
                   </p>
 
                   <div className="bg-white/50 rounded-2xl p-6">
                     <h4 className="text-xl font-bold text-blue-600 mb-4">
-                      White magic never harms or manipulates. Instead, it
-                      supports your soul&apos;s journey by:
+                      Energy healing brings harmony and supports your path by:
                     </h4>
                     <div className="grid md:grid-cols-2 gap-4">
-                      {spellTypes.slice(0, 5).map((spell, index) => (
+                      {healingTypes.slice(0, 5).map((item, index) => (
                         <div
-                          key={spell._id}
+                          key={item._id}
                           className="flex items-center bg-white/70 rounded-xl p-4"
                         >
                           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                             <span className="text-blue-600 text-sm">
-                              {getSpellIcon(spell.icon)}
+                              {getHealingIcon(item.icon)}
                             </span>
                           </div>
                           <span className="text-gray-700 font-medium">
-                            {spell.type}
+                            {item.type.replace(/spells/gi, "healing")}
                           </span>
                         </div>
                       ))}
@@ -268,33 +259,30 @@ const SpellsPage = () => {
                   </div>
 
                   <p className="text-center mt-6 text-blue-600 font-semibold text-lg">
-                    Think of white magic as light work — it&apos;s sacred,
-                    gentle, and guided by universal love.
+                    Every healing process is sacred, gentle, and guided by universal love.
                   </p>
                 </div>
               ) : (
                 <div className="bg-gradient-to-br from-blue-50 to-cyan-100 rounded-3xl shadow-2xl p-8 md:p-10 border-2 border-blue-300">
                   <p className="text-center text-gray-600">
-                    Loading white magic spells...
+                    Loading energy healing modalities...
                   </p>
                 </div>
               )}
             </div>
 
-            {/* Spells we do at Osheen Oracle */}
+            {/* Healing we do at Osheen Oracle */}
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-16 border border-purple-100">
-              <h2 className="text-4xl md:text-5xl font-bold text-purple-900 mb-4 text-center">
-                Spells We Do at Osheen Oracle
+              <h2 className="text-3xl md:text-4xl font-bold text-purple-900 mb-4 text-center">
+                Energy Healing We Perform
               </h2>
               <p className="text-xl text-gray-600 text-center mb-12">
-                Different Types of Spells
+                Different Modalities and Sessions
               </p>
 
               <p className="text-lg text-gray-700 mb-12 text-center leading-relaxed">
-                Not all spells are the same — each one is designed to work with
-                a specific purpose, emotion, or area of your life. Here&apos;s a
-                breakdown of the most common and powerful spell types I offer at
-                Osheen Oracle:
+                We design energy healing sessions tailored to balance your emotions and clear blockages. 
+                Here is a summary of the powerful energy sessions we offer at Osheen Oracle:
               </p>
 
               {loading ? (
@@ -316,30 +304,30 @@ const SpellsPage = () => {
                     </div>
                   ))}
                 </div>
-              ) : spellTypes.length > 0 ? (
+              ) : healingTypes.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {spellTypes.map((spell, index) => (
+                  {healingTypes.map((item, index) => (
                     <div
-                      key={spell._id}
+                      key={item._id}
                       className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                     >
                       <div className="flex items-center mb-4">
                         <div className="text-2xl mr-3">
-                          {getSpellIcon(spell.icon)}
+                          {getHealingIcon(item.icon)}
                         </div>
                         <h3 className="text-xl font-bold text-purple-800">
-                          {spell.type}
+                          {item.type.replace(/spells/gi, "Healing")}
                         </h3>
                       </div>
-                      <p className="text-gray-700 mb-4 text-sm leading-relaxed">
-                        {spell.description}
+                      <p className="text-gray-700 mb-4 text-sm leading-relaxed whitespace-pre-wrap">
+                        {item.description.replace(/spell/gi, "healing")}
                       </p>
                       <div className="bg-white/50 rounded-xl p-4">
                         <h4 className="font-semibold text-purple-700 text-sm mb-2">
                           Ideal for:
                         </h4>
                         <p className="text-gray-600 text-sm">
-                          {spell.idealFor}
+                          {item.idealFor}
                         </p>
                       </div>
                     </div>
@@ -347,7 +335,7 @@ const SpellsPage = () => {
                 </div>
               ) : (
                 <p className="text-center text-gray-500">
-                  No spells available at the moment.
+                  No healing modalities available at the moment.
                 </p>
               )}
             </div>
@@ -355,28 +343,28 @@ const SpellsPage = () => {
             {/* Final Note */}
             <div className="text-center mb-16">
               <p className="text-2xl md:text-3xl font-bold text-purple-900 mb-6 italic">
-                Every Spell Is Unique
+                Every Session Is Unique
               </p>
               <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
-                At Osheen Oracle, every spell I create is personalized,
-                ethically guided, and rooted in positive energy. Real magic
-                isn&apos;t about control — it&apos;s about alignment, intention,
-                and calling in your highest path.
+                At Osheen Oracle, every energy healing session is customized, 
+                ethically guided, and rooted in pure light. Real healing is not 
+                about control — it is about intention, alignment, and letting 
+                positive universal flow run through your life.
               </p>
             </div>
 
             {/* Rules Section - Static */}
             <div className="bg-gradient-to-br from-yellow-400 to-orange-400 rounded-3xl shadow-2xl p-8 md:p-12 text-white">
               <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">
-                Rules You Must Follow During the Spell
+                Rules You Must Follow During the Healing Period
               </h2>
 
               <div className="grid md:grid-cols-2 gap-6 mb-8">
                 {[
-                  "Do not tell anyone about the spell",
-                  "Strictly no non-veg or alcohol during the spell period",
-                  "No negative thoughts allowed – stay in high vibration",
-                  "Behave as if the outcome has already manifested",
+                  "Do not discuss your healing details with others",
+                  "Strictly no non-veg foods or alcohol during the session period",
+                  "Release negative thoughts and maintain a high vibration of faith",
+                  "Actively behave and manifest as if the healing is already complete",
                 ].map((rule, index) => (
                   <div
                     key={index}
@@ -394,8 +382,8 @@ const SpellsPage = () => {
 
               <div className="bg-red-500/20 border-2 border-red-400 rounded-2xl p-6 text-center">
                 <p className="text-xl font-bold">
-                  ⚠️ If any rule is broken, the spell will automatically fail.
-                  Merlin, the God of Magic, will withdraw the energy.
+                  ⚠️ If any guidelines are broken, the healing energy alignment may be disrupted. 
+                  Maintaining focus and purity is essential for the vibration to take hold.
                 </p>
               </div>
             </div>
@@ -406,4 +394,4 @@ const SpellsPage = () => {
   );
 };
 
-export default SpellsPage;
+export default EnergyHealingPage;

@@ -66,7 +66,7 @@ export default function AboutHeader() {
             reached us, it means we are meant to be. You are now at a phase in
             your life which requires a soul upgrade where you leave all the
             negativity behind and embark a glorious journey to heal your life
-            with powerful healing spells, Tarot guidance and magically enchanted
+            with powerful energy healing, Tarot guidance and magically enchanted
             Crystals in form of jars, bracelet and energized ancient Yantras.
           </p>
         </div>

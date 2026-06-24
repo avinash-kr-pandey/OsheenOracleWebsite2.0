@@ -5,8 +5,10 @@ export interface Review {
   name: string;
   comment: string;
   rating: number;
-  date: string;
-  avatar: string;
+  date?: string;
+  avatar?: string;
+  createdAt?: string;
+  _id?: string;
 }
 
 export interface Product {
@@ -28,6 +30,8 @@ export interface Product {
   gender?: string[];
   isNew?: boolean;
   images?: string[];
+  video?: string;
+  sizePrices?: { size: string; price: number; originalPrice: number; }[];
   size?: string[];
   color?: string[];
   reviews?: Review[];
@@ -86,6 +90,8 @@ export function normalizeProduct(product: any): Product {
     gender: Array.isArray(product.gender) ? product.gender : [],
     isNew: product.isNew ?? false,
     images: Array.isArray(product.images) ? product.images : [product.image || '/placeholder.jpg'],
+    video: product.video || '',
+    sizePrices: Array.isArray(product.sizePrices) ? product.sizePrices : [],
     size: Array.isArray(product.size) ? product.size : (Array.isArray(product.sizeOptions) ? product.sizeOptions.map(String) : []),
     color: Array.isArray(product.color) ? product.color : (Array.isArray(product.colors) ? product.colors : []),
     reviews: Array.isArray(product.reviews) ? product.reviews : [],

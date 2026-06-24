@@ -55,6 +55,15 @@ const BlogSlider: React.FC = () => {
     }
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    card.style.setProperty("--mouse-x", `${x}px`);
+    card.style.setProperty("--mouse-y", `${y}px`);
+  };
+
   const scroll = (direction: "next" | "prev") => {
     if (sliderRef.current) {
       const scrollAmount = sliderRef.current.offsetWidth * 0.8;
@@ -118,16 +127,18 @@ const BlogSlider: React.FC = () => {
           <>
             <button
               onClick={() => scroll("prev")}
-              className="absolute top-1/2 -left-4 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transform -translate-y-1/2"
+              className="absolute top-1/2 left-1 sm:-left-4 z-10 bg-white hover:bg-yellow-400 hover:text-white p-2.5 rounded-full shadow-lg border border-gray-100 transition-all duration-300 transform -translate-y-1/2 active:scale-90"
+              aria-label="Previous post"
             >
-              <ChevronLeft />
+              <ChevronLeft className="w-6 h-6" />
             </button>
 
             <button
               onClick={() => scroll("next")}
-              className="absolute top-1/2 -right-4 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transform -translate-y-1/2"
+              className="absolute top-1/2 right-1 sm:-right-4 z-10 bg-white hover:bg-yellow-400 hover:text-white p-2.5 rounded-full shadow-lg border border-gray-100 transition-all duration-300 transform -translate-y-1/2 active:scale-90"
+              aria-label="Next post"
             >
-              <ChevronRight />
+              <ChevronRight className="w-6 h-6" />
             </button>
           </>
         )}
@@ -142,7 +153,9 @@ const BlogSlider: React.FC = () => {
             return (
               <motion.div
                 key={cardBlog.id}
-                className="flex-shrink-0 w-full md:w-80 bg-white rounded-xl shadow-lg p-4 cursor-pointer hover:shadow-2xl transition-shadow"
+                onMouseMove={handleMouseMove}
+                className="flex-shrink-0 w-full md:w-80 bg-white rounded-xl shadow-lg p-4 cursor-pointer hover:shadow-2xl transition-shadow spotlight-card"
+                whileHover={{ y: -8, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 {/* Blog Image */}
@@ -167,7 +180,7 @@ const BlogSlider: React.FC = () => {
                 </div>
 
                 {/* Blog Content */}
-                <div className="py-4 sm:py-6">
+                <div className="py-4 sm:py-6 relative z-10">
                   <p className="text-xs sm:text-sm mb-1 sm:mb-2 text-gray-600">
                     {cardBlog.date} • {cardBlog.category}
                   </p>
@@ -205,6 +218,27 @@ const BlogSlider: React.FC = () => {
         .hide-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+        .spotlight-card {
+          position: relative;
+          overflow: hidden;
+        }
+        .spotlight-card::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(
+            250px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+            rgba(244, 223, 78, 0.15),
+            transparent 80%
+          );
+          opacity: 0;
+          transition: opacity 0.3s;
+          pointer-events: none;
+          z-index: 1;
+        }
+        .spotlight-card:hover::before {
+          opacity: 1;
         }
       `}</style>
     </div>

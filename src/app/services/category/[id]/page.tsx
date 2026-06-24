@@ -90,7 +90,6 @@ const UserDetailsModal = ({
     address: string;
     description: string;
     communicationMode: string;
-    preferredDate?: string;
     preferredTimeSlot?: string;
   }) => void;
 }) => {
@@ -102,7 +101,6 @@ const UserDetailsModal = ({
     address: "",
     description: "",
     communicationMode: isVideoCall ? "video_call" : "voice_call",
-    preferredDate: "",
     preferredTimeSlot: "",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -311,8 +309,7 @@ const UserDetailsModal = ({
                 >
                   <option value="">Select time slot</option>
                   <option value="11:00 AM - 01:00 PM">11:00 AM - 01:00 PM</option>
-                  <option value="02:00 PM - 04:00 PM">02:00 PM - 04:00 PM</option>
-                  <option value="04:00 PM - 06:00 PM">04:00 PM - 06:00 PM</option>
+                  <option value="02:00 PM - 06:00 PM">02:00 PM - 06:00 PM</option>
                 </select>
               </div>
             </div>
@@ -384,7 +381,7 @@ const ServiceCard = ({
       </h3>
 
       <div className="mb-4">
-        <p className={`text-gray-500 text-sm leading-relaxed ${!isExpanded && 'line-clamp-3'}`}>
+        <p className={`text-gray-500 text-sm leading-relaxed whitespace-pre-wrap ${!isExpanded && "line-clamp-3"}`}>
           {service.description}
         </p>
         {service.description.length > 100 && (
@@ -537,7 +534,6 @@ const CategoryPage = () => {
     address: string;
     description: string;
     communicationMode: string;
-    preferredDate?: string;
     preferredTimeSlot?: string;
   }) => {
     if (!selectedService || !category) return;
@@ -556,7 +552,6 @@ const CategoryPage = () => {
       address: userData.address,
       description: userData.description,
       communicationMode: userData.communicationMode,
-      preferredDate: userData.preferredDate,
       preferredTimeSlot: userData.preferredTimeSlot,
     };
 
@@ -663,7 +658,7 @@ const CategoryPage = () => {
                 </div>
 
                 <div className="p-5">
-                  <p className="text-gray-700 leading-relaxed text-sm">
+                  <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
                     {category.description}
                   </p>
 

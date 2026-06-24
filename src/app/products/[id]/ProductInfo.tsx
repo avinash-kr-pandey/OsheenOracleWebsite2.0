@@ -44,8 +44,6 @@ const useImagePreloader = (imageUrls: string[]) => {
 };
 
 export default function ProductInfo({ product }: ProductInfoProps) {
-  const [selectedImage, setSelectedImage] =
-    useState<string>("/placeholder.jpg");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -55,6 +53,62 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     x: 0,
     y: 0,
   });
+
+  const mediaList = useMemo(() => {
+    if (!product) return [{ type: "image" as const, url: "/placeholder.jpg" }];
+
+    const list: { type: "image" | "video"; url: string }[] = [];
+    if (product.image) {
+      list.push({ type: "image", url: getFullImageUrl(product.image) });
+    } else {
+      list.push({ type: "image", url: "/placeholder.jpg" });
+    }
+
+    if (product.images && Array.isArray(product.images)) {
+      product.images.forEach((img) => {
+        if (img) {
+          list.push({ type: "image", url: getFullImageUrl(img) });
+        }
+      });
+    }
+
+    if (product.video) {
+      list.push({ type: "video", url: getFullImageUrl(product.video) });
+    }
+
+    return list;
+  }, [product]);
+
+  const [selectedMedia, setSelectedMedia] = useState<{ type: "image" | "video"; url: string }>({
+    type: "image",
+    url: "/placeholder.jpg"
+  });
+
+  useEffect(() => {
+    if (mediaList.length > 0) {
+      setSelectedMedia(mediaList[0]);
+    }
+  }, [mediaList]);
+
+  // Keep selectedImage as alias to selectedMedia.url for backward compatibility
+  const selectedImage = selectedMedia.url;
+
+  // Dynamic pricing variant based on size selection
+  const currentPricing = useMemo(() => {
+    if (selectedSize && product.sizePrices && product.sizePrices.length > 0) {
+      const match = product.sizePrices.find((sp) => sp.size === selectedSize);
+      if (match) {
+        return {
+          price: match.price,
+          originalPrice: match.originalPrice || match.price,
+        };
+      }
+    }
+    return {
+      price: product.price || 0,
+      originalPrice: product.originalPrice || product.price || 0,
+    };
+  }, [selectedSize, product.price, product.originalPrice, product.sizePrices]);
 
   console.log("🔍 ProductInfo Rendered for product:", product);
 
@@ -89,15 +143,6 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   // ✅ Custom hook for image preloading
   const loadedImages = useImagePreloader(allImages);
 
-  // ✅ Initialize selected image
-  useEffect(() => {
-    if (product?.image) {
-      setSelectedImage(getFullImageUrl(product.image));
-    } else if (allImages.length > 0) {
-      setSelectedImage(allImages[0]);
-    }
-  }, [product, allImages]);
-
   // ✅ Mouse handlers for zoom
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageRef.current || !showZoom) return;
@@ -123,8 +168,8 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     setShowZoom(false);
   };
 
-  const handleImageSelect = (img: string) => {
-    setSelectedImage(img);
+  const handleImageSelect = (item: { type: "image" | "video"; url: string }) => {
+    setSelectedMedia(item);
     setShowZoom(false);
   };
 
@@ -156,7 +201,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     const cartItem = {
       id: product._id || product.id || "",
       name: product.name || "Unknown Product",
-      price: product.price || 0,
+      price: currentPricing.price,
       image: selectedImage || product.image || "/placeholder.jpg",
       quantity: quantity,
       size: selectedSize,
@@ -186,7 +231,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       const cartItem = {
         id: product._id || product.id || "",
         name: product.name || "Unknown Product",
-        price: product.price || 0,
+        price: currentPricing.price,
         image: selectedImage || product.image || "/placeholder.jpg",
         quantity: quantity,
         size: selectedSize,
@@ -204,7 +249,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     const wishlistItem = {
       id: product._id || product.id || "",
       name: product.name || "Unknown Product",
-      price: product.price || 0,
+      price: currentPricing.price,
       image: product.image || "/placeholder.jpg",
       inStock: product.inStock ?? true,
     };
@@ -284,28 +329,37 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Thumbnail Gallery - Vertical on left */}
               <div className="flex lg:flex-col gap-2 order-2 lg:order-1 lg:max-h-[90vh] p-2">
-                {allImages?.map((img, idx) => (
+                {mediaList?.map((item, idx) => (
                   <div
                     key={idx}
                     className={`relative flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 rounded-lg overflow-hidden cursor-pointer transition-all duration-300 border-1 ${
-                      selectedImage === img
+                      selectedMedia.url === item.url
                         ? "border-pink-500 ring-2 ring-pink-200 scale-105"
                         : "border-gray-200 hover:border-pink-300"
                     }`}
-                    onClick={() => handleImageSelect(img)}
+                    onClick={() => handleImageSelect(item)}
                   >
-                    <Image
-                      src={img}
-                      alt={`Thumbnail ${idx + 1}`}
-                      fill
-                      className="object-cover"
-                      loading="lazy"
-                    />
-                    {/* Loading indicator for thumbnails */}
-                    {!loadedImages.has(img) && (
-                      <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-                        <div className="w-4 h-4 border-2 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+                    {item.type === "video" ? (
+                      <div className="w-full h-full bg-gray-900 flex flex-col items-center justify-center text-white relative">
+                        <span className="text-xl">▶</span>
+                        <span className="text-[9px] uppercase font-bold tracking-wide mt-1">Video</span>
                       </div>
+                    ) : (
+                      <>
+                        <Image
+                          src={item.url}
+                          alt={`Thumbnail ${idx + 1}`}
+                          fill
+                          className="object-cover"
+                          loading="lazy"
+                        />
+                        {/* Loading indicator for thumbnails */}
+                        {!loadedImages.has(item.url) && (
+                          <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+                            <div className="w-4 h-4 border-2 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 ))}
@@ -314,42 +368,54 @@ export default function ProductInfo({ product }: ProductInfoProps) {
               {/* Main Image Container with Amazon-style Zoom */}
               <div className="flex-1 order-1 lg:order-2 relative">
                 <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-gradient-to-br from-pink-100 to-blue-50 shadow-inner h-[70vh] w-full">
-                  {/* Main Image with Lens */}
-                  <div
-                    ref={imageRef}
-                    className="relative w-full h-full cursor-crosshair"
-                    onMouseMove={handleMouseMove}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <Image
-                      src={selectedImage}
-                      alt={product.name || "Product"}
-                      fill
-                      className={`object-cover transition-opacity duration-500 ${
-                        isCurrentImageLoaded ? "opacity-100" : "opacity-0"
-                      }`}
-                      priority
-                    />
-
-                    {/* Loading State for Main Image */}
-                    {!isCurrentImageLoaded && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse rounded-2xl">
-                        <div className="w-10 h-10 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    )}
-
-                    {/* Zoom Lens - Only show when image is loaded and zoom is active */}
-                    {showZoom && isCurrentImageLoaded && (
-                      <div
-                        className="absolute w-42 h-42 bg-black/40 rounded-full bg-opacity-20 pointer-events-none z-10 border-2 border-white/50 shadow-lg"
-                        style={{
-                          left: `calc(${zoomPosition.x}% - 64px)`,
-                          top: `calc(${zoomPosition.y}% - 64px)`,
-                        }}
+                  {selectedMedia.type === "video" ? (
+                    <div className="w-full h-full bg-black relative flex items-center justify-center">
+                      <video
+                        src={selectedMedia.url}
+                        controls
+                        className="w-full h-full object-contain"
+                        autoPlay
+                        muted
                       />
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    /* Main Image with Lens */
+                    <div
+                      ref={imageRef}
+                      className="relative w-full h-full cursor-crosshair"
+                      onMouseMove={handleMouseMove}
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      <Image
+                        src={selectedMedia.url}
+                        alt={product.name || "Product"}
+                        fill
+                        className={`object-cover transition-opacity duration-500 ${
+                          isCurrentImageLoaded ? "opacity-100" : "opacity-0"
+                        }`}
+                        priority
+                      />
+
+                      {/* Loading State for Main Image */}
+                      {!isCurrentImageLoaded && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse rounded-2xl">
+                          <div className="w-10 h-10 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      )}
+
+                      {/* Zoom Lens - Only show when image is loaded and zoom is active */}
+                      {showZoom && isCurrentImageLoaded && (
+                        <div
+                          className="absolute w-42 h-42 bg-black/40 rounded-full bg-opacity-20 pointer-events-none z-10 border-2 border-white/50 shadow-lg"
+                          style={{
+                            left: `calc(${zoomPosition.x}% - 64px)`,
+                            top: `calc(${zoomPosition.y}% - 64px)`,
+                          }}
+                        />
+                      )}
+                    </div>
+                  )}
 
                   {product.isNew && (
                     <div className="absolute top-4 left-4 z-10">
@@ -371,12 +437,12 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                 </div>
 
                 {/* Zoomed Preview - Right Side Modal - Only show when image is loaded */}
-                {showZoom && isCurrentImageLoaded && (
+                {showZoom && isCurrentImageLoaded && selectedMedia.type === "image" && (
                   <div className="absolute left-full top-0 ml-6 w-140 h-140 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-20">
                     <div
                       className="w-full h-full bg-no-repeat bg-origin-padding transition-all duration-100"
                       style={{
-                        backgroundImage: `url(${selectedImage})`,
+                        backgroundImage: `url(${selectedMedia.url})`,
                         backgroundSize: "200%",
                         backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
                       }}
@@ -428,12 +494,12 @@ export default function ProductInfo({ product }: ProductInfoProps) {
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
                   <p className="text-3xl font-bold text-gray-900">
-                    Rs. {(product.price || 0).toFixed(2)}
+                    Rs. {(currentPricing.price || 0).toFixed(2)}
                   </p>
-                  {product.originalPrice &&
-                    product.originalPrice > (product.price || 0) && (
+                  {currentPricing.originalPrice &&
+                    currentPricing.originalPrice > (currentPricing.price || 0) && (
                       <p className="text-xl text-gray-500 line-through">
-                        Rs. {product.originalPrice.toFixed(2)}
+                        Rs. {currentPricing.originalPrice.toFixed(2)}
                       </p>
                     )}
                 </div>
@@ -446,7 +512,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
               </div>
 
               {/* Description */}
-              <p className="text-gray-600 text-sm leading-relaxed border-l-4 border-pink-400 pl-4">
+              <p className="text-gray-600 text-sm leading-relaxed border-l-4 border-pink-400 pl-4 whitespace-pre-wrap">
                 {product.description ||
                   "Premium quality product designed for ultimate comfort and style. Crafted with sustainable materials and exceptional attention to detail."}
               </p>
@@ -673,7 +739,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                     Product Description
                   </h3>
-                  <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+                  <p className="text-gray-600 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
                     {product.description ||
                       "Discover the perfect blend of style and comfort with our premium product. Meticulously crafted with attention to every detail, this item offers exceptional quality and durability."}
                   </p>
@@ -946,7 +1012,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                               {review.name}
                             </span>
                             <span className="text-gray-400 text-sm">
-                              {review.date}
+                              {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : review.date}
                             </span>
                           </div>
                           <p className="text-gray-600 text-sm sm:text-base">

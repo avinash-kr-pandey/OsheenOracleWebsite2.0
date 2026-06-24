@@ -336,8 +336,7 @@ const UserDetailsModal = ({
                 >
                   <option value="">Select time slot</option>
                   <option value="11:00 AM - 01:00 PM">11:00 AM - 01:00 PM</option>
-                  <option value="02:00 PM - 04:00 PM">02:00 PM - 04:00 PM</option>
-                  <option value="04:00 PM - 06:00 PM">04:00 PM - 06:00 PM</option>
+                  <option value="02:00 PM - 06:00 PM">02:00 PM - 06:00 PM</option>
                 </select>
               </div>
             </div>
@@ -490,10 +489,13 @@ const BookingPage = () => {
       case 'tarot reading & guidance':
         return <BookOpen className="w-6 h-6 text-white" />;
       case 'relationship healing spells':
+      case 'relationship energy healing':
         return <Heart className="w-6 h-6 text-white" />;
       case 'career healing spells':
+      case 'career energy healing':
         return <TrendingUp className="w-6 h-6 text-white" />;
       case 'spell jars for success':
+      case 'energy healing jars for success':
         return <Flame className="w-6 h-6 text-white" />;
       case 'reiki healing sessions':
         return <HandHeart className="w-6 h-6 text-white" />;

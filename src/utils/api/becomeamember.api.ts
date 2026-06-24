@@ -10,6 +10,7 @@ export interface MembershipFormData {
   countryCode: string;
   plan: string;
   newsletter: boolean;
+  status?: string;
 }
 
 export interface MembershipPlan {

@@ -102,16 +102,24 @@ export default function ProductReviews({ reviews }: ProductReviewsProps) {
                 className="bg-white/70 backdrop-blur border rounded-2xl shadow-md p-6"
               >
                 <div className="flex items-center mb-4">
-                  <Image
-                    src={r.avatar}
-                    alt={r.name}
-                    width={48}
-                    height={48}
-                    className="rounded-full border-2 border-pink-400 mr-4"
-                  />
+                  {r.avatar ? (
+                    <Image
+                      src={r.avatar}
+                      alt={r.name}
+                      width={48}
+                      height={48}
+                      className="rounded-full border-2 border-pink-400 mr-4"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full border-2 border-pink-400 bg-pink-100 flex items-center justify-center font-bold text-pink-600 mr-4">
+                      {r.name ? r.name.charAt(0).toUpperCase() : "A"}
+                    </div>
+                  )}
                   <div>
                     <p className="font-semibold text-gray-800">{r.name}</p>
-                    <p className="text-sm text-gray-400">{r.date}</p>
+                    <p className="text-sm text-gray-400">
+                      {r.createdAt ? new Date(r.createdAt).toLocaleDateString() : r.date}
+                    </p>
                   </div>
                 </div>
 

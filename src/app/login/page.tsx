@@ -990,10 +990,9 @@ const Login = () => {
       </div>
     </form>
   );
-
   const renderLoginForm = () => (
     <form onSubmit={handleLogin} className="space-y-4 md:space-y-6">
-      <h1 className="text-2xl md:text-3xl font-semibold pb-2 text-center text-gray-700">
+      <h1 className="text-2xl md:text-3xl font-semibold pb-2 text-center text-gray-700 font-heading">
         Sign in
       </h1>
 
@@ -1003,7 +1002,7 @@ const Login = () => {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-sm md:text-base"
+          className="w-full p-3 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 text-sm md:text-base"
           required
         />
         <div className="relative w-full">
@@ -1012,7 +1011,7 @@ const Login = () => {
             placeholder="Enter Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+            className="w-full p-3 pr-12 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 text-sm md:text-base"
             required
           />
 
@@ -1026,33 +1025,33 @@ const Login = () => {
           </button>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex justify-end -mt-2">
           <button
             type="button"
             onClick={() => {
               setAuthStep("forgot");
-              // Clear password field when going to forgot password
               setPassword("");
             }}
-            className="text-sm text-gray-600 hover:underline transition-all duration-300 text-left hover:text-gray-800"
+            className="text-sm text-purple-600 hover:text-purple-800 hover:underline transition-all duration-300 font-medium"
           >
             Forgot password?
           </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="bg-gray-800 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-900 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto min-w-[120px]"
-          >
-            {isLoading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Signing In...
-              </>
-            ) : (
-              "Sign In"
-            )}
-          </button>
         </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white py-3 rounded-xl font-bold transition-all duration-300 shadow-md hover:shadow-lg transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base cursor-pointer"
+        >
+          {isLoading ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Signing In...
+            </>
+          ) : (
+            "Sign In"
+          )}
+        </button>
 
         <div className="text-center mt-2 md:mt-4">
           <p className="text-gray-600 text-sm">
@@ -1061,10 +1060,9 @@ const Login = () => {
               type="button"
               onClick={() => {
                 setIsLogin(false);
-                // Clear fields when switching to signup
                 setPassword("");
               }}
-              className="text-gray-800 font-semibold hover:underline focus:outline-none cursor-pointer transition-all duration-300 hover:text-gray-900"
+              className="text-purple-600 font-semibold hover:underline focus:outline-none cursor-pointer transition-all duration-300 hover:text-purple-800"
             >
               Sign up
             </button>
@@ -1078,19 +1076,8 @@ const Login = () => {
           </span>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between gap-3 w-1/2 mx-auto">
-          <div className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 text-sm md:text-base font-medium cursor-pointer">
-            <GoogleLoginButton />
-          </div>
-
-          {/* <button
-            type="button"
-            onClick={handleAppleLogin}
-            className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 text-sm md:text-base font-medium cursor-pointer"
-          >
-            <FaApple size={18} className="text-black" />
-            <span>Apple</span>
-          </button> */}
+        <div className="flex justify-center w-full mt-2">
+          <GoogleLoginButton />
         </div>
 
         <p className="text-xs text-gray-500 text-center mt-4 md:mt-6 leading-5">
@@ -1102,6 +1089,7 @@ const Login = () => {
           >
             Privacy Policy
           </button>
+          {" "}and{" "}
           <button
             type="button"
             onClick={() => setOpenModal("terms")}
@@ -1120,12 +1108,12 @@ const Login = () => {
         <button
           type="button"
           onClick={handleBack}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-all duration-300 text-sm md:text-base"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-all duration-300 text-sm md:text-base cursor-pointer"
         >
           <FaArrowLeft size={14} className="md:size-[16px]" />
           <span className="hidden sm:inline">Back</span>
         </button>
-        <h1 className="text-xl md:text-3xl font-semibold text-center text-gray-700 flex-1">
+        <h1 className="text-xl md:text-3xl font-semibold text-center text-gray-700 flex-1 font-heading">
           Reset Password
         </h1>
         <div className="w-6 md:w-8"></div>
@@ -1142,14 +1130,14 @@ const Login = () => {
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-sm md:text-base"
+        className="w-full p-3 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 text-sm md:text-base"
         required
       />
 
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-gray-800 text-white py-3 rounded-xl font-semibold hover:bg-gray-900 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base"
+        className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white py-3 rounded-xl font-bold transition-all duration-300 shadow-md hover:shadow-lg transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base cursor-pointer"
       >
         {isLoading ? (
           <>
@@ -1165,7 +1153,7 @@ const Login = () => {
         <button
           type="button"
           onClick={() => setAuthStep("login")}
-          className="text-gray-600 hover:text-gray-800 text-sm transition-all duration-300"
+          className="text-purple-600 hover:text-purple-800 text-sm transition-all duration-300 cursor-pointer"
         >
           Remember your password? <span className="font-semibold">Sign in</span>
         </button>
@@ -1179,12 +1167,12 @@ const Login = () => {
         <button
           type="button"
           onClick={handleBack}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-all duration-300 text-sm md:text-base"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-all duration-300 text-sm md:text-base cursor-pointer"
         >
           <FaArrowLeft size={14} className="md:size-[16px]" />
           <span className="hidden sm:inline">Back</span>
         </button>
-        <h1 className="text-xl md:text-3xl font-semibold text-center text-gray-700 flex-1">
+        <h1 className="text-xl md:text-3xl font-semibold text-center text-gray-700 flex-1 font-heading">
           New Password
         </h1>
         <div className="w-6 md:w-8"></div>
@@ -1197,20 +1185,20 @@ const Login = () => {
       </div>
 
       {/* Show the email that was entered */}
-      <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+      <div className="bg-white/70 p-3 rounded-xl border border-gray-300">
         <p className="text-xs md:text-sm text-gray-600">Email</p>
         <p className="font-semibold text-gray-800 text-sm md:text-base truncate">
           {email}
         </p>
       </div>
 
-      <div className="relative">
+      <div className="relative w-full">
         <input
           placeholder="New Password (min. 8 chars, 1 special)"
           type={showNewPassword ? "text" : "password"}
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="w-full p-3 pr-12 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-sm md:text-base"
+          className="w-full p-3 pr-12 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 text-sm md:text-base"
           required
           minLength={8}
         />
@@ -1218,20 +1206,20 @@ const Login = () => {
         <button
           type="button"
           onClick={() => setShowNewPassword(!showNewPassword)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800 transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
           aria-label={showNewPassword ? "Hide password" : "Show password"}
         >
           {showNewPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
         </button>
       </div>
 
-      <div className="relative">
+      <div className="relative w-full">
         <input
           placeholder="Confirm Password"
           type={showConfirmPassword ? "text" : "password"}
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full p-3 pr-12 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-sm md:text-base"
+          className="w-full p-3 pr-12 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 text-sm md:text-base"
           required
           minLength={8}
         />
@@ -1239,7 +1227,7 @@ const Login = () => {
         <button
           type="button"
           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800 transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
           aria-label={showConfirmPassword ? "Hide password" : "Show password"}
         >
           {showConfirmPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
@@ -1249,7 +1237,7 @@ const Login = () => {
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-gray-800 text-white py-3 rounded-xl font-semibold hover:bg-gray-900 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base"
+        className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white py-3 rounded-xl font-bold transition-all duration-300 shadow-md hover:shadow-lg transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base cursor-pointer"
       >
         {isLoading ? (
           <>
@@ -1265,7 +1253,7 @@ const Login = () => {
 
   const renderSignupForm = () => (
     <form onSubmit={handleRegister} className="space-y-4 md:space-y-6">
-      <h1 className="text-2xl md:text-3xl font-semibold pb-2 md:pb-4 text-center text-gray-700">
+      <h1 className="text-2xl md:text-3xl font-semibold pb-2 text-center text-gray-700 font-heading">
         Create account
       </h1>
 
@@ -1275,7 +1263,7 @@ const Login = () => {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-sm md:text-base"
+          className="w-full p-3 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 text-sm md:text-base"
           required
         />
         <input
@@ -1283,16 +1271,16 @@ const Login = () => {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-sm md:text-base"
+          className="w-full p-3 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 text-sm md:text-base"
           required
         />
-        <div className="relative">
+        <div className="relative w-full">
           <input
             placeholder="Password (min. 8 chars, 1 special)"
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 pr-12 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300"
+            className="w-full p-3 pr-12 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 text-sm md:text-base"
             required
             minLength={8}
           />
@@ -1306,13 +1294,13 @@ const Login = () => {
           </button>
         </div>
 
-        <div className="relative">
+        <div className="relative w-full">
           <input
             placeholder="Confirm Password"
             type={showConfirmPassword ? "text" : "password"}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full p-3 pr-12 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300"
+            className="w-full p-3 pr-12 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 text-sm md:text-base"
             required
             minLength={8}
           />
@@ -1336,7 +1324,7 @@ const Login = () => {
             id="terms"
             checked={termsAgreed}
             onChange={handleTermsCheckboxClick}
-            className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-all duration-300 mt-1"
+            className="mr-2 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded transition-all duration-300 mt-1 cursor-pointer"
             required
           />
           <label
@@ -1347,7 +1335,7 @@ const Login = () => {
             <button
               type="button"
               onClick={() => setOpenModal("terms")}
-              className="underline text-black hover:text-gray-700 transition-colors font-medium"
+              className="underline text-black hover:text-gray-700 transition-colors font-medium cursor-pointer"
             >
               Terms of Service
             </button>{" "}
@@ -1355,7 +1343,7 @@ const Login = () => {
             <button
               type="button"
               onClick={() => setOpenModal("privacy")}
-              className="underline text-black hover:text-gray-700 transition-colors font-medium"
+              className="underline text-black hover:text-gray-700 transition-colors font-medium cursor-pointer"
             >
               Privacy Policy
             </button>
@@ -1365,11 +1353,11 @@ const Login = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="bg-gray-800 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-900 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base w-full"
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white py-3 rounded-xl font-bold transition-all duration-300 shadow-md hover:shadow-lg transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base cursor-pointer"
         >
           {isLoading ? (
             <>
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               Creating Account...
             </>
           ) : (
@@ -1384,11 +1372,10 @@ const Login = () => {
               type="button"
               onClick={() => {
                 setIsLogin(true);
-                // Clear password fields when switching to login
                 setPassword("");
                 setConfirmPassword("");
               }}
-              className="text-gray-800 font-semibold hover:underline focus:outline-none cursor-pointer transition-all duration-300 hover:text-gray-900"
+              className="text-purple-600 font-semibold hover:underline focus:outline-none cursor-pointer transition-all duration-300 hover:text-purple-800"
             >
               Sign in
             </button>
@@ -1401,21 +1388,8 @@ const Login = () => {
             or continue with
           </span>
         </div>
-
-        <div className="flex flex-col sm:flex-row justify-between gap-3 w-1/2 mx-auto">
-          {/* Google Login Button */}
-          <div className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 text-sm md:text-base font-medium cursor-pointer">
-            <GoogleLoginButton />
-          </div>
-
-          {/* <button
-            type="button"
-            onClick={handleAppleLogin}
-            className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 text-sm md:text-base font-medium cursor-pointer"
-          >
-            <FaApple size={18} className="text-[#0078D4]" />
-            <span>Apple</span>
-          </button> */}
+        <div className="flex justify-center w-full mt-2">
+          <GoogleLoginButton />
         </div>
 
         <p className="text-xs text-gray-500 text-center mt-4 md:mt-6 leading-5">
@@ -1423,14 +1397,15 @@ const Login = () => {
           <button
             type="button"
             onClick={() => setOpenModal("privacy")}
-            className="underline text-black hover:text-gray-700 transition-colors font-medium"
+            className="underline text-black hover:text-gray-700 transition-colors font-medium cursor-pointer"
           >
             Privacy Policy
           </button>
+          {" "}and{" "}
           <button
             type="button"
             onClick={() => setOpenModal("terms")}
-            className="underline text-black hover:text-gray-700 transition-colors font-medium"
+            className="underline text-black hover:text-gray-700 transition-colors font-medium cursor-pointer"
           >
             Terms of Service
           </button>
@@ -1497,12 +1472,11 @@ const Login = () => {
         {/* Background circular image */}
 
         <Image
-          // src="/images/fullrounded.png"
-          src="/images/roundimage.png"
+          src="/images/fullrounded.png"
           alt="background illustration"
-          width={650}
-          height={650}
-          className="absolute opacity-80 md:opacity-70 md:pt-10 pt-0 rounded-full animate-spin-slow pointer-events-none select-none hidden md:block"
+          width={950}
+          height={950}
+          className="absolute left-[-100px] top-10 opacity-80 md:opacity-70 md:pt-10 pt-0 rounded-full animate-spin-slow pointer-events-none select-none hidden md:block blur-[2px]"
           style={{ animationDuration: "30s" }}
         />
 
@@ -1573,7 +1547,7 @@ const Login = () => {
               renderForgotPasswordForm()
             ) : authStep === "reset" ? (
               renderOtpForm("reset")
-) : authStep === "newPassword" ? (
+            ) : authStep === "newPassword" ? (
               renderNewPasswordForm()
             ) : isLogin ? (
               renderLoginForm()
@@ -1604,7 +1578,7 @@ const Login = () => {
               Google Account Detected
             </h3>
             <p className="text-gray-600 mb-6 text-sm sm:text-base">
-              It looks like you previously registered or logged in using your Google account (<strong>{email}</strong>). 
+              It looks like you previously registered or logged in using your Google account (<strong>{email}</strong>).
               Please log in using the <strong>Sign in with Google</strong> button.
             </p>
             <div className="flex justify-end">

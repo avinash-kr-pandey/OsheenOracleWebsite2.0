@@ -165,7 +165,7 @@ const WelcomeOsheenOracle = () => {
   const defaultMaaText: CurrentData = {
     title: "Osheen MAA",
     description:
-      "Amarpreet Osheen Kaur, fondly called Osheen ma is a Spiritual Mentor, Healer, Tarot reader, aura reader, relationship counselor, motivation speaker, astrologer, Reiki master and white healing spells caster with an experience of more than 10 years in the study of field of Divination, spirituality, alternative healing modalities and creating magic. She was been given the title of No.1 tarot reader in India.",
+      "Amarpreet Osheen Kaur, fondly called Osheen ma is a Spiritual Mentor, Healer, Tarot reader, aura reader, relationship counselor, motivation speaker, astrologer, Reiki master and white energy healer with an experience of more than 10 years in the study of field of Divination, spirituality, alternative healing modalities and creating magic. She was been given the title of No.1 tarot reader in India.",
     link: "/osheen-maa",
     image: "/assets/youaremagic.jpg",
   };

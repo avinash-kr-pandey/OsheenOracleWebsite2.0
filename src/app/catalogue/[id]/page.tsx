@@ -278,7 +278,7 @@ const ZodiacDetails = () => {
                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-3">
                   About {catalogueItem.name}
                 </h2>
-                <p className="text-gray-600 text-lg leading-relaxed">
+                <p className="text-gray-600 text-lg leading-relaxed whitespace-pre-wrap">
                   {catalogueItem.description}
                 </p>
               </motion.div>

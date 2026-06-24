@@ -90,7 +90,7 @@ export const zodiacData = [
   },
   {
     id: 4,
-    name: "Relationship Healing Spells",
+    name: "Relationship Energy Healing",
     price: "899",
     rating: 4.8,
     date: "",
@@ -109,13 +109,13 @@ export const zodiacData = [
       "Strengthen connections",
       "Attract love and understanding",
     ],
-    readingIncludes: ["Relationship spells", "Trust rebuilding", "Emotional healing"],
+    readingIncludes: ["Relationship healing", "Trust rebuilding", "Emotional healing"],
     strengths: ["Compassion", "Patience", "Love"],
     challenges: ["Past baggage", "Misunderstandings"],
   },
   {
     id: 5,
-    name: "Career Healing Spells",
+    name: "Career Energy Healing",
     price: "799",
     rating: 4.4,
     date: "",
@@ -134,19 +134,19 @@ export const zodiacData = [
       "Enhance focus and motivation",
       "Attract career opportunities and growth",
     ],
-    readingIncludes: ["Career spells", "Motivation boost", "Growth alignment"],
+    readingIncludes: ["Career healing", "Motivation boost", "Growth alignment"],
     strengths: ["Ambition", "Focus", "Energy"],
     challenges: ["Stress", "Doubt"],
   },
   {
     id: 6,
-    name: "Spell Jars for Success",
+    name: "Energy Healing Jars for Success",
     price: "699",
     rating: 4.3,
     date: "",
     image: "/images/spellJars/img-8.jpg",
     description:
-      "Handcrafted spell jars infused with crystals and intentions to attract abundance and opportunities.",
+      "Handcrafted healing jars infused with crystals and intentions to attract abundance and opportunities.",
     traits: ["Manifestation", "Abundance", "Success", "Energy"],
     element: "",
     planet: "",
@@ -159,7 +159,7 @@ export const zodiacData = [
       "Boost confidence",
       "Align energy with goals",
     ],
-    readingIncludes: ["Spell jar creation", "Intention setting", "Energy alignment"],
+    readingIncludes: ["Healing jar creation", "Intention setting", "Energy alignment"],
     strengths: ["Manifestation", "Positivity", "Focus"],
     challenges: ["Negativity", "Distractions"],
   },
@@ -539,7 +539,7 @@ export const servicesData = [
   },
   {
     id: 4,
-    name: "Relationship Healing Spells",
+    name: "Relationship Energy Healing",
     price: "₹899",
     originalPrice: "₹1499",
     rating: 4.8,
@@ -556,7 +556,7 @@ export const servicesData = [
       "Resolve conflicts"
     ],
     includes: [
-      "Personalized relationship spells",
+      "Personalized relationship healing",
       "Trust rebuilding guidance",
       "Emotional healing techniques",
       "Follow-up sessions included"
@@ -567,7 +567,7 @@ export const servicesData = [
   },
   {
     id: 5,
-    name: "Career Healing Spells",
+    name: "Career Energy Healing",
     price: "₹799",
     originalPrice: "₹1399",
     rating: 4.4,
@@ -584,7 +584,7 @@ export const servicesData = [
       "Boost professional growth"
     ],
     includes: [
-      "Career-specific spells",
+      "Career-specific healing",
       "Motivation boost techniques",
       "Growth alignment guidance",
       "3-month progress tracking"
@@ -595,14 +595,14 @@ export const servicesData = [
   },
   {
     id: 6,
-    name: "Spell Jars for Success",
+    name: "Energy Healing Jars for Success",
     price: "₹699",
     originalPrice: "₹1199",
     rating: 4.3,
     duration: "One-time",
     image: "/images/services/spell-jars.jpg",
     description:
-      "Handcrafted spell jars infused with crystals and intentions to attract abundance and opportunities.",
+      "Handcrafted healing jars infused with crystals and intentions to attract abundance and opportunities.",
     features: ["Manifestation", "Abundance", "Success", "Energy"],
     category: "physical",
     benefits: [
@@ -612,7 +612,7 @@ export const servicesData = [
       "Continuous energetic support"
     ],
     includes: [
-      "Custom spell jar creation",
+      "Custom healing jar creation",
       "Intention setting ceremony",
       "Energy alignment guidance",
       "Instructions for use"
@@ -1087,7 +1087,7 @@ export const serviceCategories = [
   { id: "card-reading", name: "Card Readings", count: 2 },
   { id: "consultation", name: "Consultations", count: 1 },
   { id: "tarot", name: "Tarot", count: 1 },
-  { id: "spells", name: "Spells", count: 2 },
+  { id: "spells", name: "Energy Healing", count: 2 },
   { id: "healing", name: "Healing", count: 1 },
   { id: "physical", name: "Physical Products", count: 1 }
 ];

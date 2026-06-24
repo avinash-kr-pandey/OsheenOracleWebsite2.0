@@ -183,9 +183,9 @@ export default function AboutPage() {
               ALL-WOMEN team which symbolize women empowerment and once you get
               connect with us we make sure you never feel alone and we do our
               best to heal you from within and make a more happier and healthier
-              individual by providing a personal assistant and therapist for all
-              your needs during the healing / spells process along with constant
-              motivation from Osheen ma herself.
+              assistants and therapist for all your needs during the healing /
+              energy healing process along with constant motivation from Osheen
+              ma herself.
             </p>
             <div className="bg-white rounded-2xl p-8 shadow-lg max-w-2xl mx-auto">
               <p className="text-2xl font-semibold text-purple-800 mb-4">

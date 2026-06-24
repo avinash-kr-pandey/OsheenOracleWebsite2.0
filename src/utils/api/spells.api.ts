@@ -41,13 +41,13 @@ export const iconEmojiMap: Record<string, string> = {
 
 // Spell type categories for filtering/display
 export const spellTypeCategories = [
-  "Love Spells",
-  "Money & Abundance Spells",
-  "Protection Spells",
-  "Healing Spells",
-  "Manifestation Spells",
-  "Banishing Spells",
-  "Success & Career Spells",
+  "Love Energy Healing",
+  "Money & Abundance Energy Healing",
+  "Protection Energy Healing",
+  "Emotional & Inner Healing",
+  "Manifestation Energy Healing",
+  "Banishing Blocks Energy Healing",
+  "Success & Career Energy Healing",
 ];
 
 export const spellsAPI = {

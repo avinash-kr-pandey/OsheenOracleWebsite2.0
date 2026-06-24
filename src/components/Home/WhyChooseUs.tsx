@@ -302,21 +302,7 @@ const WhyChooseUs = () => {
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="mt-16 flex flex-col sm:flex-row flex-wrap justify-center items-center gap-8 sm:gap-12 text-gray-900">
-            <div className="text-center">
-              <h3 className="text-3xl sm:text-5xl font-serif">50,000+</h3>
-              <p className="mt-2 text-base sm:text-lg">Users</p>
-            </div>
-            <div className="text-center">
-              <h3 className="text-3xl sm:text-5xl font-serif">16+</h3>
-              <p className="mt-2 text-base sm:text-lg">Courses</p>
-            </div>
-            <div className="text-center">
-              <h3 className="text-3xl sm:text-5xl font-serif">13+</h3>
-              <p className="mt-2 text-base sm:text-lg">Instructors</p>
-            </div>
-          </div>
+
         </div>
       </section>
 

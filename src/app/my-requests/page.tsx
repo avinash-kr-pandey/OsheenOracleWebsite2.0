@@ -146,7 +146,7 @@ const PaymentSuccessPage = () => {
                 View My Requests
               </Link>
               <Link
-                href="/spells"
+                href="/services/spells"
                 className="flex-1 text-center py-3 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all"
               >
                 Book Another Service

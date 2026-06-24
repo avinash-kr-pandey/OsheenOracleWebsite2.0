@@ -130,7 +130,7 @@ export const DEFAULT_DISCOVER_SECTION: DiscoverSection = {
   osheenMaa: {
     title: "Osheen MAA",
     description:
-      "Amarpreet Osheen Kaur, fondly called Osheen ma is a Spiritual Mentor, Healer, Tarot reader, aura reader, relationship counselor, motivation speaker, astrologer, Reiki master and white healing spells caster with an experience of more than 10 years in the study of field of Divination, spirituality, alternative healing modalities and creating magic. She was been given the title of No.1 tarot reader in India.",
+      "Amarpreet Osheen Kaur, fondly called Osheen ma is a Spiritual Mentor, Healer, Tarot reader, aura reader, relationship counselor, motivation speaker, astrologer, Reiki master and white energy healer with an experience of more than 10 years in the study of field of Divination, spirituality, alternative healing modalities and creating magic. She was been given the title of No.1 tarot reader in India.",
     image: "/assets/youaremagic.jpg",
     link: "/osheen-maa",
   },
@@ -330,7 +330,7 @@ export const DEFAULT_CATALOGUE: Catalogue = [
   {
     _id: "4",
     id: 4,
-    name: "Relationship Healing Spells",
+    name: "Relationship Energy Healing",
     price: "899",
     rating: 4.8,
     date: "",
@@ -350,7 +350,7 @@ export const DEFAULT_CATALOGUE: Catalogue = [
       "Attract love and understanding",
     ],
     readingIncludes: [
-      "Relationship spells",
+      "Relationship healing",
       "Trust rebuilding",
       "Emotional healing",
     ],
@@ -362,7 +362,7 @@ export const DEFAULT_CATALOGUE: Catalogue = [
   {
     _id: "5",
     id: 5,
-    name: "Career Healing Spells",
+    name: "Career Energy Healing",
     price: "799",
     rating: 4.4,
     date: "",
@@ -381,7 +381,7 @@ export const DEFAULT_CATALOGUE: Catalogue = [
       "Enhance focus and motivation",
       "Attract career opportunities and growth",
     ],
-    readingIncludes: ["Career spells", "Motivation boost", "Growth alignment"],
+    readingIncludes: ["Career healing", "Motivation boost", "Growth alignment"],
     strengths: ["Ambition", "Focus", "Energy"],
     challenges: ["Stress", "Doubt"],
     order: 5,
@@ -390,13 +390,13 @@ export const DEFAULT_CATALOGUE: Catalogue = [
   {
     _id: "6",
     id: 6,
-    name: "Spell Jars for Success",
+    name: "Energy Healing Jars for Success",
     price: "699",
     rating: 4.3,
     date: "",
     image: "/images/spellJars/img-8.jpg",
     description:
-      "Handcrafted spell jars infused with crystals and intentions to attract abundance and opportunities.",
+      "Handcrafted healing jars infused with crystals and intentions to attract abundance and opportunities.",
     traits: ["Manifestation", "Abundance", "Success", "Energy"],
     element: "",
     planet: "",
@@ -410,7 +410,7 @@ export const DEFAULT_CATALOGUE: Catalogue = [
       "Align energy with goals",
     ],
     readingIncludes: [
-      "Spell jar creation",
+      "Healing jar creation",
       "Intention setting",
       "Energy alignment",
     ],
