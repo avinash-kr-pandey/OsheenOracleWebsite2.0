@@ -1,16 +1,24 @@
 // plandata.ts
 
+export interface MembershipPlanDuration {
+  name: string; // "Monthly", "3 Months", "6 Months", "Yearly"
+  months: number;
+  benefits: string;
+  priceMultiplier: number;
+}
+
 export interface MembershipPlan {
   id: string;
   name: string;
-  price: string;
-  period: string;
-  features: string[];
-  popular?: boolean;
+  price: string; // Base monthly price
+  period: string; // e.g. "month"
   description: string;
   longDescription: string;
+  features: string[];
+  popular?: boolean;
   benefits: string[];
   recommendedFor: string[];
+  durations: MembershipPlanDuration[];
   includedServices: {
     name: string;
     description: string;
@@ -22,63 +30,70 @@ export interface MembershipPlan {
   }[];
 }
 
+export interface AddOn {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+}
+
+export const addOnsList: AddOn[] = [
+  { id: "extra-tarot", name: "Extra Tarot Session", price: 2100, description: "Additional deep-dive tarot guidance session" },
+  { id: "extra-healing", name: "Extra Healing Session", price: 5100, description: "Additional remote reiki & sound healing session" },
+  { id: "urgent-reading", name: "Urgent Reading (within 30 minutes)", price: 21000, description: "Priority emergency reading delivered in 30 mins" },
+  { id: "manifestation-coaching", name: "Manifestation Coaching (weekly)", price: 11000, description: "Weekly 1-on-1 coaching for manifestation guidance" },
+];
+
 export const membershipPlans: MembershipPlan[] = [
   {
     id: "basic-aura",
     name: "Basic Aura Subscription",
     price: "₹2,100",
     period: "month",
-    description: "Perfect for beginners starting their spiritual journey",
+    description: "For beginners who want light support & monthly guidance.",
     longDescription:
-      "The Basic Aura Subscription is designed for those who are new to spiritual practices and want to experience the transformative power of Osheen Oracle's guidance. This plan offers a gentle introduction to tarot, healing, and spiritual insights.",
+      "The Basic Aura Subscription is designed for beginners who want a gentle introduction to spiritual guidance, energy work, and personal growth under the direction of Osheen Ma'am.",
     features: [
       "1 Tarot Guidance Session/month (voice note)",
-      "1 Chakra Scanning",
-      "Access to voice note healing session",
-      "1 Prediction (1 question)",
+      "1 chakra scanning",
+      "Access to voice note healing session with Osheen maam",
+      "1 prediction (1 question)",
       "1 Affirmation Sheet",
       "Priority WhatsApp replies within 3 days",
     ],
     benefits: [
-      "Beginner-friendly spiritual guidance",
-      "Affordable entry into spiritual practices",
-      "Gentle introduction to energy work",
-      "Monthly affirmation support",
-      "Access to basic healing sessions",
+      "Light support & monthly guidance",
+      "Clear chakra diagnosis",
+      "Access to direct voice note healings",
+      "Monthly affirmation training",
     ],
     recommendedFor: [
       "Spiritual beginners",
-      "Those on a budget",
-      "People seeking gentle guidance",
-      "Anyone new to tarot readings",
+      "Anyone wanting light guidance",
+      "Budget-friendly seekers",
+    ],
+    durations: [
+      { name: "Monthly", months: 1, benefits: "Basic features only.", priceMultiplier: 1 },
+      { name: "3 Months", months: 3, benefits: "+1 one to one call with osheen maam per month (15-20min)", priceMultiplier: 3 },
+      { name: "6 Months", months: 6, benefits: "+1 Bonus Healing Session(voicenote) + 2 Custom Affirmation session + 1 call with osheen maam/month", priceMultiplier: 6 },
+      { name: "Yearly", months: 12, benefits: "+ 3 Bonus Tarot sessions (30 mins each) + 1 Full Chakra Healing + 1 Personalised 12-Month Prediction PDF + 1 call with osheen maam/month", priceMultiplier: 12 },
     ],
     includedServices: [
       {
-        name: "Tarot Guidance",
-        description: "Personalized tarot reading session",
-        sessions: "1 session per month (voice note)",
+        name: "Tarot Session",
+        description: "Voice-note based tarot reading answering your key life questions.",
+        sessions: "1 per month",
       },
       {
         name: "Chakra Scanning",
-        description: "Comprehensive chakra energy assessment",
-        sessions: "1 session per month",
-      },
-      {
-        name: "Healing Session",
-        description: "Voice note based healing practice",
-        sessions: "Access to monthly session",
+        description: "Scanning of major chakra points to find blockages and energy levels.",
+        sessions: "1 per month",
       },
     ],
     faqs: [
       {
-        question: "How long are the tarot sessions?",
-        answer:
-          "Each tarot guidance session is delivered via voice note and typically lasts 15-20 minutes.",
-      },
-      {
-        question: "Can I ask multiple questions in one session?",
-        answer:
-          "The basic plan includes one main question per session, but you can get clarifications during the reading.",
+        question: "How long are the voice note sessions?",
+        answer: "Tarot guidance voice notes are detailed and address your questions comprehensively, typically lasting 10-15 minutes.",
       },
     ],
   },
@@ -87,59 +102,43 @@ export const membershipPlans: MembershipPlan[] = [
     name: "Tarot Insight Subscription",
     price: "₹4,200",
     period: "month",
-    description: "Deep tarot insights and regular spiritual guidance",
+    description: "Focused tarot support for people who need regular answers.",
     longDescription:
-      "The Tarot Insight Subscription is perfect for those who seek regular spiritual guidance and deeper insights into their life path. With multiple sessions each month, you'll receive comprehensive support for your journey.",
+      "The Tarot Insight Subscription is tailored for individuals seeking regular tarot support, detailed decision analysis, and direct consultations to resolve doubts fast.",
     features: [
       "2 Full Tarot Readings/month (30 mins each)",
       "2 Quick Doubt Tarot Checks/month",
-      "1 Decision Guidance Session/month",
-      "Access to Members Only monthly prediction",
-      "Priority WhatsApp support (48 hours)",
-      "1 Healing session with Osheen",
+      "1 Decision Guidance Session/month (voice note)",
+      "Access to 'Members Only' monthly prediction",
+      "Priority WhatsApp support (reply within 48 hours)",
     ],
-    popular: true,
     benefits: [
-      "Regular tarot guidance for ongoing support",
-      "Quick doubt resolution between sessions",
-      "Decision-making support",
-      "Exclusive monthly predictions",
-      "Direct healing with Osheen",
+      "Regular deep tarot answers",
+      "Doubt clearance on the go",
+      "Members-only prediction reports",
+      "Fast priority replies on WhatsApp",
     ],
     recommendedFor: [
-      "Regular tarot enthusiasts",
-      "Those facing important decisions",
-      "People seeking ongoing spiritual support",
-      "Individuals wanting deeper insights",
+      "People navigating complex life situations",
+      "Seekers needing weekly/bi-weekly tarot advice",
+    ],
+    durations: [
+      { name: "Monthly", months: 1, benefits: "All basic tarot features", priceMultiplier: 1 },
+      { name: "3 Months", months: 3, benefits: "+1 additional tarot reading + 1 healing session (on call) with osheen", priceMultiplier: 3 },
+      { name: "6 Months", months: 6, benefits: "+2 additional tarot readings + 2 healing sessions (on call) osheen + affirmation session on call", priceMultiplier: 6 },
+      { name: "Yearly", months: 12, benefits: "+ monthly readings (voicenote) + 6 detailed love/finance readings + 1 Ritual/per month + per month affirmation session + 1 video tarot session with osheen Maam", priceMultiplier: 12 },
     ],
     includedServices: [
       {
         name: "Full Tarot Readings",
-        description: "Comprehensive 30-minute tarot sessions",
-        sessions: "2 sessions per month",
-      },
-      {
-        name: "Quick Tarot Checks",
-        description: "Rapid answers to urgent questions",
-        sessions: "2 sessions per month",
-      },
-      {
-        name: "Decision Guidance",
-        description: "Specialized sessions for life decisions",
-        sessions: "1 session per month",
+        description: "Deep dive 30-minute readings covering love, career, or life path.",
+        sessions: "2 per month",
       },
     ],
     faqs: [
       {
-        question:
-          "What's the difference between full readings and quick checks?",
-        answer:
-          "Full readings are comprehensive 30-minute sessions, while quick checks are brief 5-10 minute answers to specific questions.",
-      },
-      {
-        question: "Can I carry over unused sessions?",
-        answer:
-          "Sessions are use-them-or-lose-them each month to ensure regular spiritual practice.",
+        question: "What is a Quick Doubt Tarot Check?",
+        answer: "It allows you to get text or voice responses to short, urgent questions within a few hours.",
       },
     ],
   },
@@ -148,116 +147,96 @@ export const membershipPlans: MembershipPlan[] = [
     name: "Healing & Energy Subscription",
     price: "₹6,300",
     period: "month",
-    description: "Intensive energy healing and spiritual transformation",
+    description: "For people needing deep emotional/energy transformation.",
     longDescription:
-      "The Healing & Energy Subscription is designed for those who are ready to dive deep into energy work and spiritual transformation. This plan focuses on clearing energetic blocks and elevating your spiritual vibration.",
+      "The Healing & Energy Subscription provides continuous therapeutic alignment, guided meditation, and custom energetic rituals to dissolve blockages and restore emotional peace.",
     features: [
-      "2 Energy Healings/month (Reiki/Chakra/Angel)",
+      "2 Energy Healings/month (Reiki/Chakra/Angel healing)",
       "2 Aura Scan Reports/month",
-      "1 Ritual/month",
+      "1 ritual/month",
       "1 Guided Meditation/month",
       "Monthly Readings (voice note)",
-      "WhatsApp priority (24 hrs)",
+      "WhatsApp priority: replies within 24 hrs",
+      "Astrological kundali analysis",
     ],
     benefits: [
-      "Deep energetic cleansing and healing",
-      "Regular aura maintenance",
-      "Powerful monthly rituals",
-      "Guided meditation practices",
-      "Faster response times",
+      "Deep emotional release & alignment",
+      "Aura analysis report tracking",
+      "Karma & Angel healing integrations",
+      "Direct guidance calls with Osheen Ma'am",
     ],
     recommendedFor: [
-      "Energy healing enthusiasts",
-      "Those dealing with emotional blocks",
-      "People seeking spiritual transformation",
-      "Individuals interested in rituals",
+      "Seekers undergoing stress or trauma",
+      "Anyone desiring deep vibrational healing",
+    ],
+    durations: [
+      { name: "Monthly", months: 1, benefits: "All main healing features", priceMultiplier: 1 },
+      { name: "3 Months", months: 3, benefits: "+1 Angel Healing session (voice note) + 1 transformation session", priceMultiplier: 3 },
+      { name: "6 Months", months: 6, benefits: "+2 Angel Healings + 1 karma healing + 1 Positive affirmation session with osheen Maam on call + 2 transformation session per month + kundali analysis", priceMultiplier: 6 },
+      { name: "Yearly", months: 12, benefits: "+ 6 Bonus Healings (on call) + 1 Full Chakra Alignment (7-session series)(video recorded) + 1 Personalized ritual Manual + 3 Cord-Cutting sessions across the year(or aura cleansing, according to need) + 2 video call healing sessions + 1 gift + Kundali analysis and totkas", priceMultiplier: 12 },
     ],
     includedServices: [
       {
-        name: "Energy Healing",
-        description: "Reiki, Chakra, or Angel healing sessions",
-        sessions: "2 sessions per month",
-      },
-      {
-        name: "Aura Scanning",
-        description: "Detailed aura energy reports",
-        sessions: "2 reports per month",
-      },
-      {
-        name: "Spiritual Rituals",
-        description: "Customized monthly rituals",
-        sessions: "1 ritual per month",
+        name: "Energy Healings",
+        description: "Reiki, Angel, or Chakra healing sessions customized to your current vibration.",
+        sessions: "2 per month",
       },
     ],
     faqs: [
       {
-        question: "What types of energy healing are offered?",
-        answer:
-          "We offer Reiki for universal energy, Chakra healing for energy centers, and Angel healing for divine connection.",
-      },
-      {
-        question: "How long do the healing effects last?",
-        answer:
-          "Effects vary by individual, but most clients feel the benefits for several weeks after each session.",
+        question: "Do I need to be active during energy healing?",
+        answer: "Healing sessions are remote; Osheen Ma'am coordinates the timing so you can be in a receptive, relaxed state.",
       },
     ],
   },
   {
     id: "premium-manifestation",
-    name: "Premium Manifestation",
+    name: "Premium Manifestation & Ritual Subscription",
     price: "₹10,500",
     period: "month",
-    description: "VIP manifestation coaching and unlimited spiritual support",
+    description: "For clients who want spellwork, manifestation support & full guidance.",
     longDescription:
-      "The Premium Manifestation Subscription is our most exclusive offering for serious spiritual seekers who want to manifest their dreams rapidly. With VIP access and unlimited support, you'll accelerate your spiritual growth and manifestation power.",
+      "Our most elite tier. Get personalized roadmaps, astrological compatibility checks, major monthly rituals, VIP hotlines, and complete spiritual mentorship directly from Osheen Ma'am.",
     features: [
-      "1 Major Ritual Every Month",
+      "1 Major Ritual Every Month (Money / Protection / Love / Success)",
       "2 Tarot Readings/month",
       "Unlimited tarot doubts (text-based)",
-      "2 Healings/month + Full Aura Scan",
+      "2 Healings/month",
+      "Full Aura Scan & Report every month",
       "Personal Manifestation Roadmap",
-      "VIP replies within 12 hours",
+      "WhatsApp VIP lane replies within 12 hours",
+      "Call support: 1 priority call/month",
+      "Monthly personalised affirmations & scripting guidance",
+      "Full Astrology kundali analysis",
+      "Monthly Astrological Rituals and totkas",
     ],
     benefits: [
-      "Rapid manifestation support",
-      "Unlimited tarot guidance",
-      "Personalized manifestation roadmap",
-      "VIP priority access",
-      "Major monthly rituals for powerful shifts",
+      "Custom high-level spellwork and major rituals",
+      "Unlimited questions answered fast",
+      "VIP direct hotline and compatibility reports",
+      "Complete 108-day manifestation blueprint",
     ],
     recommendedFor: [
-      "Serious manifestors",
-      "VIP clients wanting premium access",
-      "Those with urgent spiritual needs",
-      "Individuals ready for rapid transformation",
+      "Clients desiring VIP-level support and custom spellwork",
+      "Business leaders, entrepreneurs, and high-manifestors",
+    ],
+    durations: [
+      { name: "Monthly", months: 1, benefits: "+ all features of basic subscription", priceMultiplier: 1 },
+      { name: "3 Months", months: 3, benefits: "+ all features of basic subscription + all tarot subscription", priceMultiplier: 3 },
+      { name: "6 Months", months: 6, benefits: "All features of tarot subscription + 6 Bonus Healings (on call) + 1 Full Chakra Alignment (7-session series)(video recorded) + 1 Personalized ritual Manual + 3 Cord-Cutting sessions across the year(or aura cleansing, according to need) + 2 video call healing sessions + 1 gift", priceMultiplier: 6 },
+      { name: "Yearly", months: 12, benefits: "ULTIMATE ACCESS: ✔ 12 Major Rituals + 4 Bonus Rituals | ✔ 1 Mega Ritual (Money / Life Purpose / Business Boost) | ✔ 1 Astrological kundali analysis + totkas | ✔ 1 Astrology Compatibility Report | ✔ 108-Day Manifestation Plan | ✔ VIP Hotline + Same-day replies | ✔ Personalized Bracelet/Crystal | ✔ all features included in 6 month subscription", priceMultiplier: 12 },
     ],
     includedServices: [
       {
-        name: "Major Rituals",
-        description: "Powerful monthly manifestation rituals",
-        sessions: "1 major ritual per month",
-      },
-      {
-        name: "Unlimited Tarot",
-        description: "Text-based tarot guidance",
-        sessions: "Unlimited questions",
-      },
-      {
-        name: "Manifestation Roadmap",
-        description: "Personalized manifestation plan",
-        sessions: "Updated monthly",
+        name: "Major Ritual",
+        description: "Intense manifestation ritual conducted for your specific intention.",
+        sessions: "1 per month",
       },
     ],
     faqs: [
       {
-        question: "What makes the 'major rituals' different?",
-        answer:
-          "Major rituals are extensive, personalized ceremonies designed for significant life changes and powerful manifestations.",
-      },
-      {
-        question: "How quickly can I expect to see manifestation results?",
-        answer:
-          "Results vary, but premium members typically see noticeable shifts within the first month due to the intensive support.",
+        question: "Is the personalized bracelet included?",
+        answer: "Yes, a customized crystal/bracelet tailored to your energy configuration is shipped as part of the Yearly package.",
       },
     ],
   },

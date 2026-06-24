@@ -3,11 +3,9 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { MembershipPlan, membershipPlans } from "@/utils/plandata";
+import { MembershipPlan, membershipPlans, addOnsList } from "@/utils/plandata";
 import { membershipApi, countryCodes } from "@/utils/api/becomeamember.api";
 import { paymentAPI } from "@/utils/api/payment.api";
-
-
 
 interface FormErrors {
   name?: string;
@@ -23,6 +21,10 @@ const PlanDetailsPage = () => {
   const [activePlan, setActivePlan] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Subscription configuration states
+  const [selectedDuration, setSelectedDuration] = useState<string>("Monthly");
+  const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
+
   // Form state
   const [formData, setFormData] = useState({
     name: "",
@@ -36,7 +38,7 @@ const PlanDetailsPage = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
-  const [submitError, setSubmitError] = useState<string>( "");
+  const [submitError, setSubmitError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   // Fetch plan content on mount (dynamic + static fallback)
@@ -51,7 +53,11 @@ const PlanDetailsPage = () => {
             (p: any) => p._id === planId || p.id === planId
           );
           if (matched) {
-            setActivePlan(matched);
+            const staticPlan = membershipPlans.find((p) => p.id === matched.id || p.id === planId);
+            setActivePlan({
+              ...staticPlan,
+              ...matched,
+            });
             setFormData((prev) => ({ ...prev, plan: matched._id || matched.id }));
             setLoading(false);
             return;
@@ -97,6 +103,21 @@ const PlanDetailsPage = () => {
     if (!priceStr) return 0;
     const numericStr = priceStr.replace(/[^0-9]/g, "");
     return parseInt(numericStr, 10) || 0;
+  };
+
+  // Helper to calculate total price
+  const calculateTotal = (): number => {
+    if (!activePlan) return 0;
+    const basePrice = getNumericPrice(activePlan.price);
+    const matchedDuration = activePlan.durations?.find((d: any) => d.name === selectedDuration);
+    const multiplier = matchedDuration ? matchedDuration.priceMultiplier : 1;
+    
+    const addOnsCost = selectedAddOns.reduce((sum, id) => {
+      const addon = addOnsList.find(a => a.id === id);
+      return sum + (addon ? addon.price : 0);
+    }, 0);
+
+    return (basePrice * multiplier) + addOnsCost;
   };
 
   // Validate Form Fields
@@ -181,16 +202,16 @@ const PlanDetailsPage = () => {
         return;
       }
 
-      const amountToCharge = getNumericPrice(activePlan.price);
-      if (amountToCharge <= 0) {
-        setSubmitError("Invalid plan price. Please try another plan.");
+      const totalToCharge = calculateTotal();
+      if (totalToCharge <= 0) {
+        setSubmitError("Invalid plan price. Please try another configuration.");
         setIsSubmitting(false);
         return;
       }
 
       // Create Razorpay Order
       const orderResponse = await paymentAPI.createOrder({
-        amount: amountToCharge,
+        amount: totalToCharge,
         currency: "INR",
         receipt: `membership_${Date.now()}`,
       });
@@ -199,13 +220,16 @@ const PlanDetailsPage = () => {
         throw new Error("Failed to create order on payment gateway.");
       }
 
+      const addOnNames = selectedAddOns.map(id => addOnsList.find(a => a.id === id)?.name).filter(Boolean).join(", ");
+      const paymentDescription = `${activePlan.name} - ${selectedDuration}${addOnNames ? ` + Add-ons (${addOnNames})` : ""}`;
+
       // Open Razorpay Checkout Modal
       const options: any = {
         key: orderResponse.key_id,
         amount: orderResponse.order.amount,
         currency: orderResponse.order.currency,
         name: "Osheen Oracle",
-        description: `${activePlan.name} Membership`,
+        description: paymentDescription,
         order_id: orderResponse.order.id,
         handler: async (response: any) => {
           try {
@@ -217,9 +241,12 @@ const PlanDetailsPage = () => {
             });
 
             if (verification.success) {
-              // Submit the application with status "active"
+              const notesContent = `Duration: ${selectedDuration}\nAdd-ons: ${addOnNames || "None"}\nGrand Total Paid: ₹${totalToCharge}`;
+              
+              // Submit the application with status "active" and selections in notes
               const submitResponse = await membershipApi.submitApplication({
                 ...formData,
+                notes: notesContent,
                 status: "active",
               });
 
@@ -239,6 +266,7 @@ const PlanDetailsPage = () => {
                   plan: activePlan._id || activePlan.id,
                   newsletter: true,
                 });
+                setSelectedAddOns([]);
               } else {
                 setSubmitError(
                   submitResponse.message ||
@@ -314,6 +342,8 @@ const PlanDetailsPage = () => {
       </div>
     );
   }
+
+  const grandTotal = calculateTotal();
 
   return (
     <div
@@ -391,8 +421,92 @@ const PlanDetailsPage = () => {
       <section className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Left Column - Features & Benefits */}
+            {/* Left Column - Configurations & Details */}
             <div className="lg:col-span-2 space-y-12">
+              
+              {/* STEP 1: SELECT SUBSCRIPTION DURATION */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600 text-sm font-bold">1</span>
+                  Choose Subscription Duration
+                </h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {activePlan.durations?.map((dur: any) => {
+                    const basePriceNum = getNumericPrice(activePlan.price);
+                    const durationPrice = basePriceNum * dur.priceMultiplier;
+                    const isSelected = selectedDuration === dur.name;
+                    
+                    return (
+                      <div
+                        key={dur.name}
+                        onClick={() => setSelectedDuration(dur.name)}
+                        className={`p-5 border-2 rounded-2xl cursor-pointer transition-all duration-300 transform hover:scale-[1.01] flex flex-col justify-between ${
+                          isSelected
+                            ? "border-purple-500 bg-purple-50/50 shadow-md"
+                            : "border-gray-200 bg-white hover:border-purple-300"
+                        }`}
+                      >
+                        <div className="flex justify-between items-center mb-3">
+                          <span className="font-bold text-gray-900 text-lg">{dur.name}</span>
+                          <span className="text-purple-600 font-extrabold text-lg">
+                            ₹{durationPrice.toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        <p className="text-gray-600 text-sm leading-relaxed">{dur.benefits}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* STEP 2: ADD-ONS (OPTIONAL) */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600 text-sm font-bold">2</span>
+                  Add-Ons (Optional)
+                </h2>
+                <p className="text-gray-550 text-sm mb-6">Enhance your spiritual guidance on any plan.</p>
+
+                <div className="space-y-4">
+                  {addOnsList.map((addon) => {
+                    const isChecked = selectedAddOns.includes(addon.id);
+                    return (
+                      <label
+                        key={addon.id}
+                        className={`flex items-start gap-4 p-4 border rounded-2xl cursor-pointer transition-all duration-200 ${
+                          isChecked
+                            ? "border-purple-500 bg-purple-50/20 shadow-sm"
+                            : "border-gray-200 bg-white hover:bg-gray-50/50"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedAddOns(prev => [...prev, addon.id]);
+                            } else {
+                              setSelectedAddOns(prev => prev.filter(id => id !== addon.id));
+                            }
+                          }}
+                          className="mt-1.5 w-5 h-5 text-purple-600 rounded focus:ring-purple-400 cursor-pointer"
+                        />
+                        <div className="flex-grow">
+                          <div className="flex justify-between items-center flex-wrap gap-2">
+                            <span className="font-bold text-gray-900 text-base">{addon.name}</span>
+                            <span className="text-purple-600 font-bold text-sm bg-purple-100/50 px-2.5 py-1 rounded-lg">
+                              + ₹{addon.price.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                          <p className="text-gray-500 text-xs mt-1">{addon.description}</p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Features */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-8">
@@ -469,19 +583,37 @@ const PlanDetailsPage = () => {
             <div className="space-y-8">
               {/* Plan Card */}
               <div className="bg-white rounded-2xl shadow-lg border-2 border-purple-500 p-8 sticky top-28">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                <div className="text-center mb-6 pb-6 border-b border-gray-100">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
                     {activePlan.name}
                   </h3>
-                  <div className="flex items-baseline justify-center mb-2">
-                    <span className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-                      {activePlan.price}
-                    </span>
-                    <span className="text-gray-600 ml-2 text-lg">
-                      /{activePlan.period}
-                    </span>
+                  <p className="text-purple-600 font-semibold text-sm mb-4">
+                    Selected Duration: {selectedDuration}
+                  </p>
+                  
+                  {/* Price Breakdown */}
+                  <div className="space-y-2.5 text-left text-sm text-gray-600">
+                    <div className="flex justify-between">
+                      <span>Plan Cost ({selectedDuration}):</span>
+                      <span className="font-semibold text-gray-900">
+                        ₹{((getNumericPrice(activePlan.price)) * (activePlan.durations?.find((d: any) => d.name === selectedDuration)?.priceMultiplier || 1)).toLocaleString("en-IN")}
+                      </span>
+                    </div>
+                    {selectedAddOns.length > 0 && (
+                      <div className="flex justify-between">
+                        <span>Add-Ons:</span>
+                        <span className="font-semibold text-gray-900">
+                          + ₹{selectedAddOns.reduce((sum, id) => sum + (addOnsList.find(a => a.id === id)?.price || 0), 0).toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-base font-bold text-gray-955 pt-2.5 border-t border-dashed border-gray-200">
+                      <span>Grand Total:</span>
+                      <span className="text-purple-700 font-extrabold text-lg">
+                        ₹{grandTotal.toLocaleString("en-IN")}
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-gray-600 text-sm">{activePlan.description}</p>
                 </div>
 
                 <button
@@ -492,7 +624,7 @@ const PlanDetailsPage = () => {
                 </button>
 
                 <div className="mt-6 text-center">
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-gray-500 text-sm animate-pulse">
                     ✨ Begin your transformation today ✨
                   </p>
                 </div>
@@ -566,7 +698,7 @@ const PlanDetailsPage = () => {
                 <div className="flex items-center">
                   <div className="text-2xl mr-3">✨</div>
                   <div>
-                    <p className="text-green-800 font-medium">{successMessage}</p>
+                     <p className="text-green-800 font-medium">{successMessage}</p>
                   </div>
                 </div>
               </div>
@@ -590,8 +722,13 @@ const PlanDetailsPage = () => {
                   Spiritual Transformation
                 </span>
               </h2>
-              <p className="text-lg text-gray-600">
-                You are subscribing to the <span className="font-semibold text-purple-600">{activePlan.name}</span> plan ({activePlan.price}/{activePlan.period})
+              <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+                You are subscribing to <span className="font-semibold text-purple-600">{activePlan.name}</span> for <span className="font-semibold text-purple-600">{selectedDuration}</span>.
+                {selectedAddOns.length > 0 && <span> with selected add-ons.</span>}
+                <br />
+                <span className="font-extrabold text-gray-900 text-xl mt-2 block">
+                  Grand Total Paid: ₹{grandTotal.toLocaleString("en-IN")}
+                </span>
               </p>
             </div>
 

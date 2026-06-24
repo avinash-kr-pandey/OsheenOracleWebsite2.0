@@ -11,6 +11,7 @@ export interface MembershipFormData {
   plan: string;
   newsletter: boolean;
   status?: string;
+  notes?: string;
 }
 
 export interface MembershipPlan {
