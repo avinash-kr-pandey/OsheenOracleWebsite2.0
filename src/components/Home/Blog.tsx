@@ -115,33 +115,36 @@ const BlogSlider: React.FC = () => {
       className="px-8 py-12 relative"
       style={{ fontFamily: "var(--font-montserrat)" }}
     >
-      <p className="md:text-lg text-md mb-2 text-[#3D2E4F]">BLOG</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+        <div>
+          <p className="md:text-lg text-md mb-2 text-[#3D2E4F]">BLOG</p>
+          <h2 className="md:text-5xl text-2xl text-[#3D2E4F] py-1 font-bold">
+            Cosmic <span className="italic font-serif">Stories</span> from Celestial
+          </h2>
+        </div>
 
-      <h2 className="md:text-5xl text-2xl mb-8 text-[#3D2E4F] py-3">
-        Cosmic <span className="italic">Stories</span> from Celestial
-      </h2>
-
-      <div className="relative">
         {/* Scroll Buttons - Only show if there are blogs */}
         {blogs.length > 0 && (
-          <>
+          <div className="flex gap-3 pb-2">
             <button
               onClick={() => scroll("prev")}
-              className="absolute top-1/2 left-1 sm:-left-4 z-10 bg-white hover:bg-yellow-400 hover:text-white p-2.5 rounded-full shadow-lg border border-gray-100 transition-all duration-300 transform -translate-y-1/2 active:scale-90"
+              className="bg-white hover:bg-yellow-400 hover:text-white p-3 rounded-full shadow-md border border-gray-150 transition-all duration-300 active:scale-95 text-[#3D2E4F]"
               aria-label="Previous post"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
-
             <button
               onClick={() => scroll("next")}
-              className="absolute top-1/2 right-1 sm:-right-4 z-10 bg-white hover:bg-yellow-400 hover:text-white p-2.5 rounded-full shadow-lg border border-gray-100 transition-all duration-300 transform -translate-y-1/2 active:scale-90"
+              className="bg-white hover:bg-yellow-400 hover:text-white p-3 rounded-full shadow-md border border-gray-150 transition-all duration-300 active:scale-95 text-[#3D2E4F]"
               aria-label="Next post"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5" />
             </button>
-          </>
+          </div>
         )}
+      </div>
+
+      <div className="relative">
 
         {/* Blog Slider */}
         <motion.div

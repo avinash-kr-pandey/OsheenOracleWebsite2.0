@@ -89,27 +89,36 @@ const BlogSlider: React.FC = () => {
       }}
       className="min-h-screen pt-32 md:px-38 px-5 pb-20"
     >
-      <p className="md:text-lg text-md mb-2 text-[#3D2E4F]">BLOG</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+        <div>
+          <p className="md:text-lg text-md mb-2 text-[#3D2E4F]">BLOG</p>
+          <h2 className="md:text-5xl text-2xl text-[#3D2E4F] py-1 font-bold">
+            Cosmic <span className="italic font-serif">Stories</span> from Celestial
+          </h2>
+        </div>
 
-      <h2 className="md:text-5xl text-2xl mb-8 text-[#3D2E4F] py-3">
-        Cosmic <span className="italic">Stories</span> from Celestial
-      </h2>
+        {/* Scroll Buttons */}
+        {blogs?.length > 0 && (
+          <div className="flex gap-3 pb-2">
+            <button
+              onClick={() => scroll("prev")}
+              className="bg-white hover:bg-yellow-400 hover:text-white p-3 rounded-full shadow-md border border-gray-150 transition-all duration-300 active:scale-95 text-[#3D2E4F]"
+              aria-label="Previous post"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => scroll("next")}
+              className="bg-white hover:bg-yellow-400 hover:text-white p-3 rounded-full shadow-md border border-gray-150 transition-all duration-300 active:scale-95 text-[#3D2E4F]"
+              aria-label="Next post"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+      </div>
 
       <div className="relative">
-        {/* Scroll Buttons */}
-        <button
-          onClick={() => scroll("prev")}
-          className="absolute top-1/2 -left-4 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transform -translate-y-1/2"
-        >
-          <ChevronLeft />
-        </button>
-
-        <button
-          onClick={() => scroll("next")}
-          className="absolute top-1/2 -right-4 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transform -translate-y-1/2"
-        >
-          <ChevronRight />
-        </button>
 
         {/* Blog Slider */}
         <motion.div
