@@ -347,9 +347,14 @@ const SingleBlogPage = () => {
             <p className="text-gray-300 text-sm">
               Follow for guidance
             </p>
-            <button className="mt-4 w-full bg-gradient-to-r from-orange-500 to-purple-600 py-2 rounded-xl text-sm font-semibold hover:shadow-lg transition-all">
+            <a
+              href="https://www.instagram.com/osheen_oracle?igsh=MTVienBkNjI0ZzhteQ%3D%3D"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 block w-full bg-gradient-to-r from-orange-500 to-purple-600 py-2 rounded-xl text-sm font-semibold hover:shadow-lg transition-all text-center"
+            >
               Follow Author
-            </button>
+            </a>
           </div>
 
           {/* Related Posts */}

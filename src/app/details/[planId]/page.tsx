@@ -671,26 +671,6 @@ const PlanDetailsPage = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-12 md:py-16 relative">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#3D2E4F] mb-4 font-serif">
-              Ready to Begin Your Spiritual Journey?
-            </h2>
-            <p className="text-base sm:text-lg text-gray-700 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Join thousands of spiritual seekers who have transformed their lives
-              with Osheen Oracle&rsquo;s guidance.
-            </p>
-            <div className="flex justify-center">
-              <button
-                onClick={scrollToForm}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3.5 rounded-xl font-bold text-base sm:text-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-[1.02] cursor-pointer"
-              >
-                Select This Plan
-              </button>
-            </div>
-          </div>
-        </section>
 
         {/* Registration & Checkout Form Section */}
         <section id="registration-form-section" className="py-8 pb-24">

@@ -487,7 +487,11 @@ const ZodiacDetails = () => {
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
+          <div className={`grid gap-6 sm:gap-8 ${
+            expertGuides.length === 1
+              ? "grid-cols-1 max-w-md mx-auto"
+              : "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+          }`}>
             {expertGuides.map((guide, index) => (
               <motion.div
                 key={guide._id || index}
@@ -522,7 +526,9 @@ const ZodiacDetails = () => {
                         {guide.name}
                       </h3>
                       <p className="text-purple-100 text-sm sm:text-base">
-                        {guide.expertise?.split(",")[0] || "Expert Guide"}
+                        {guide.expertiseAreas && guide.expertiseAreas.length > 0
+                          ? guide.expertiseAreas.slice(0, 2).join(" & ")
+                          : (guide.expertise?.split(",")[0] || "Expert Guide")}
                       </p>
                     </div>
                   </div>

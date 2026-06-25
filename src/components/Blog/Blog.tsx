@@ -355,9 +355,14 @@ const Blog = () => {
                 />
               ))}
             </div>
-            <button className="w-full bg-gradient-to-r from-orange-500 to-purple-600 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300">
+            <a
+              href="https://www.instagram.com/osheen_oracle?igsh=MTVienBkNjI0ZzhteQ%3D%3D"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full bg-gradient-to-r from-orange-500 to-purple-600 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 text-center"
+            >
               Follow @CosmicWisdom
-            </button>
+            </a>
           </div>
         </div>
       </div>

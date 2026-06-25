@@ -368,12 +368,11 @@ const Orders = () => {
     const reviewText = (form.review as HTMLTextAreaElement)?.value || "";
 
     try {
-      const reviewData: ReviewSubmitBody = {
-        productId: reviewProduct.productId || reviewProduct.id,
+      await postData(`/products/${reviewProduct.productId || reviewProduct.id}/reviews`, {
+        name: user?.name || "Anonymous",
         rating: 5,
         comment: reviewText,
-      };
-      await postData("/reviews", reviewData);
+      });
 
       toast.success(`Review submitted for ${reviewProduct.productName}!`);
       setShowReviewModal(false);
