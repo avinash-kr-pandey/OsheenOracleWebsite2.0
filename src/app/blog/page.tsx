@@ -23,9 +23,7 @@ const transformBlogForCard = (blog: BlogType) => {
     id: blog._id,
     title: blog.title,
     description: blog.excerpt || blog.content?.substring(0, 100) + "..." || "",
-    image: blog.image
-      ? getFullImageUrl(blog.image)
-      : "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format",
+    image: blog.image ? getFullImageUrl(blog.image) : "",
     date: formatDate(blog.createdAt || ""),
     category: blog.category,
     author: blog.author,
@@ -36,6 +34,7 @@ const BlogSlider: React.FC = () => {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [blogs, setBlogs] = useState<BlogType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchBlogs();
@@ -135,13 +134,24 @@ const BlogSlider: React.FC = () => {
               >
                 {/* Blog Image */}
                 <div className="relative w-full h-48">
-                  <Image
-                    src={cardBlog.image}
-                    alt={cardBlog.title}
-                    fill
-                    className="rounded-xl object-cover"
-                    unoptimized={process.env.NODE_ENV === "production"}
-                  />
+                  {cardBlog.image && !imageErrors[cardBlog.id] ? (
+                    <Image
+                      src={cardBlog.image}
+                      alt={cardBlog.title}
+                      fill
+                      className="rounded-xl object-cover"
+                      onError={() => {
+                        setImageErrors((prev) => ({
+                          ...prev,
+                          [cardBlog.id]: true,
+                        }));
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 rounded-xl flex items-center justify-center">
+                      <span className="text-gray-400">No Image</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Blog Content */}

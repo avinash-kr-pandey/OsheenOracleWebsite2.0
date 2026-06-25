@@ -235,7 +235,6 @@ const CatalogueDetails = () => {
                     const idKey = item._id || index.toString();
                     setImageErrors((prev) => ({ ...prev, [idKey]: true }));
                   }}
-                  unoptimized={process.env.NODE_ENV === "production"}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                 

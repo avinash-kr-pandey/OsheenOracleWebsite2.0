@@ -184,7 +184,6 @@ const SliderRow = ({ rowData }: { rowData: CatalogueItem[] }) => {
                       [item._id || i.toString()]: true,
                     }));
                   }}
-                  unoptimized={process.env.NODE_ENV === "production"}
                 />
               </div>
 

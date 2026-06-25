@@ -72,6 +72,18 @@ export interface Product {
 
 // ✅ Helper function to normalize product data
 export function normalizeProduct(product: any): Product {
+  const reviewsList = Array.isArray(product.reviews) ? product.reviews : [];
+  
+  let ratingVal = 0;
+  if (product.rating !== undefined && product.rating !== null && Number(product.rating) !== 0) {
+    ratingVal = Number(product.rating);
+  } else if (product.averageRating !== undefined && product.averageRating !== null && Number(product.averageRating) !== 0) {
+    ratingVal = Number(product.averageRating);
+  } else if (reviewsList.length > 0) {
+    const total = reviewsList.reduce((sum: number, r: any) => sum + (Number(r.rating) || 0), 0);
+    ratingVal = total / reviewsList.length;
+  }
+
   return {
     // Required fields with defaults
     _id: String(product._id || product.id || ''),
@@ -86,7 +98,7 @@ export function normalizeProduct(product: any): Product {
     discount: product.discount,
     description: product.description,
     inStock: product.inStock ?? true,
-    rating: product.rating ? Number(product.rating) : 0,
+    rating: ratingVal,
     gender: Array.isArray(product.gender) ? product.gender : [],
     isNew: product.isNew ?? false,
     images: Array.isArray(product.images) ? product.images : [product.image || '/placeholder.jpg'],
@@ -94,7 +106,7 @@ export function normalizeProduct(product: any): Product {
     sizePrices: Array.isArray(product.sizePrices) ? product.sizePrices : [],
     size: Array.isArray(product.size) ? product.size : (Array.isArray(product.sizeOptions) ? product.sizeOptions.map(String) : []),
     color: Array.isArray(product.color) ? product.color : (Array.isArray(product.colors) ? product.colors : []),
-    reviews: Array.isArray(product.reviews) ? product.reviews : [],
+    reviews: reviewsList,
     tags: Array.isArray(product.tags) ? product.tags : [],
     stock: product.stock ? Number(product.stock) : undefined,
     sku: product.sku,

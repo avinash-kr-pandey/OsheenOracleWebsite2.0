@@ -32,7 +32,7 @@ interface OrderApiResponse {
   deliveryDate?: string;
   size?: string;
   color?: string;
-  productId?: number;
+  productId?: string;
   shippingAddress?: string;
   paymentMethod?: string;
 }
@@ -51,7 +51,7 @@ interface Order {
   deliveryDate?: string;
   size?: string;
   color?: string;
-  productId?: number;
+  productId?: string;
   orderDate?: string;
   shippingAddress?: string;
   paymentMethod?: string;
@@ -86,7 +86,7 @@ interface CartAddBody {
 }
 
 interface ReviewSubmitBody {
-  productId: number;
+  productId: string;
   rating: number;
   comment: string;
 }
@@ -347,13 +347,46 @@ const Orders = () => {
     }
   };
 
-  const writeReview = (order: Order) => {
+  const writeReview = async (order: Order) => {
     if (!isAuthenticated || !token) {
       toast.error("Please login to write review");
       return;
     }
 
-    setReviewProduct(order);
+    let resolvedProductId = order.productId;
+
+    // Fallback: if order doesn't have a productId (e.g. legacy order), try to find the product by name
+    if (!resolvedProductId) {
+      try {
+        console.log(`Searching for product ID for legacy order: "${order.productName}"`);
+        const productsResponse = await fetchData("/products");
+        let productsList: any[] = [];
+        
+        if (Array.isArray(productsResponse)) {
+          productsList = productsResponse;
+        } else if (productsResponse && typeof productsResponse === "object") {
+          const res = productsResponse as any;
+          if (Array.isArray(res.data)) productsList = res.data;
+          else if (Array.isArray(res.products)) productsList = res.products;
+        }
+
+        const matchedProduct = productsList.find(
+          (p: any) => p.name?.toLowerCase().trim() === order.productName?.toLowerCase().trim()
+        );
+
+        if (matchedProduct) {
+          resolvedProductId = matchedProduct._id || matchedProduct.id;
+          console.log(`Resolved legacy product ID for "${order.productName}": ${resolvedProductId}`);
+        }
+      } catch (err) {
+        console.error("Error resolving legacy product ID:", err);
+      }
+    }
+
+    setReviewProduct({
+      ...order,
+      productId: resolvedProductId,
+    });
     setSelectedRating(5);
     setShowReviewModal(true);
   };
@@ -366,11 +399,17 @@ const Orders = () => {
       return;
     }
 
+    const targetProductId = reviewProduct.productId;
+    if (!targetProductId) {
+      toast.error("Could not resolve product ID for this order. Review cannot be submitted.");
+      return;
+    }
+
     const form = e.target as HTMLFormElement;
     const reviewText = (form.review as HTMLTextAreaElement)?.value || "";
 
     try {
-      await postData(`/products/${reviewProduct.productId || reviewProduct.id}/reviews`, {
+      await postData(`/products/${targetProductId}/reviews`, {
         name: user?.name || "Anonymous",
         rating: selectedRating,
         comment: reviewText,

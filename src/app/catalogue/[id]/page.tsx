@@ -245,7 +245,6 @@ const ZodiacDetails = () => {
                 className="object-contain lg:object-cover w-full h-full transition-transform duration-700 group-hover:scale-105 rounded-t-3xl lg:rounded-l-3xl"
                 priority
                 onError={() => setImageError(true)}
-                unoptimized={process.env.NODE_ENV === "production"}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent lg:rounded-l-3xl" />
               <div className="absolute bottom-6 left-6 text-white">

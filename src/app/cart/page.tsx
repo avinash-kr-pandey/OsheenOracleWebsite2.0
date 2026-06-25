@@ -39,6 +39,7 @@ export default function CartPage() {
       // Register each cart item as a database order in the backend
       const orderPromises = cartItems.map(async (item) => {
         return profileApi.createOrder({
+          productId: String(item.id),
           productName: item.name,
           price: item.price * item.quantity,
           status: "Pending",

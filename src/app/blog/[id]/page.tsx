@@ -76,9 +76,7 @@ const transformBlogForUI = (blog: BlogType): BlogPost => {
     id: blog._id,
     title: blog.title,
     description: blog.excerpt || fullContent.substring(0, 150) + "...",
-    image: blog.image
-      ? getFullImageUrl(blog.image)
-      : "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format",
+    image: blog.image ? getFullImageUrl(blog.image) : "",
     category: blog.category,
     date: formatBlogDate(blog.date || blog.createdAt),
     comments: blog.comments || 0,
@@ -96,6 +94,7 @@ const SingleBlogPage = () => {
   const [blog, setBlog] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   // Comment states
   const [comments, setComments] = useState<Comment[]>([]);
@@ -269,13 +268,24 @@ const SingleBlogPage = () => {
           <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-[#6a5f57] to-[#8a7967] text-white shadow-2xl">
             {/* Blog Image */}
             <div className="relative h-96 w-full overflow-hidden">
-              <Image
-                src={blog.image}
-                alt={blog.title}
-                fill
-                className="object-cover"
-                unoptimized={process.env.NODE_ENV === "production"}
-              />
+              {blog.image && !imageErrors[blog.id] ? (
+                <Image
+                  src={blog.image}
+                  alt={blog.title}
+                  fill
+                  className="object-cover"
+                  onError={() => {
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [blog.id]: true,
+                    }));
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-[#362f2b] flex items-center justify-center">
+                  <span className="text-gray-400">No Image Available</span>
+                </div>
+              )}
               <div className="absolute inset-0 bg-black/10" />
               <div className="absolute top-4 left-4 bg-gradient-to-r from-orange-500 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold z-10">
                 {blog.category}
@@ -371,13 +381,24 @@ const SingleBlogPage = () => {
                     className="flex items-center gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 group cursor-pointer"
                   >
                     <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
-                      <Image
-                        src={post.image}
-                        alt={post.title}
-                        fill
-                        className="object-cover"
-                        unoptimized={process.env.NODE_ENV === "production"}
-                      />
+                      {post.image && !imageErrors[post.id] ? (
+                        <Image
+                          src={post.image}
+                          alt={post.title}
+                          fill
+                          className="object-cover"
+                          onError={() => {
+                            setImageErrors((prev) => ({
+                              ...prev,
+                              [post.id]: true,
+                            }));
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-[#1e1a17] flex items-center justify-center">
+                          <span className="text-xs text-gray-500">No Image</span>
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-orange-300 mb-1">

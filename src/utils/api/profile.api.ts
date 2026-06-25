@@ -333,6 +333,7 @@ export const cancelOrder = async (id: number): Promise<ApiResponse> => {
  * POST /api/orders
  */
 export const createOrder = async (orderData: {
+  productId?: string;
   productName: string;
   price: number;
   status: string;

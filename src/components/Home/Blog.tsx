@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { blogAPI, Blog } from "@/utils/api/blog.api"; // ✅ Import Blog type
+import { getFullImageUrl } from "@/utils/api/api";
 
 // Transform API blog to component format
 const transformBlogForCard = (blog: Blog) => {
@@ -24,7 +25,7 @@ const transformBlogForCard = (blog: Blog) => {
     title: blog.title,
     description:
       blog.excerpt || blog.description?.substring(0, 100) + "..." || "",
-    image: blog.image,
+    image: blog.image ? getFullImageUrl(blog.image) : "",
     date: blog.date || formatDate(blog.createdAt || new Date().toISOString()),
     category: blog.category,
     author: blog.author,
@@ -35,6 +36,7 @@ const BlogSlider: React.FC = () => {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [blogs, setBlogs] = useState<Blog[]>([]); // ✅ Use Blog type
   const [loading, setLoading] = useState(true);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchBlogs();
@@ -163,16 +165,17 @@ const BlogSlider: React.FC = () => {
               >
                 {/* Blog Image */}
                 <div className="relative w-full h-48">
-                  {cardBlog.image ? (
+                  {cardBlog.image && !imageErrors[cardBlog.id] ? (
                     <Image
                       src={cardBlog.image}
                       alt={cardBlog.title}
                       fill
                       className="rounded-xl object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src =
-                          "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format";
+                      onError={() => {
+                        setImageErrors((prev) => ({
+                          ...prev,
+                          [cardBlog.id]: true,
+                        }));
                       }}
                     />
                   ) : (
