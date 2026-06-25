@@ -98,6 +98,7 @@ const Orders = () => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewProduct, setReviewProduct] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedRating, setSelectedRating] = useState<number>(5);
 
   // Get authentication state - WITH TOKEN
   const { token, isAuthenticated, user } = useAuth();
@@ -353,6 +354,7 @@ const Orders = () => {
     }
 
     setReviewProduct(order);
+    setSelectedRating(5);
     setShowReviewModal(true);
   };
 
@@ -370,7 +372,7 @@ const Orders = () => {
     try {
       await postData(`/products/${reviewProduct.productId || reviewProduct.id}/reviews`, {
         name: user?.name || "Anonymous",
-        rating: 5,
+        rating: selectedRating,
         comment: reviewText,
       });
 
@@ -913,7 +915,12 @@ const Orders = () => {
                       <button
                         key={star}
                         type="button"
-                        className="text-2xl text-amber-400 hover:text-amber-500 transition-colors"
+                        onClick={() => setSelectedRating(star)}
+                        className={`text-2xl transition-colors ${
+                          star <= selectedRating
+                            ? "text-amber-400 hover:text-amber-500"
+                            : "text-gray-300 hover:text-gray-400"
+                        }`}
                       >
                         <FaStar />
                       </button>

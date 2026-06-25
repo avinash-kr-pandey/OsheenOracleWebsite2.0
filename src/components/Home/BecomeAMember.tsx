@@ -1,24 +1,13 @@
 "use client";
-import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   membershipApi,
-  countryCodes,
   MembershipPlan,
   Benefit,
   Stat,
   Testimonial,
-  AddOn,
-  MembershipFormData,
 } from "@/utils/api/becomeamember.api";
-
-// Types for component state
-interface FormErrors {
-  name?: string;
-  email?: string;
-  phone?: string;
-  plan?: string;
-}
 
 const BecomeAMember: React.FC = () => {
   const router = useRouter();
@@ -28,25 +17,8 @@ const BecomeAMember: React.FC = () => {
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [stats, setStats] = useState<Stat[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [addOns, setAddOns] = useState<AddOn[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [contentError, setContentError] = useState<string>("");
-
-  // Form state
-  const [formData, setFormData] = useState<MembershipFormData>({
-    name: "",
-    email: "",
-    phone: "",
-    countryCode: "+91",
-    plan: "",
-    newsletter: true,
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
-  const [submitError, setSubmitError] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
 
   // Fetch all dynamic content on component mount
   useEffect(() => {
@@ -62,7 +34,6 @@ const BecomeAMember: React.FC = () => {
           setBenefits(response.data.benefits || []);
           setStats(response.data.stats || []);
           setTestimonials(response.data.testimonials || []);
-          setAddOns(response.data.addOns || []);
 
           // Debug: Check if data loaded
           console.log("Plans loaded:", response.data.membershipPlans?.length);
@@ -81,150 +52,9 @@ const BecomeAMember: React.FC = () => {
     fetchContent();
   }, []);
 
-  // Validation function
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = "Name must be at least 2 characters";
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    const phoneDigits = formData.phone.replace(/\D/g, "");
-    if (formData.phone && phoneDigits.length !== 10) {
-      newErrors.phone = "Phone number must be exactly 10 digits";
-    }
-
-    if (!formData.plan) {
-      newErrors.plan = "Please select a spiritual plan";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ): void => {
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
-
-    if (name === "phone") {
-      const cleaned = value.replace(/\D/g, "").slice(0, 10);
-      setFormData((prev: MembershipFormData) => ({
-        ...prev,
-        [name]: cleaned,
-      }));
-      if (errors.phone) {
-        setErrors((prev: FormErrors) => ({ ...prev, phone: undefined }));
-      }
-      if (submitError) setSubmitError("");
-      return;
-    }
-
-    setFormData((prev: MembershipFormData) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-
-    if (errors[name as keyof FormErrors]) {
-      setErrors((prev: FormErrors) => ({ ...prev, [name]: undefined }));
-    }
-    if (submitError) setSubmitError("");
-  };
-
-  const handleCountryCodeChange = (e: ChangeEvent<HTMLSelectElement>): void => {
-    setFormData((prev: MembershipFormData) => ({
-      ...prev,
-      countryCode: e.target.value,
-    }));
-  };
-
-  const handlePlanSelect = (planId: string): void => {
-    console.log("Selected plan ID:", planId); // Debug log
-    setFormData((prev: MembershipFormData) => ({ ...prev, plan: planId }));
-    if (errors.plan) {
-      setErrors((prev: FormErrors) => ({ ...prev, plan: undefined }));
-    }
-  };
-
   const handlePlanDetails = (planId: string): void => {
     router.push(`/details/${planId}`);
   };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmitError("");
-
-    try {
-      console.log("Submitting form data:", formData); // Debug log
-
-      const response = await membershipApi.submitApplication(formData);
-
-      console.log("Submit response:", response); // Debug log
-
-      if (response.success) {
-        setFormSubmitted(true);
-        setSuccessMessage(
-          response.message ||
-            "Form submitted successfully! We'll contact you shortly.",
-        );
-
-        // Reset form
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          countryCode: "+91",
-          plan: "",
-          newsletter: true,
-        });
-
-        // Scroll to top to show success message
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else {
-        const errorMsg =
-          response.message || "Something went wrong. Please try again.";
-        setSubmitError(errorMsg);
-        setFormSubmitted(false);
-      }
-    } catch (error: unknown) {
-      console.error("Error submitting form:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Network error. Please check your connection and try again.";
-      setSubmitError(errorMessage);
-      setFormSubmitted(false);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Auto-hide success message
-  useEffect(() => {
-    if (formSubmitted) {
-      const timer = setTimeout(() => {
-        setFormSubmitted(false);
-        setSuccessMessage("");
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [formSubmitted]);
 
   // Show loading state
   if (loading) {
@@ -389,12 +219,7 @@ const BecomeAMember: React.FC = () => {
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div
-                    onClick={() => handlePlanSelect(plan._id || plan.id)}
-                    className={`p-6 border-2 rounded-2xl cursor-pointer transition-all duration-300 h-full flex flex-col transform hover:-translate-y-2 hover:shadow-xl ${
-                      formData.plan === (plan._id || plan.id)
-                        ? "border-purple-500 bg-white/90 backdrop-blur-sm shadow-lg"
-                        : "border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-300"
-                    }`}
+                    className="p-6 border-2 rounded-2xl border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-300 transition-all duration-300 h-full flex flex-col transform hover:-translate-y-2 hover:shadow-xl"
                   >
                     <div className="text-center mb-6">
                       <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight">
@@ -433,26 +258,14 @@ const BecomeAMember: React.FC = () => {
                     <div className="space-y-3 mt-auto">
                       <button
                         type="button"
-                        onClick={() => handlePlanSelect(plan._id || plan.id)}
+                        onClick={() => handlePlanDetails(plan._id || plan.id)}
                         className={`w-full py-3 px-4 rounded-xl font-semibold text-base transition-all duration-300 transform hover:scale-[1.02] ${
-                          formData.plan === (plan._id || plan.id)
-                            ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg"
-                            : plan.popular
-                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 shadow-lg"
-                              : "bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 shadow-md"
+                          plan.popular
+                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 shadow-lg"
+                            : "bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 shadow-md"
                         }`}
                       >
-                        {formData.plan === (plan._id || plan.id)
-                          ? "✓ Selected"
-                          : "Select Plan"}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handlePlanDetails(plan._id || plan.id)}
-                        className="w-full py-2.5 px-4 border border-purple-300 text-purple-600 rounded-xl font-medium text-sm hover:bg-purple-50/50 transition-all duration-300 hover:border-purple-400"
-                      >
-                        View Details →
+                        Select Plan
                       </button>
                     </div>
                   </div>
@@ -542,247 +355,7 @@ const BecomeAMember: React.FC = () => {
         </div>
       </section>
 
-      {/* Registration Form */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-10 border border-white/50">
-            {formSubmitted && (
-              <div className="mb-8 p-4 bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200 rounded-2xl animate-fade-in">
-                <div className="flex items-center">
-                  <div className="text-2xl mr-3">✨</div>
-                  <div>
-                    <p className="text-green-800 font-medium">
-                      {successMessage ||
-                        "Form submitted successfully! We'll contact you shortly."}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
 
-            {submitError && (
-              <div className="mb-8 p-4 bg-gradient-to-r from-red-100 to-rose-100 border border-red-200 rounded-2xl animate-fade-in">
-                <div className="flex items-center">
-                  <div className="text-2xl mr-3">⚠️</div>
-                  <div>
-                    <p className="text-red-800 font-medium">{submitError}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="text-center mb-10 animate-fade-in">
-              <h2 className="text-3xl md:text-4xl text-gray-900 mb-4">
-                Begin Your{" "}
-                <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-                  Spiritual Transformation
-                </span>
-              </h2>
-              <p className="text-lg text-gray-700">
-                Join Osheen Oracle and unlock your divine potential
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="animate-slide-up animation-delay-100">
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Your Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all duration-300 bg-white/50 text-sm ${
-                      errors.name ? "border-red-300" : "border-gray-300"
-                    }`}
-                    placeholder="Enter your full name"
-                  />
-                  {errors.name && (
-                    <p className="mt-2 text-sm text-red-600 animate-shake">
-                      {errors.name}
-                    </p>
-                  )}
-                </div>
-                <div className="animate-slide-up animation-delay-200">
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all duration-300 bg-white/50 text-sm ${
-                      errors.email ? "border-red-300" : "border-gray-300"
-                    }`}
-                    placeholder="Enter your email"
-                  />
-                  {errors.email && (
-                    <p className="mt-2 text-sm text-red-600 animate-shake">
-                      {errors.email}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="animate-slide-up animation-delay-300">
-                <label
-                  htmlFor="phone"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Phone Number (Optional)
-                </label>
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0">
-                    <select
-                      id="countryCode"
-                      name="countryCode"
-                      value={formData.countryCode}
-                      onChange={handleCountryCodeChange}
-                      className="px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all duration-300 bg-white/50 text-sm w-32"
-                    >
-                      {countryCodes.map((country) => (
-                        <option key={country.code} value={country.code}>
-                          {country.flag} {country.code}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex-grow">
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      maxLength={10}
-                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all duration-300 bg-white/50 text-sm ${
-                        errors.phone ? "border-red-300" : "border-gray-300"
-                      }`}
-                      placeholder="Your contact number"
-                    />
-                  </div>
-                </div>
-                {errors.phone && (
-                  <p className="mt-2 text-sm text-red-600 animate-shake">
-                    {errors.phone}
-                  </p>
-                )}
-              </div>
-
-              {/* Plan Selection in Form */}
-              <div className="animate-slide-up animation-delay-400">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Choose Your Spiritual Plan *
-                </label>
-                {errors.plan && (
-                  <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-xl animate-shake">
-                    <p className="text-red-700 text-sm">{errors.plan}</p>
-                  </div>
-                )}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {membershipPlans.map((plan) => (
-                    <div
-                      key={plan._id || plan.id}
-                      onClick={() => handlePlanSelect(plan._id || plan.id)}
-                      className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 h-full transform hover:scale-[1.02] ${
-                        formData.plan === (plan._id || plan.id)
-                          ? "border-purple-500 bg-purple-50/50 shadow-md"
-                          : "border-gray-300 bg-white/80 hover:border-purple-300"
-                      }`}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="font-bold text-gray-900 text-sm leading-tight">
-                          {plan.name}
-                        </span>
-                        {plan.popular && (
-                          <span className="bg-gradient-to-r from-pink-100 to-purple-100 text-pink-700 px-2 py-1 rounded-full text-xs font-bold ml-2">
-                            Popular
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-purple-600 font-bold text-lg mb-1">
-                        {plan.price}/{plan.period}
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        {plan.features.length} divine features
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center p-4 bg-gradient-to-r from-purple-50/50 to-pink-50/50 rounded-xl border border-purple-100 animate-slide-up animation-delay-500">
-                <input
-                  type="checkbox"
-                  id="newsletter"
-                  name="newsletter"
-                  checked={formData.newsletter}
-                  onChange={handleInputChange}
-                  className="w-5 h-5 text-purple-500 border-gray-300 rounded focus:ring-purple-400"
-                />
-                <label
-                  htmlFor="newsletter"
-                  className="ml-3 text-sm text-gray-700"
-                >
-                  Receive weekly spiritual insights, moon cycle guidance, and
-                  exclusive Osheen Oracle updates
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting || !formData.plan}
-                className="w-full flex justify-center items-center bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 px-8 rounded-xl font-semibold text-base hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg animate-slide-up animation-delay-600"
-              >
-                {isSubmitting ? (
-                  <span className="flex items-center justify-center text-sm">
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Activating Your Spiritual Journey...
-                  </span>
-                ) : (
-                  <>
-                    <span className="mr-2 text-lg">🔮</span>
-                    Begin Your Spiritual Journey
-                    <span className="ml-2 text-lg">🔮</span>
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
 
       {/* Custom CSS for animations */}
       <style jsx>{`

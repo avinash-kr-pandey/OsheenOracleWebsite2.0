@@ -11,11 +11,14 @@ import {
 // const API_BASE_URL = "https://osheenoraclebackend02.onrender.com/api";
 // const API_BASE_URL = "https://api.osheenoracle.com/api";
 
+// Set to true to connect to local backend for testing, or false for production
+const USE_LOCAL_BACKEND = false;
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.NODE_ENV === "production"
-    ? "https://api.osheenoracle.com/api"
-    : "http://localhost:5000/api");
+  (USE_LOCAL_BACKEND
+    ? "http://localhost:5000/api"
+    : "https://api.osheenoracle.com/api");
 
 // Google Auth API object
 export const googleAuthApi = {
@@ -695,9 +698,9 @@ export const getFullImageUrl = (imagePath?: string): string => {
     if (isProd || isLocalUrl) {
       const apiBaseUrl =
         process.env.NEXT_PUBLIC_API_URL ||
-        (isProd
-          ? "https://api.osheenoracle.com/api"
-          : "http://localhost:5000/api");
+        (USE_LOCAL_BACKEND
+          ? "http://localhost:5000/api"
+          : "https://api.osheenoracle.com/api");
       const baseUrl = apiBaseUrl.replace(/\/api\/?$/, "");
       return `${baseUrl}${relativeUploadPath}`;
     }
@@ -714,9 +717,9 @@ export const getFullImageUrl = (imagePath?: string): string => {
   
   const apiBaseUrl =
     process.env.NEXT_PUBLIC_API_URL ||
-    (isProd
-      ? "https://api.osheenoracle.com/api"
-      : "http://localhost:5000/api");
+    (USE_LOCAL_BACKEND
+      ? "http://localhost:5000/api"
+      : "https://api.osheenoracle.com/api");
       
   const baseUrl = apiBaseUrl.replace(/\/api\/?$/, "");
   const formattedPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
