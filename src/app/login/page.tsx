@@ -1481,7 +1481,7 @@ const Login = () => {
               height={650}
               unoptimized
               priority
-              className="w-full h-full object-contain scale-105 animate-spin-slow"
+              className="w-full h-full object-contain scale-115 animate-spin-slow [backface-visibility:hidden] [transform-style:preserve-3d] [will-change:transform]"
               style={{ animationDuration: "40s" }}
             />
           </div>
