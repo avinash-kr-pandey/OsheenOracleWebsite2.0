@@ -1476,11 +1476,11 @@ const Login = () => {
           <Image
             src="/images/Chakra/NewChakra.png"
             alt="background illustration"
-            width={650}
-            height={650}
+            width={1250}
+            height={1250}
             priority
             unoptimized
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-h-[90%] max-w-[90%] w-auto h-auto aspect-square object-contain opacity-25 rounded-full animate-spin-slow pointer-events-none select-none z-0"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] h-[85vw] sm:w-[70vw] sm:h-[70vw] md:w-[50vw] md:h-[50vw] lg:w-[42vw] lg:h-[42vw] xl:w-[38vw] xl:h-[38vw] max-w-[850px] max-h-[850px] aspect-square object-contain opacity-25 rounded-full animate-spin-slow pointer-events-none select-none z-0"
             style={{ animationDuration: "40s" }}
           />
 
