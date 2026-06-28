@@ -49,6 +49,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   const [quantity, setQuantity] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<string>("description");
   const [showZoom, setShowZoom] = useState<boolean>(false);
+  const [showSizeGuide, setShowSizeGuide] = useState<boolean>(false);
   const [zoomPosition, setZoomPosition] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
@@ -391,7 +392,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                         src={selectedMedia.url}
                         alt={product.name || "Product"}
                         fill
-                        className={`object-cover transition-opacity duration-500 ${
+                        className={`object-contain transition-opacity duration-500 ${
                           isCurrentImageLoaded ? "opacity-100" : "opacity-0"
                         }`}
                         priority
@@ -563,7 +564,10 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                     <h3 className="font-semibold text-gray-900 text-sm">
                       SELECT SIZE
                     </h3>
-                    <button className="text-pink-600 hover:text-pink-700 text-xs font-medium">
+                    <button
+                      onClick={() => setShowSizeGuide(true)}
+                      className="text-pink-600 hover:text-pink-700 text-xs font-medium"
+                    >
                       Size Guide →
                     </button>
                   </div>
@@ -1075,6 +1079,80 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           </div>
         </div>
       </div>
+      
+      {showSizeGuide && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-pink-100 animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setShowSizeGuide(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <span className="text-pink-500 text-xl">✨</span>
+                Product Size Guide
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Find the perfect fit for your rings, bracelets, and apparel.
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              <div className="overflow-hidden border border-gray-100 rounded-2xl">
+                <table className="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr className="bg-pink-50/50 text-pink-700 font-bold border-b border-gray-100">
+                      <th className="p-3">Size</th>
+                      <th className="p-3">Inner Diameter (mm)</th>
+                      <th className="p-3">Standard US Size</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-gray-700">
+                    <tr>
+                      <td className="p-3 font-semibold">S</td>
+                      <td className="p-3">16.5 mm</td>
+                      <td className="p-3">US 6</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-semibold">M</td>
+                      <td className="p-3">17.3 mm</td>
+                      <td className="p-3">US 7</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-semibold">L</td>
+                      <td className="p-3">18.2 mm</td>
+                      <td className="p-3">US 8</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-semibold">XL</td>
+                      <td className="p-3">19.0 mm</td>
+                      <td className="p-3">US 9</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="bg-pink-50/30 border border-pink-100 rounded-2xl p-4 text-xs text-gray-600 leading-relaxed">
+                <strong>Measurement Tip:</strong> Wrap a strip of paper or string around the base of your finger. Mark where the paper meets, and measure the length with a ruler. Match this circumference to get your ideal ring size!
+              </div>
+            </div>
+
+            <div className="mt-8 flex justify-end">
+              <button
+                onClick={() => setShowSizeGuide(false)}
+                className="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
+              >
+                Close Size Guide
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

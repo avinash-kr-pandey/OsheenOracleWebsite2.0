@@ -302,7 +302,7 @@ const WelcomeOsheenOracle = () => {
             {currentData.title}
           </h2>
           <p
-            className="text-base sm:text-lg md:text-xl text-[#3C3C3C] leading-relaxed text-justify"
+            className="text-base sm:text-lg md:text-xl text-[#3C3C3C] leading-relaxed text-left"
             style={{ fontFamily: "var(--font-montserrat)" }}
           >
             {currentData.description}

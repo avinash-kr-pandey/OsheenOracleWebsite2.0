@@ -71,7 +71,7 @@ export default function AboutPage() {
                 <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 text-center md:text-left">
                   {aboutData?.heroTitle || "About Us"}
                 </h2>
-                <p className="text-gray-700 leading-relaxed text-justify text-[15px] md:text-base">
+                <p className="text-gray-700 leading-relaxed text-left text-[15px] md:text-base">
                   {aboutData?.heroDescription}
                 </p>
               </div>
@@ -103,7 +103,7 @@ export default function AboutPage() {
                 {section.content.split("\n").map((paragraph, i) => (
                   <p
                     key={i}
-                    className="text-gray-700 leading-relaxed text-justify text-[15px] md:text-base"
+                    className="text-gray-700 leading-relaxed text-left text-[15px] md:text-base"
                   >
                     {paragraph}
                   </p>
@@ -167,14 +167,14 @@ export default function AboutPage() {
             <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-8">
               Join Our Family
             </h2>
-            <p className="text-gray-700 leading-relaxed text-justify text-lg max-w-4xl mx-auto mb-8">
+            <p className="text-gray-700 leading-relaxed text-left text-lg max-w-4xl mx-auto mb-8">
               Today Osheen Oracle has grown to become an LLP company and from
               all over the world we receive immense love and appreciation for
               all the hard work, magic and healings we have provided to millions
               of clients and their success stories continue to provide hope,
               encouragement and zeal to everyone who comes to us for help.
             </p>
-            <p className="text-gray-700 leading-relaxed text-justify text-lg max-w-4xl mx-auto mb-8">
+            <p className="text-gray-700 leading-relaxed text-left text-lg max-w-4xl mx-auto mb-8">
               Osheen Ma always had a vision and was very ethical when dealing
               with clients as her advice is always accurate and for her healing
               is her divine calling and her guidance is also full of wisdom and

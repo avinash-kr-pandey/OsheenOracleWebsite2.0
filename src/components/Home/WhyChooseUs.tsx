@@ -330,7 +330,7 @@ const WhyChooseUs = () => {
           <h1 className="text-3xl sm:text-4xl md:text-4xl mb-4 tracking-wide">
             Have Questions Or Need Guidance?
           </h1>
-          <p className="text-base sm:text-lg mb-6 text-justify max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg mb-6 text-center max-w-2xl mx-auto">
             Reach out to us! At Oshsen Oracle, we value every connection and are
             ready to assist you on your journey. Whether it&#39;s inquiries
             about our services or simply sharing your thoughts, we&#39;re just a

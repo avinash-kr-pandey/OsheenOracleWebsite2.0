@@ -99,7 +99,7 @@ export function normalizeProduct(product: any): Product {
     description: product.description,
     inStock: product.inStock ?? true,
     rating: ratingVal,
-    gender: Array.isArray(product.gender) ? product.gender : [],
+    gender: Array.isArray(product.gender) ? product.gender : (typeof product.gender === 'string' && product.gender ? [product.gender] : []),
     isNew: product.isNew ?? false,
     images: Array.isArray(product.images) ? product.images : [product.image || '/placeholder.jpg'],
     video: product.video || '',

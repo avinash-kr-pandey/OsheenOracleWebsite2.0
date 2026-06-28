@@ -1490,7 +1490,7 @@ const Login = () => {
               Whole Team Needs
             </h1>
 
-            <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 mb-4 lg:mb-6 text-justify">
+            <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 mb-4 lg:mb-6 text-left">
               Join thousands of people who trust our
               spiritual guidance to find clarity in love, career,
               and life. Sign in to access your personal
@@ -1602,7 +1602,7 @@ const Login = () => {
 // Wrap with GoogleOAuthProvider
 const LoginWithGoogleProvider = () => {
   const googleClientId =
-    "300648228526-lndqaf2qrktbg30anu93cfocds0vlr0h.apps.googleusercontent.com";
+    "833457932790-9psrhtuf6bvn2glq8glnbufb4ucfrth0.apps.googleusercontent.com";
 
   if (!googleClientId) {
     console.error("Google Client ID is not set in environment variables");

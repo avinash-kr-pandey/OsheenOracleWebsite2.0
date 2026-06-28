@@ -15,6 +15,7 @@ import {
 import { fetchData, setAuthToken, postData, putData } from "@/utils/api/api";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import axios from "axios";
 
 // Define TypeScript interfaces
@@ -80,11 +81,6 @@ interface StatusUpdateBody {
   status: string;
 }
 
-interface CartAddBody {
-  productId: number;
-  quantity: number;
-}
-
 interface ReviewSubmitBody {
   productId: string;
   rating: number;
@@ -102,6 +98,7 @@ const Orders = () => {
 
   // Get authentication state - WITH TOKEN
   const { token, isAuthenticated, user } = useAuth();
+  const { addToCart } = useCart();
 
   // Set auth token when component mounts or token changes
   useEffect(() => {
@@ -321,29 +318,30 @@ const Orders = () => {
     }
   };
 
-  const reorderProduct = async (order: Order) => {
+  const reorderProduct = (order: Order) => {
     if (!isAuthenticated || !token) {
       toast.error("Please login to add to cart");
       return;
     }
 
     try {
-      const cartData: CartAddBody = {
-        productId: order.productId || order.id,
+      const priceString = String(order.price || "0");
+      const cleanPrice = parseFloat(priceString.replace(/[₹,]/g, "")) || 0;
+
+      addToCart({
+        id: order.productId || order.id,
+        name: order.productName,
+        price: cleanPrice,
+        image: order.image || "/placeholder-product.jpg",
         quantity: order.quantity || 1,
-      };
-      await postData("/cart", cartData);
+        size: order.size,
+        color: order.color,
+      });
 
       toast.success(`Added ${order.productName} to cart!`);
     } catch (error) {
       console.error("Error reordering product:", error);
-
-      const err = error as ErrorResponse;
-      if (err.response?.status === 401) {
-        toast.error("Session expired. Please login again.");
-      } else {
-        toast.error("Failed to add to cart");
-      }
+      toast.error("Failed to add to cart");
     }
   };
 

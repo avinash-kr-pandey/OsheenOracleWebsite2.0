@@ -413,7 +413,45 @@ const BookingPage = () => {
     }
   }, [isAuthenticated]);
 
-  const displayedServices = showAllServices ? servicesData : servicesData.slice(0, 6);
+  // Dynamically build services list from database categories/subcategories if available
+  const servicesList = React.useMemo(() => {
+    if (!loadingDb && dbCategories && dbCategories.length > 0) {
+      const list: any[] = [];
+      let index = 1;
+      dbCategories.forEach((cat: any) => {
+        if (cat.subcategories && Array.isArray(cat.subcategories)) {
+          cat.subcategories.forEach((sub: any) => {
+            if (sub.isActive !== false) {
+              list.push({
+                id: index++,
+                _id: sub._id,
+                name: sub.name,
+                category: cat.name,
+                categoryId: cat._id,
+                duration: sub.duration || "30 mins",
+                price: `₹${sub.price}`,
+                numericPrice: sub.price,
+                description: sub.description || "Personalized spiritual session to guide your path and clear obstacles.",
+                popularity: index === 2 ? "bestseller" : "normal",
+                rating: 4.9,
+                sessionsCompleted: 120 + index * 10,
+                satisfactionRate: "99%",
+                features: ["Personal Consultation", "Actionable Guidance", "Spiritual Alignment", "Healing Energy"],
+                benefits: ["Deep clarity on life situation", "Obstacle removal", "Emotional healing and calm"],
+                includes: ["One-on-one session", "Custom remedies recommendation"]
+              });
+            }
+          });
+        }
+      });
+      if (list.length > 0) {
+        return list;
+      }
+    }
+    return servicesData;
+  }, [dbCategories, loadingDb]);
+
+  const displayedServices = showAllServices ? servicesList : servicesList.slice(0, 6);
 
   const handleWhatsAppBooking = (astrologer: (typeof astrologers)[0], serviceName?: string) => {
     const message = serviceName
@@ -450,15 +488,16 @@ const BookingPage = () => {
     router.push("/header/payment-methods");
   };
 
-  const handleServiceBooking = (service: typeof servicesData[0]) => {
-    const match = getDbMapping(service.name, dbCategories);
+  const handleServiceBooking = (service: any) => {
+    const isDynamic = !!service._id && service._id.length > 5;
+    const match = isDynamic ? null : getDbMapping(service.name, dbCategories);
     const serviceDataForLater = {
-      _id: match?.subcategoryId || service.id.toString(),
+      _id: isDynamic ? service._id : (match?.subcategoryId || service.id.toString()),
       name: service.name,
-      price: match?.price || parseFloat(service.price.replace(/[^\d.]/g, "")),
-      duration: match?.duration || service.duration,
-      description: match?.description || service.description,
-      categoryId: match?.categoryId || "",
+      price: isDynamic ? service.numericPrice : (match?.price || parseFloat(service.price.replace(/[^\d.]/g, ""))),
+      duration: service.duration,
+      description: service.description,
+      categoryId: isDynamic ? service.categoryId : (match?.categoryId || ""),
       categoryName: service.category,
     };
 
@@ -647,7 +686,7 @@ const BookingPage = () => {
                           Key Features
                         </h4>
                         <div className="flex flex-wrap gap-2">
-                          {service.features.slice(0, 4).map((feature, idx) => (
+                          {service.features.slice(0, 4).map((feature: string, idx: number) => (
                             <span
                               key={idx}
                               className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-xs font-medium"
@@ -664,7 +703,7 @@ const BookingPage = () => {
                           Benefits
                         </h4>
                         <ul className="space-y-2">
-                          {service.benefits.slice(0, 3).map((benefit, idx) => (
+                          {service.benefits.slice(0, 3).map((benefit: string, idx: number) => (
                             <li key={idx} className="flex items-start gap-2">
                               <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
                               <span className="text-sm text-gray-600">{benefit}</span>
@@ -710,13 +749,13 @@ const BookingPage = () => {
               ))}
             </div>
 
-            {servicesData.length > 6 && !showAllServices && (
+            {servicesList.length > 6 && !showAllServices && (
               <div className="text-center mt-12">
                 <button
                   onClick={() => setShowAllServices(true)}
                   className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-purple-600 hover:text-purple-600 hover:bg-purple-50 transition-all duration-300"
                 >
-                  View All {servicesData.length} Services
+                  View All {servicesList.length} Services
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
@@ -731,29 +770,29 @@ const BookingPage = () => {
                 <div className="flex flex-col lg:flex-row items-center gap-8">
                   <div className="flex-shrink-0">
                     <div className="w-32 h-32 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-xl">
-                      {getServiceIcon(servicesData.find(s => s.id === selectedService)!.name)}
+                      {getServiceIcon(servicesList.find(s => s.id === selectedService)!.name)}
                     </div>
                   </div>
 
                   <div className="flex-1 text-center lg:text-left">
                     <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
                       <h3 className="text-3xl font-bold text-gray-900">
-                        {servicesData.find(s => s.id === selectedService)!.name}
+                        {servicesList.find(s => s.id === selectedService)!.name}
                       </h3>
                       <div className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                        {servicesData.find(s => s.id === selectedService)!.duration}
+                        {servicesList.find(s => s.id === selectedService)!.duration}
                       </div>
                     </div>
 
                     <p className="text-gray-600 mb-6 text-lg leading-relaxed">
-                      {servicesData.find(s => s.id === selectedService)!.description}
+                      {servicesList.find(s => s.id === selectedService)!.description}
                     </p>
 
                     <div className="space-y-4">
                       <div>
                         <h4 className="font-semibold text-gray-800 mb-2">What's Included:</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {servicesData.find(s => s.id === selectedService)!.includes.map((item, idx) => (
+                          {servicesList.find(s => s.id === selectedService)!.includes.map((item: string, idx: number) => (
                             <div key={idx} className="flex items-center gap-2">
                               <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                               <span className="text-sm text-gray-600">{item}</span>
@@ -767,18 +806,18 @@ const BookingPage = () => {
                   <div className="flex-shrink-0">
                     <div className="text-center mb-4">
                       <div className="text-3xl font-bold text-gray-900">
-                        {servicesData.find(s => s.id === selectedService)!.price}
+                        {servicesList.find(s => s.id === selectedService)!.price}
                       </div>
-                      {servicesData.find(s => s.id === selectedService)!.originalPrice && (
+                      {servicesList.find(s => s.id === selectedService)!.originalPrice && (
                         <div className="text-gray-500 text-sm line-through">
-                          {servicesData.find(s => s.id === selectedService)!.originalPrice}
+                          {servicesList.find(s => s.id === selectedService)!.originalPrice}
                         </div>
                       )}
                       <div className="text-sm text-gray-500 mt-1">Per session</div>
                     </div>
                     <button
                       onClick={() => {
-                        const selectedServiceData = servicesData.find(s => s.id === selectedService);
+                        const selectedServiceData = servicesList.find(s => s.id === selectedService);
                         if (selectedServiceData) {
                           handleServiceBooking(selectedServiceData);
                         }
@@ -919,7 +958,7 @@ const BookingPage = () => {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <button
                     onClick={() => {
-                      const bestSellerService = servicesData.find(s => s.popularity === "bestseller") || servicesData[0];
+                      const bestSellerService = servicesList.find(s => s.popularity === "bestseller") || servicesList[0];
                       handleServiceBooking(bestSellerService);
                     }}
                     className="group relative bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-4 px-10 rounded-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3"
