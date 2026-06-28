@@ -1471,18 +1471,18 @@ const Login = () => {
       <div className="w-full flex flex-col lg:flex-row justify-between items-center px-4 sm:px-8 md:px-16 py-6 md:py-10 gap-8 md:gap-0 md:pt-0 pt-30">
         {/* Background circular image */}
 
-        <Image
-          src="/images/Chakra/NewChakra.png"
-          alt="background illustration"
-          width={500}
-          height={500}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20 rounded-full animate-spin-slow pointer-events-none select-none blur-[1px]"
-          style={{ animationDuration: "40s" }}
-        />
-
         {/* Text content */}
         <div className="relative z-10 px-4 lg:px-6 text-center md:text-left w-full lg:w-auto md:h-auto h-[60vh] flex flex-col justify-center">
-          <div className="lg:block pt-10 md:pt-20">
+          <Image
+            src="/images/Chakra/NewChakra.png"
+            alt="background illustration"
+            width={450}
+            height={450}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-25 rounded-full animate-spin-slow pointer-events-none select-none blur-[1px] z-0"
+            style={{ animationDuration: "40s" }}
+          />
+
+          <div className="relative z-10 lg:block pt-10 md:pt-20">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#636363] mb-3 lg:mb-4">
               Let's the
             </h1>
