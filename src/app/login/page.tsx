@@ -1473,18 +1473,16 @@ const Login = () => {
 
         {/* Text content */}
         <div className="relative z-10 px-4 lg:px-6 text-center md:text-left w-full lg:w-auto md:h-auto h-[60vh] flex flex-col justify-center">
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-25 rounded-full overflow-hidden w-[80vw] max-w-[650px] max-h-[75vh] aspect-square pointer-events-none select-none z-0">
-            <Image
-              src="/images/Chakra/NewChakra.png"
-              alt="background illustration"
-              width={650}
-              height={650}
-              unoptimized
-              priority
-              className="w-full h-full object-contain scale-115 animate-spin-slow [backface-visibility:hidden] [transform-style:preserve-3d] [will-change:transform]"
-              style={{ animationDuration: "40s" }}
-            />
-          </div>
+          <Image
+            src="/images/Chakra/NewChakra.png"
+            alt="background illustration"
+            width={650}
+            height={650}
+            priority
+            unoptimized
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-h-[90%] max-w-[90%] w-auto h-auto aspect-square object-contain opacity-25 rounded-full animate-spin-slow pointer-events-none select-none z-0"
+            style={{ animationDuration: "40s" }}
+          />
 
           <div className="relative z-10 lg:block pt-10 md:pt-20">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#636363] mb-3 lg:mb-4">
