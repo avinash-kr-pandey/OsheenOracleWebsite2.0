@@ -65,7 +65,7 @@ const ZodiacDetails = () => {
   };
 
   return (
-    <div>
+    <div className="pb-20 md:pb-0">
       <CommonPageHeader title="Book Your Reading" subtitle="Home - Booking" />
       {/* Header with Back Button */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -507,6 +507,23 @@ const ZodiacDetails = () => {
           </div>
         </motion.div>
       </section>
+
+      {/* Mobile Fixed Bottom Sticky Bar */}
+      {zodiac && astrologers.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md p-4 border-t border-gray-100 shadow-[0_-8px_30px_rgb(0,0,0,0.06)] md:hidden flex items-center justify-between">
+          <div className="flex flex-col text-left">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Zodiac Reading</p>
+            <p className="text-base font-bold text-gray-800">{zodiac.name}</p>
+          </div>
+          <button
+            onClick={() => handleWhatsAppBooking(astrologers[0])}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-5 rounded-xl hover:shadow-lg transition-all flex items-center gap-2 text-sm cursor-pointer"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>Book Now</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

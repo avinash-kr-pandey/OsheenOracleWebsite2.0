@@ -425,7 +425,7 @@ const Horoscope = () => {
                   </div>
 
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-400">
-                    <p className="text-lg leading-relaxed text-gray-700">
+                    <p className="text-lg leading-relaxed text-gray-700 whitespace-pre-line text-left">
                       {language === "english"
                         ? prediction.prediction
                         : prediction.predictionHindi || prediction.prediction}

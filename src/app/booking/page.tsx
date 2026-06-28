@@ -413,45 +413,7 @@ const BookingPage = () => {
     }
   }, [isAuthenticated]);
 
-  // Dynamically build services list from database categories/subcategories if available
-  const servicesList = React.useMemo(() => {
-    if (!loadingDb && dbCategories && dbCategories.length > 0) {
-      const list: any[] = [];
-      let index = 1;
-      dbCategories.forEach((cat: any) => {
-        if (cat.subcategories && Array.isArray(cat.subcategories)) {
-          cat.subcategories.forEach((sub: any) => {
-            if (sub.isActive !== false) {
-              list.push({
-                id: index++,
-                _id: sub._id,
-                name: sub.name,
-                category: cat.name,
-                categoryId: cat._id,
-                duration: sub.duration || "30 mins",
-                price: `₹${sub.price}`,
-                numericPrice: sub.price,
-                description: sub.description || "Personalized spiritual session to guide your path and clear obstacles.",
-                popularity: index === 2 ? "bestseller" : "normal",
-                rating: 4.9,
-                sessionsCompleted: 120 + index * 10,
-                satisfactionRate: "99%",
-                features: ["Personal Consultation", "Actionable Guidance", "Spiritual Alignment", "Healing Energy"],
-                benefits: ["Deep clarity on life situation", "Obstacle removal", "Emotional healing and calm"],
-                includes: ["One-on-one session", "Custom remedies recommendation"]
-              });
-            }
-          });
-        }
-      });
-      if (list.length > 0) {
-        return list;
-      }
-    }
-    return servicesData;
-  }, [dbCategories, loadingDb]);
-
-  const displayedServices = showAllServices ? servicesList : servicesList.slice(0, 6);
+  const displayedServices = showAllServices ? servicesData : servicesData.slice(0, 6);
 
   const handleWhatsAppBooking = (astrologer: (typeof astrologers)[0], serviceName?: string) => {
     const message = serviceName
@@ -488,16 +450,15 @@ const BookingPage = () => {
     router.push("/header/payment-methods");
   };
 
-  const handleServiceBooking = (service: any) => {
-    const isDynamic = !!service._id && service._id.length > 5;
-    const match = isDynamic ? null : getDbMapping(service.name, dbCategories);
+  const handleServiceBooking = (service: typeof servicesData[0]) => {
+    const match = getDbMapping(service.name, dbCategories);
     const serviceDataForLater = {
-      _id: isDynamic ? service._id : (match?.subcategoryId || service.id.toString()),
+      _id: match?.subcategoryId || service.id.toString(),
       name: service.name,
-      price: isDynamic ? service.numericPrice : (match?.price || parseFloat(service.price.replace(/[^\d.]/g, ""))),
-      duration: service.duration,
-      description: service.description,
-      categoryId: isDynamic ? service.categoryId : (match?.categoryId || ""),
+      price: match?.price || parseFloat(service.price.replace(/[^\d.]/g, "")),
+      duration: match?.duration || service.duration,
+      description: match?.description || service.description,
+      categoryId: match?.categoryId || "",
       categoryName: service.category,
     };
 
@@ -544,7 +505,7 @@ const BookingPage = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 md:pb-0">
       <CommonPageHeader
         title="Book Your Spiritual Services"
         subtitle="Home - Services - All Experts"
@@ -686,7 +647,7 @@ const BookingPage = () => {
                           Key Features
                         </h4>
                         <div className="flex flex-wrap gap-2">
-                          {service.features.slice(0, 4).map((feature: string, idx: number) => (
+                          {service.features.slice(0, 4).map((feature, idx) => (
                             <span
                               key={idx}
                               className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-xs font-medium"
@@ -703,7 +664,7 @@ const BookingPage = () => {
                           Benefits
                         </h4>
                         <ul className="space-y-2">
-                          {service.benefits.slice(0, 3).map((benefit: string, idx: number) => (
+                          {service.benefits.slice(0, 3).map((benefit, idx) => (
                             <li key={idx} className="flex items-start gap-2">
                               <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
                               <span className="text-sm text-gray-600">{benefit}</span>
@@ -749,13 +710,13 @@ const BookingPage = () => {
               ))}
             </div>
 
-            {servicesList.length > 6 && !showAllServices && (
+            {servicesData.length > 6 && !showAllServices && (
               <div className="text-center mt-12">
                 <button
                   onClick={() => setShowAllServices(true)}
                   className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-purple-600 hover:text-purple-600 hover:bg-purple-50 transition-all duration-300"
                 >
-                  View All {servicesList.length} Services
+                  View All {servicesData.length} Services
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
@@ -770,29 +731,29 @@ const BookingPage = () => {
                 <div className="flex flex-col lg:flex-row items-center gap-8">
                   <div className="flex-shrink-0">
                     <div className="w-32 h-32 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-xl">
-                      {getServiceIcon(servicesList.find(s => s.id === selectedService)!.name)}
+                      {getServiceIcon(servicesData.find(s => s.id === selectedService)!.name)}
                     </div>
                   </div>
 
                   <div className="flex-1 text-center lg:text-left">
                     <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
                       <h3 className="text-3xl font-bold text-gray-900">
-                        {servicesList.find(s => s.id === selectedService)!.name}
+                        {servicesData.find(s => s.id === selectedService)!.name}
                       </h3>
                       <div className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                        {servicesList.find(s => s.id === selectedService)!.duration}
+                        {servicesData.find(s => s.id === selectedService)!.duration}
                       </div>
                     </div>
 
                     <p className="text-gray-600 mb-6 text-lg leading-relaxed">
-                      {servicesList.find(s => s.id === selectedService)!.description}
+                      {servicesData.find(s => s.id === selectedService)!.description}
                     </p>
 
                     <div className="space-y-4">
                       <div>
                         <h4 className="font-semibold text-gray-800 mb-2">What's Included:</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {servicesList.find(s => s.id === selectedService)!.includes.map((item: string, idx: number) => (
+                          {servicesData.find(s => s.id === selectedService)!.includes.map((item, idx) => (
                             <div key={idx} className="flex items-center gap-2">
                               <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                               <span className="text-sm text-gray-600">{item}</span>
@@ -806,18 +767,18 @@ const BookingPage = () => {
                   <div className="flex-shrink-0">
                     <div className="text-center mb-4">
                       <div className="text-3xl font-bold text-gray-900">
-                        {servicesList.find(s => s.id === selectedService)!.price}
+                        {servicesData.find(s => s.id === selectedService)!.price}
                       </div>
-                      {servicesList.find(s => s.id === selectedService)!.originalPrice && (
+                      {servicesData.find(s => s.id === selectedService)!.originalPrice && (
                         <div className="text-gray-500 text-sm line-through">
-                          {servicesList.find(s => s.id === selectedService)!.originalPrice}
+                          {servicesData.find(s => s.id === selectedService)!.originalPrice}
                         </div>
                       )}
                       <div className="text-sm text-gray-500 mt-1">Per session</div>
                     </div>
                     <button
                       onClick={() => {
-                        const selectedServiceData = servicesList.find(s => s.id === selectedService);
+                        const selectedServiceData = servicesData.find(s => s.id === selectedService);
                         if (selectedServiceData) {
                           handleServiceBooking(selectedServiceData);
                         }
@@ -958,7 +919,7 @@ const BookingPage = () => {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <button
                     onClick={() => {
-                      const bestSellerService = servicesList.find(s => s.popularity === "bestseller") || servicesList[0];
+                      const bestSellerService = servicesData.find(s => s.popularity === "bestseller") || servicesData[0];
                       handleServiceBooking(bestSellerService);
                     }}
                     className="group relative bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-4 px-10 rounded-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3"
@@ -1004,6 +965,31 @@ const BookingPage = () => {
           onProceedToPayment={handleProceedToPayment}
         />
       )}
+
+      {/* Mobile Fixed Bottom Sticky Bar for Selected Service */}
+      {selectedService !== null && (
+        (() => {
+          const service = servicesData.find(s => s.id === selectedService);
+          if (!service) return null;
+          return (
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md p-4 border-t border-gray-100 shadow-[0_-8px_30px_rgb(0,0,0,0.06)] md:hidden flex items-center justify-between animate-in slide-in-from-bottom duration-300">
+              <div className="flex flex-col text-left max-w-[60%]">
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Selected Service</p>
+                <p className="text-sm font-bold text-gray-800 truncate">{service.name}</p>
+                <p className="text-xs font-semibold text-purple-600 mt-0.5">{service.price}</p>
+              </div>
+              <button
+                onClick={() => handleServiceBooking(service)}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-2.5 px-4 rounded-xl hover:shadow-lg transition-all flex items-center gap-1.5 text-xs cursor-pointer whitespace-nowrap"
+              >
+                <CalendarDays className="w-3.5 h-3.5" />
+                <span>Book Now</span>
+              </button>
+            </div>
+          );
+        })()
+      )}
+
       <Toaster />
     </div>
   );

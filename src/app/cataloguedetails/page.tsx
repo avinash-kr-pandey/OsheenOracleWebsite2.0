@@ -222,100 +222,102 @@ const CatalogueDetails = () => {
             <motion.div
               key={item._id || index}
               whileHover={{ y: -8 }}
-              className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-xl flex flex-col hover:shadow-2xl transition-all duration-300 group h-full"
+              className="relative p-[1px] rounded-3xl bg-gradient-to-br from-purple-200/50 via-pink-200/30 to-blue-200/50 hover:from-purple-500 hover:via-pink-500 hover:to-blue-500 transition-all duration-500 group shadow-lg hover:shadow-2xl hover:shadow-purple-500/10 flex flex-col h-full overflow-hidden"
             >
-              {/* Image Section */}
-              <div className="relative h-60 w-full bg-gray-100 overflow-hidden flex-shrink-0">
-                <Image
-                  src={getDisplayImage(item, index)}
-                  alt={item.name}
-                  fill
-                  className="object-contain transition-transform duration-700 group-hover:scale-110"
-                  onError={() => {
-                    const idKey = item._id || index.toString();
-                    setImageErrors((prev) => ({ ...prev, [idKey]: true }));
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                
-                {/* Element Badge */}
-                {item.element && (
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
-                    <Zap className="w-3.5 h-3.5 text-purple-600" />
-                    <span className="text-xs font-bold text-gray-800 uppercase tracking-wide">
-                      {item.element}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Card Body */}
-              <div className="p-6 sm:p-8 flex flex-col flex-grow">
-                {/* Category / Date */}
-                <div className="text-xs font-semibold text-purple-600 mb-2 flex items-center justify-between">
-                  <span>ZODIAC READING</span>
-                  <span className="text-gray-400">{item.date || "Available"}</span>
-                </div>
-
-                {/* Name */}
-                <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-purple-700 transition-colors">
-                  {item.name}
-                </h3>
-
-                {/* Rating & Price */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-1">
-                    {renderStars(item.rating || 4.5)}
-                    <span className="text-xs font-bold text-gray-500 ml-1">
-                      ({item.rating || 4.5})
-                    </span>
-                  </div>
-                  <div className="text-2xl font-extrabold text-gray-900">
-                    ₹{item.price || 699}
-                  </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3">
-                  {item.description || "Unlock deep cosmic understandings and custom actions suited to clear blockages and fulfill your spiritual destiny."}
-                </p>
-
-                {/* Planet / Symbol Info */}
-                <div className="grid grid-cols-2 gap-3 mb-6 bg-gray-50 p-3 rounded-2xl border border-gray-100 text-xs text-gray-600">
-                  <div className="flex items-center gap-1.5">
-                    <Globe className="w-4 h-4 text-blue-500" />
-                    <span className="truncate">Planet: <strong>{item.planet || "Sun"}</strong></span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Compass className="w-4 h-4 text-pink-500" />
-                    <span className="truncate">Symbol: <strong>{item.symbol || "Star"}</strong></span>
-                  </div>
-                </div>
-
-                {/* Key Traits Badges */}
-                {item.traits && item.traits.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-6">
-                    {item.traits.slice(0, 3).map((trait, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2.5 py-1 bg-purple-50 border border-purple-100 text-purple-700 text-xs font-semibold rounded-lg"
-                      >
-                        {trait}
+              <div className="bg-white/90 backdrop-blur-md rounded-[23px] overflow-hidden flex flex-col h-full w-full">
+                {/* Image Section */}
+                <div className="relative h-60 w-full bg-gradient-to-br from-purple-50 to-pink-50 overflow-hidden flex-shrink-0 border-b border-gray-100">
+                  <Image
+                    src={getDisplayImage(item, index)}
+                    alt={item.name}
+                    fill
+                    className="object-contain p-4 transition-transform duration-700 group-hover:scale-110"
+                    onError={() => {
+                      const idKey = item._id || index.toString();
+                      setImageErrors((prev) => ({ ...prev, [idKey]: true }));
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent" />
+                  
+                  {/* Element Badge */}
+                  {item.element && (
+                    <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-md border border-purple-100">
+                      <Zap className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
+                      <span className="text-[10px] font-bold text-gray-800 uppercase tracking-wider font-heading">
+                        {item.element}
                       </span>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
 
-                {/* Action Button */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => router.push(`/catalogue/${item.id}`)}
-                  className="w-full mt-auto bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 text-white font-bold py-3.5 px-6 rounded-2xl hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer text-sm sm:text-base"
-                >
-                  <span>Get Your Reading</span>
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1.5" />
-                </motion.button>
+                {/* Card Body */}
+                <div className="p-6 sm:p-8 flex flex-col flex-grow">
+                  {/* Category / Date */}
+                  <div className="text-[10px] font-bold text-purple-600 mb-2 flex items-center justify-between uppercase tracking-wider">
+                    <span>ZODIAC READING</span>
+                    <span className="text-gray-400 font-semibold">{item.date || "Available"}</span>
+                  </div>
+
+                  {/* Name */}
+                  <h3 className="text-xl font-bold font-heading text-gray-800 mb-3 group-hover:text-purple-700 transition-colors tracking-wide min-h-[56px] flex items-center">
+                    {item.name}
+                  </h3>
+
+                  {/* Rating & Price Inset Box */}
+                  <div className="flex items-center justify-between mb-4 bg-purple-50/40 p-3 rounded-2xl border border-purple-100/50">
+                    <div className="flex items-center gap-1">
+                      {renderStars(item.rating || 4.5)}
+                      <span className="text-[11px] font-bold text-gray-500 ml-1">
+                        ({item.rating || 4.5})
+                      </span>
+                    </div>
+                    <div className="text-xl font-extrabold text-purple-700 font-heading">
+                      ₹{item.price || 699}
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-gray-650 text-sm leading-relaxed mb-6 line-clamp-3">
+                    {item.description || "Unlock deep cosmic understandings and custom actions suited to clear blockages and fulfill your spiritual destiny."}
+                  </p>
+
+                  {/* Planet / Symbol Info */}
+                  <div className="grid grid-cols-2 gap-3 mb-6 bg-gray-50/50 p-3 rounded-2xl border border-gray-100 text-xs text-gray-650">
+                    <div className="flex items-center gap-1.5">
+                      <Globe className="w-4 h-4 text-blue-500" />
+                      <span className="truncate">Planet: <strong>{item.planet || "Sun"}</strong></span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Compass className="w-4 h-4 text-pink-500" />
+                      <span className="truncate">Symbol: <strong>{item.symbol || "Star"}</strong></span>
+                    </div>
+                  </div>
+
+                  {/* Key Traits Badges */}
+                  {item.traits && item.traits.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-6">
+                      {item.traits.slice(0, 3).map((trait, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2.5 py-1 bg-white border border-purple-100 text-purple-700 text-[10px] font-bold rounded-lg uppercase tracking-wider shadow-sm"
+                        >
+                          {trait}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Action Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => router.push(`/catalogue/${item.id}`)}
+                    className="w-full mt-auto bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 text-white font-bold py-3.5 px-6 rounded-2xl hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer text-sm font-heading tracking-wider"
+                  >
+                    <span>Get Your Reading</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1.5" />
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
           ))}

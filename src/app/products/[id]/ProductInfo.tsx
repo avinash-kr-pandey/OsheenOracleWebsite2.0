@@ -1079,7 +1079,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           </div>
         </div>
       </div>
-      
+
       {showSizeGuide && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-pink-100 animate-in fade-in zoom-in-95 duration-200">

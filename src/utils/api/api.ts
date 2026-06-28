@@ -689,21 +689,17 @@ export const getFullImageUrl = (imagePath?: string): string => {
   
   const isProd = process.env.NODE_ENV === "production";
   
-  // If the path is an absolute URL pointing to a backend uploads folder (e.g. from local testing or older domain)
   if (imagePath.includes("/uploads/")) {
     const uploadIndex = imagePath.indexOf("/uploads/");
     const relativeUploadPath = imagePath.substring(uploadIndex);
-    const isLocalUrl = imagePath.includes("localhost") || imagePath.includes("127.0.0.1");
     
-    if (isProd || isLocalUrl) {
-      const apiBaseUrl =
-        process.env.NEXT_PUBLIC_API_URL ||
-        (USE_LOCAL_BACKEND
-          ? "http://localhost:5000/api"
-          : "https://api.osheenoracle.com/api");
-      const baseUrl = apiBaseUrl.replace(/\/api\/?$/, "");
-      return `${baseUrl}${relativeUploadPath}`;
-    }
+    const apiBaseUrl =
+      process.env.NEXT_PUBLIC_API_URL ||
+      (USE_LOCAL_BACKEND
+        ? "http://localhost:5000/api"
+        : "https://api.osheenoracle.com/api");
+    const baseUrl = apiBaseUrl.replace(/\/api\/?$/, "");
+    return `${baseUrl}${relativeUploadPath}`;
   }
   
   if (

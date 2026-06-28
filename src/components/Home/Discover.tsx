@@ -243,7 +243,7 @@ const Discover = () => {
                   </h2>
                 </div>
 
-                <p className="text-gray-700 leading-relaxed p-3 text-left">
+                <p className="text-gray-700 leading-relaxed p-3 text-justify">
                   {service.description}
                 </p>
               </div>
