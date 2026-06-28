@@ -1484,17 +1484,17 @@ const Login = () => {
         <div className="relative z-10 px-4 lg:px-6 text-center md:text-left w-full lg:w-auto md:h-auto h-[60vh] flex flex-col justify-center">
           <div className="lg:block pt-10 md:pt-20">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#636363] mb-3 lg:mb-4">
-              One Tool For Four
+              Let's the
             </h1>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#636363] mb-4 lg:mb-6">
-              Whole Team Needs
+              healing begin
             </h1>
 
             <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 mb-4 lg:mb-6 text-left">
               Join thousands of people who trust our
               spiritual guidance to find clarity in love, career,
               and life. Sign in to access your personal
-              readings and continue your journeyWe are lo.
+              readings and continue your journey
             </p>
 
             {/* Avatars + text */}
