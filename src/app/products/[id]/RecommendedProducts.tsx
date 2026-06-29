@@ -76,7 +76,7 @@ export default function RecommendedProducts({
                       alt={product.name || "Product"}
                       width={400}
                       height={400}
-                      className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300 border-b border-gray-200"
+                      className="object-contain p-2 w-full h-full transform group-hover:scale-102 transition-transform duration-300 border-b border-gray-200 bg-white"
                     />
 
                     {/* Top Badges */}
