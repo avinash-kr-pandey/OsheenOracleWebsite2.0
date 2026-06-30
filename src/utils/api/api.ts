@@ -99,10 +99,19 @@ api.interceptors.response.use(
   (error: AxiosError) => {
     const status = error.response?.status;
     if (status === 401 && typeof window !== "undefined") {
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("token");
-      const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
-      window.location.href = `/login?redirect=${currentPath}`;
+      const requestToken = error.config?.headers?.Authorization;
+      const currentToken = localStorage.getItem("token") || sessionStorage.getItem("token");
+      
+      // Only clear token and redirect if the failed request used the current token in use
+      if (!currentToken || !requestToken || requestToken === `Bearer ${currentToken}`) {
+        console.warn("Unauthorized request detected. Clearing session and redirecting to login.");
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/login?redirect=${currentPath}`;
+      } else {
+        console.warn("Ignored 401 error from an outdated token request to prevent logout race condition.");
+      }
     }
     return Promise.reject(error);
   },

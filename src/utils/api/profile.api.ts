@@ -336,8 +336,18 @@ export const createOrder = async (orderData: {
   productId?: string;
   productName: string;
   price: number;
+  quantity?: number;
+  totalAmount?: number;
   status: string;
   image?: string;
+  shippingAddress?: {
+    name: string;
+    phone: string;
+    address: string;
+  };
+  phone?: string;
+  paymentMethod?: string;
+  paymentId?: string;
 }): Promise<ApiResponse<Order>> => {
   try {
     const response = await postData<ApiResponse<Order>>("/orders", orderData);

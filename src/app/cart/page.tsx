@@ -20,7 +20,7 @@ export default function CartPage() {
     getTotalItems,
   } = useCart();
 
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const [checkoutStep, setCheckoutStep] = useState<"CART" | "ADDRESS" | "PAYMENT">("CART");
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
   const [showPayment, setShowPayment] = useState(false);
@@ -41,9 +41,18 @@ export default function CartPage() {
         return profileApi.createOrder({
           productId: String(item.id),
           productName: item.name,
-          price: item.price * item.quantity,
+          price: item.price,
+          quantity: item.quantity,
+          totalAmount: item.price * item.quantity,
           status: "Pending",
           image: item.image,
+          shippingAddress: {
+            name: selectedAddress?.name || user?.name || "Customer",
+            phone: selectedAddress?.phone || user?.phone || "N/A",
+            address: selectedAddress?.address || "N/A"
+          },
+          phone: selectedAddress?.phone || user?.phone || "N/A",
+          paymentMethod: "Razorpay",
         });
       });
 
@@ -71,9 +80,13 @@ export default function CartPage() {
       alert("Your cart is empty!");
       return;
     }
+    if (loading) {
+      toast.error("Please wait while checking authentication status...");
+      return;
+    }
     if (!isAuthenticated) {
       toast.error("Please login to proceed with checkout");
-      window.location.href = "/login";
+      window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
       return;
     }
     setCheckoutStep("ADDRESS");
@@ -289,9 +302,17 @@ export default function CartPage() {
 
                   <button
                     onClick={handleProceedToAddress}
-                    className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg mb-4"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg mb-4 disabled:opacity-75 flex items-center justify-center gap-2"
                   >
-                    Proceed to Checkout
+                    {loading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Checking authentication...</span>
+                      </>
+                    ) : (
+                      "Proceed to Checkout"
+                    )}
                   </button>
 
                   <Link
