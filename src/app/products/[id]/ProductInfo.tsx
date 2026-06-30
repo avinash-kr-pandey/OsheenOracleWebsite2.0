@@ -395,6 +395,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                         className={`object-contain transition-opacity duration-500 ${
                           isCurrentImageLoaded ? "opacity-100" : "opacity-0"
                         }`}
+                        style={{ objectFit: "contain" }}
                         priority
                       />
 
