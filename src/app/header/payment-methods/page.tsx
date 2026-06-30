@@ -110,6 +110,7 @@ const PaymentMethodsPage = () => {
         phone: bookingUserDetails.phone,
         address: bookingUserDetails.address,
         serviceId: selectedService.serviceId,
+        categoryId: selectedService.categoryId,
         communicationMode: selectedService.communicationMode || "voice_call",
         description:
           selectedService.description || selectedService.serviceDescription,
@@ -122,7 +123,7 @@ const PaymentMethodsPage = () => {
       if (response.success) {
         sessionStorage.removeItem("selectedService");
         alert("✅ Booking confirmed successfully!");
-        router.push("/my-requests");
+        router.push("/my-requests?success=true");
       } else {
         alert("Failed to confirm booking. Please try again.");
       }

@@ -20,7 +20,8 @@ import axios from "axios";
 
 // Define TypeScript interfaces
 interface OrderApiResponse {
-  id: number;
+  _id?: string;
+  id?: number | string;
   productName: string;
   price: string | number;
   date?: string;
@@ -39,11 +40,11 @@ interface OrderApiResponse {
 }
 
 interface Order {
-  id: number;
+  id: string | number;
   productName: string;
   price: string;
   date: string;
-  status: "Processing" | "Shipped" | "Delivered" | "Cancelled";
+  status: "Pending" | "Packed" | "Shipped" | "Reached" | "Cancelled" | "Processing" | "Delivered";
   image: string;
   originalPrice?: string;
   reason?: string;
@@ -161,39 +162,38 @@ const Orders = () => {
         return;
       }
 
-      const formattedOrders = ordersData.map((order: OrderApiResponse) => ({
-        id: order.id || Date.now() + Math.random(),
-        productName: order.productName || "Product",
-        price: order.price ? `₹${order.price}` : "₹0",
-        date:
-          order.date ||
-          order.createdAt ||
-          new Date().toISOString().split("T")[0],
-        status: (order.status || "Processing") as
-          | "Processing"
-          | "Shipped"
-          | "Delivered"
-          | "Cancelled",
-        image: order.image || "/placeholder-product.jpg",
-        originalPrice: order.originalPrice
-          ? `₹${order.originalPrice}`
-          : undefined,
-        reason: getStatusReason(order.status || "Processing"),
-        quantity: order.quantity || 1,
-        trackingId:
-          order.trackingId || `TRK${order.id.toString().padStart(9, "0")}`,
-        deliveryDate:
-          order.deliveryDate ||
-          calculateDeliveryDate(
-            order.date || new Date().toISOString().split("T")[0]
-          ),
-        size: order.size || "Standard",
-        color: order.color || "Default",
-        productId: order.productId,
-        orderDate: order.date,
-        shippingAddress: order.shippingAddress,
-        paymentMethod: order.paymentMethod,
-      }));
+      const formattedOrders = ordersData.map((order: OrderApiResponse) => {
+        const orderId = order._id || order.id || String(Math.random());
+        return {
+          id: orderId,
+          productName: order.productName || "Product",
+          price: order.price ? `₹${order.price}` : "₹0",
+          date:
+            order.date ||
+            order.createdAt ||
+            new Date().toISOString().split("T")[0],
+          status: (order.status || "Pending") as any,
+          image: order.image || "/placeholder-product.jpg",
+          originalPrice: order.originalPrice
+            ? `₹${order.originalPrice}`
+            : undefined,
+          reason: getStatusReason(order.status || "Pending"),
+          quantity: order.quantity || 1,
+          trackingId:
+            order.trackingId || `TRK${String(orderId).substring(0, 9).toUpperCase()}`,
+          deliveryDate:
+            order.deliveryDate ||
+            calculateDeliveryDate(
+              order.date || order.createdAt || new Date().toISOString().split("T")[0]
+            ),
+          size: order.size || "Standard",
+          color: order.color || "Default",
+          productId: order.productId,
+          orderDate: order.date || order.createdAt,
+          shippingAddress: order.shippingAddress,
+          paymentMethod: order.paymentMethod,
+        };
+      });
 
       setOrders(formattedOrders);
       toast.success(`Loaded ${formattedOrders.length} order(s)`);
@@ -240,16 +240,19 @@ const Orders = () => {
   // Helper function to get status reason
   const getStatusReason = (status: string) => {
     switch (status.toLowerCase()) {
+      case "reached":
       case "delivered":
-        return "Successfully delivered to your address.";
+        return "Successfully reached/delivered to your address.";
       case "shipped":
         return "Expected delivery within 3-5 business days.";
       case "cancelled":
         return "Order was cancelled as requested.";
+      case "packed":
+        return "Your order is packed and ready for dispatch.";
+      case "pending":
       case "processing":
-        return "Your order is being processed and will be shipped soon.";
       default:
-        return "Order is being processed.";
+        return "Your order is placed and is pending processing.";
     }
   };
 
@@ -262,12 +265,15 @@ const Orders = () => {
 
   const getStatusIcon = (status: Order["status"]) => {
     switch (status.toLowerCase()) {
+      case "reached":
       case "delivered":
         return <FaCheckCircle className="text-green-500" />;
       case "shipped":
         return <FaShippingFast className="text-blue-500" />;
       case "cancelled":
         return <FaTimesCircle className="text-red-500" />;
+      case "packed":
+        return <FaBox className="text-indigo-500" />;
       default:
         return <FaBox className="text-amber-500" />;
     }
@@ -275,18 +281,21 @@ const Orders = () => {
 
   const getStatusColor = (status: Order["status"]) => {
     switch (status.toLowerCase()) {
+      case "reached":
       case "delivered":
         return "bg-green-100 text-green-800 border-green-200";
       case "shipped":
         return "bg-blue-100 text-blue-800 border-blue-200";
       case "cancelled":
         return "bg-red-100 text-red-800 border-red-200";
+      case "packed":
+        return "bg-indigo-100 text-indigo-800 border-indigo-200";
       default:
         return "bg-amber-100 text-amber-800 border-amber-200";
     }
   };
 
-  const cancelOrder = async (orderId: number) => {
+  const cancelOrder = async (orderId: string | number) => {
     if (!isAuthenticated || !token) {
       toast.error("Please login to cancel order");
       return;
@@ -517,10 +526,10 @@ const Orders = () => {
               color: "from-pink-500 to-amber-500",
             },
             {
-              status: "processing",
-              label: "Processing",
-              icon: "⏳",
-              color: "from-amber-400 to-amber-600",
+              status: "packed",
+              label: "Packed",
+              icon: "📦",
+              color: "from-indigo-400 to-indigo-600",
             },
             {
               status: "shipped",
@@ -529,8 +538,8 @@ const Orders = () => {
               color: "from-blue-400 to-blue-600",
             },
             {
-              status: "delivered",
-              label: "Delivered",
+              status: "reached",
+              label: "Reached",
               icon: "✅",
               color: "from-green-400 to-green-600",
             },
@@ -563,9 +572,10 @@ const Orders = () => {
         <div className="flex flex-wrap gap-2 mb-6">
           {[
             { key: "all", label: "All Orders" },
-            { key: "processing", label: "Processing" },
+            { key: "pending", label: "Pending" },
+            { key: "packed", label: "Packed" },
             { key: "shipped", label: "Shipped" },
-            { key: "delivered", label: "Delivered" },
+            { key: "reached", label: "Reached" },
             { key: "cancelled", label: "Cancelled" },
           ].map((filter) => (
             <button
@@ -674,7 +684,7 @@ const Orders = () => {
                         View Details
                       </button>
 
-                      {order.status.toLowerCase() === "delivered" && (
+                      {(order.status.toLowerCase() === "delivered" || order.status.toLowerCase() === "reached") && (
                         <button
                           onClick={() => writeReview(order)}
                           className="flex items-center gap-2 px-3 py-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition-colors duration-200 text-sm"
@@ -684,7 +694,7 @@ const Orders = () => {
                         </button>
                       )}
 
-                      {order.status.toLowerCase() === "processing" && (
+                      {["pending", "processing", "packed"].includes(order.status.toLowerCase()) && (
                         <button
                           onClick={() => cancelOrder(order.id)}
                           className="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-200 text-sm"

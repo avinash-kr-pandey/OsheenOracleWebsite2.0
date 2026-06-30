@@ -121,6 +121,10 @@ const UserDetailsModal = ({
   onProceedToPayment: (userData: any) => void;
 }) => {
   const isVideoCall = service.name.toLowerCase().includes("video") || service.description.toLowerCase().includes("video");
+  const isEnergyHealing =
+    service.categoryName?.toLowerCase().includes("energy healing") ||
+    service.name?.toLowerCase().includes("energy healing");
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -130,6 +134,7 @@ const UserDetailsModal = ({
     communicationMode: isVideoCall ? "video_call" : "voice_call",
     preferredTimeSlot: "",
   });
+  const [consentChecked, setConsentChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { user } = useAuth();
 
@@ -181,6 +186,11 @@ const UserDetailsModal = ({
     const phoneDigits = formData.phone.replace(/\D/g, "");
     if (phoneDigits.length !== 10) {
       toast.error("Phone number must be exactly 10 digits");
+      return;
+    }
+
+    if (isEnergyHealing && !consentChecked) {
+      toast.error("You must tick the checkbox to proceed with Energy Healing.");
       return;
     }
 
@@ -341,10 +351,28 @@ const UserDetailsModal = ({
               </div>
             </div>
 
+            {isEnergyHealing && (
+              <div className="flex items-start gap-3 p-4 bg-purple-50 rounded-xl border border-purple-100 select-none">
+                <input
+                  type="checkbox"
+                  id="energy-healing-consent"
+                  checked={consentChecked}
+                  onChange={(e) => setConsentChecked(e.target.checked)}
+                  className="w-5 h-5 mt-0.5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="energy-healing-consent"
+                  className="text-sm text-gray-700 leading-relaxed cursor-pointer font-medium"
+                >
+                  I understand and agree that this Energy Healing session will be conducted remotely/spiritually as per the instructions provided, and I consent to the terms of the session. *
+                </label>
+              </div>
+            )}
+
             <div className="flex gap-3 pt-4">
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || (isEnergyHealing && !consentChecked)}
                 className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
               >
                 {submitting ? "Processing..." : "Continue to Payment →"}
