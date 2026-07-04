@@ -7,12 +7,11 @@ const TermsOfUse = () => {
         {/* Header Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            Terms of Use
+            Terms & Conditions
           </h1>
           <div className="w-24 h-1 bg-purple-600 mx-auto mb-6"></div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Please read these terms carefully before using our consultation
-            services
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            SERVICE INSTRUCTION: By accepting these service instructions, the client is willing to avail the service(s) provided by the service provider and is confirming to be bound by the terms and conditions herein detailed.
           </p>
         </div>
 
@@ -21,391 +20,147 @@ const TermsOfUse = () => {
           {/* Introduction */}
           <div className="bg-gradient-to-r from-purple-600 to-pink-700 text-white p-8">
             <h2 className="text-2xl font-bold mb-4">
-              Welcome to Osheen Oracle
+              Services Terms and Conditions
             </h2>
             <p className="text-purple-100 leading-relaxed">
-              The Osheen Oracle is a platform for OHC (Online Healing
-              Consultation) for healing via Tarot card, Reiki, Motivation and
-              counseling.
+              The Service Provider provides services relating to astrology, spirituality, numerology, reiki healing, psychic/tarot card reading, charging crystals and bracelets, energy exchange, performance of spells and pooja.
             </p>
-            <div className="mt-4 p-4 bg-purple-500 rounded-lg">
-              <p className="text-sm italic">
-                <strong>Important:</strong> Osheen is not a medical practitioner
-                and does not deal in treatment of any physical or mental injury.
-                Please consult doctors for medical issues.
-              </p>
-            </div>
           </div>
 
           {/* Terms Sections */}
           <div className="p-8 space-y-12">
-            {/* Section 1 - Definitions */}
+            {/* Section 1 - Payment */}
             <section className="border-l-4 border-purple-500 pl-6">
               <h3 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
                 <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mr-3 text-sm font-bold">
                   1
                 </span>
-                Definitions
+                Payment
               </h3>
-              <div className="space-y-4 text-gray-600">
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">Spell</h4>
-                  <p>
-                    Online Consultation Time-Period either audio or video, if
-                    any availed by you as per the financial terms package.
-                  </p>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">Consent</h4>
-                  <p>
-                    Means the free and volunteered consent given by you to opt
-                    the spell.
-                  </p>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">User</h4>
-                  <p>A person who avails OHC from the Osheen.</p>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">Visitor</h4>
-                  <p>
-                    A person visiting the website and other social media
-                    platforms without availing OHC.
-                  </p>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">Product</h4>
-                  <p>
-                    Means the product provided through the Osheen to the user on
-                    his request.
-                  </p>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">Content</h4>
-                  <p>
-                    The displayed photos, written material, audio or video
-                    recordings, uploaded or live content on Osheen platforms.
-                  </p>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Offending Content
-                  </h4>
-                  <p>
-                    Message, photo, audio or video content that is abusive,
-                    vulgar, hate speech, racist, gender discriminative, or
-                    unethical.
-                  </p>
-                </div>
+              <div className="space-y-4 text-gray-600 leading-relaxed">
+                <p>
+                  The client shall pay the service provider a fee in advance upon execution of this agreement to observe the fixation of appointment with the service provider. This fee shall be paid in full and is non-refundable.
+                </p>
+                <p className="bg-purple-50 p-4 rounded-lg font-medium text-purple-900 border-l-4 border-purple-400">
+                  Any kind of negotiation in fees is not appreciated as the service involves exchange of spiritual energies between the service provider and the client.
+                </p>
+                <p>
+                  In case of cancellation of appointment by the client for any reason, the fees remain non-refundable and client has liberty to re-schedule the appointment with service provider. Hence, clients are requested to request the services carefully with accurate disclosure of details accompanied with full consideration.
+                </p>
               </div>
             </section>
 
-            {/* Section 2 - Guarantee or Warranty */}
+            {/* Section 2 - Specifications */}
             <section className="border-l-4 border-red-500 pl-6">
               <h3 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
                 <span className="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center mr-3 text-sm font-bold">
                   2
                 </span>
-                Guarantee or Warranty
+                Specifications & Guidelines
               </h3>
-              <div className="space-y-4 text-gray-600">
-                <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    No Guarantees Provided
-                  </h4>
-                  <p>
-                    Osheen does not provide any guarantee or warranty on online
-                    consultations or products purchased from third parties.
-                  </p>
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="bg-red-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-gray-800 mb-2">
-                      Product Responsibility
-                    </h4>
-                    <p>
-                      Osheen is not responsible for product quality, delivery
-                      delays, or damages as we only help arrange products from
-                      third parties.
-                    </p>
-                  </div>
-                  <div className="bg-red-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-gray-800 mb-2">
-                      Consultation Effectiveness
-                    </h4>
-                    <p>
-                      OHC may work as per suggested processes but does not
-                      guarantee 100% success. Consultations are not always
-                      helpful.
-                    </p>
-                  </div>
-                </div>
-                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                  <h4 className="font-semibold text-yellow-800 mb-2">
-                    Important Notice
-                  </h4>
-                  <p className="text-yellow-700">
-                    Osheen has no branches, associations, franchisees or sister
-                    concerns. Users are responsible if they contact any
-                    imitation of Osheen.
-                  </p>
-                </div>
+              <div className="space-y-4 text-gray-600 leading-relaxed">
+                <p className="font-semibold text-gray-900">
+                  The service provider is duty bound to provide best services and readings to utmost satisfaction of the client and work in good faith towards the client.
+                </p>
+                <ul className="list-disc list-inside space-y-3 ml-4">
+                  <li>
+                    Services invoke powerful healing energies, spiritual exchanges and do not use any kind of harmful elements or substances of black magic or hoodoo.
+                  </li>
+                  <li>
+                    The energy exchange, astrology, psychic or tarot readings, crystal or bracelet charging, spells or pooja brings positive exchanges which are highly effective and is not disadvantageous to health of the client. It involves success rate however, these remedies can never provide 100% guarantee or certainty about results, forecast or accuracy as effectiveness varies with beliefs, conditions or timely follow up of remedies by clients.
+                  </li>
+                  <li>
+                    <strong>Prohibited Substances:</strong> The Client availing any of the above spiritual healing, crystal or bracelet healing or spell service is strictly prohibited from consuming alcohol or any kind of narcotic or psychotropic substance or non-vegetarian food or smoking as it obstructs the success of spell and can lead to failure of granting adequate relief sought from the remedy.
+                  </li>
+                  <li>
+                    <strong>Sacred Union:</strong> Cheating upon spouse, extra marital affairs, emotional detachment or any kind of casual, physical or emotional relationship outside sacred marital union automatically leads to failure of spells or pooja or healing due to involvement of spiritual energies.
+                  </li>
+                  <li>
+                    <strong>Medical Issues:</strong> If client is suffering from any medical issues or health condition like depression, anxiety disorders, suicidal tendencies etc. then the service provider holds no responsibility about effectiveness of remedy upon the client. The effectiveness of remedy and healings varies according to mental, physical and health conditions of the client. In exceptional cases, it can lead to longevity of healing sessions, spells or multiple remedies, which shall warrant patience of the client throughout the completion of process.
+                  </li>
+                </ul>
               </div>
             </section>
 
-            {/* Section 3 - Relationship */}
+            {/* Section 3 - Complaint */}
             <section className="border-l-4 border-blue-500 pl-6">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
                 <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3 text-sm font-bold">
                   3
                 </span>
-                Relationship between Osheen and You
+                Complaint & Grievance Redressal
               </h3>
-              <div className="bg-blue-50 p-6 rounded-lg">
-                <p className="text-gray-600">
-                  Osheen only consults the user to heal grievances. There is no
-                  relationship of service provider-consumer, businessman-buyer
-                  or Practitioner-Client between you and Osheen. Consultations
-                  are based on special studies of tarot reading, motivation and
-                  counseling.
+              <div className="bg-blue-50 p-6 rounded-lg text-gray-600 leading-relaxed">
+                <p>
+                  In case of any complaint, the client can report the query or issue affecting his or her interest to the service provider through E-mail at{" "}
+                  <a href="mailto:contact@osheenoracle.com" className="font-semibold text-blue-600 underline">
+                    contact@osheenoracle.com
+                  </a>.
+                </p>
+                <p className="mt-3 font-semibold text-blue-900">
+                  The client may please ensure patience for 10 days from the date of complaint for redressal of grievance by the service provider.
                 </p>
               </div>
             </section>
 
-            {/* Section 4 - Data Collection */}
-            <section className="border-l-4 border-green-500 pl-6">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
-                <span className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-3 text-sm font-bold">
-                  4
-                </span>
-                Collection of Personal Data
-              </h3>
-              <div className="grid md:grid-cols-2 gap-4 text-gray-600">
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Data Collected
-                  </h4>
-                  <p>
-                    Name, address, UID Number, Mobile No. and Email ID before
-                    receiving Spell Premium.
-                  </p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Data Retention
-                  </h4>
-                  <p>
-                    Data retained in compliance with Indian government
-                    regulations and legal requirements.
-                  </p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg md:col-span-2">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Data Sharing
-                  </h4>
-                  <p>
-                    Data may be shared with courts or government investigation
-                    agencies on written instructions.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* Section 5 - Termination */}
+            {/* Section 4 - Indemnification */}
             <section className="border-l-4 border-orange-500 pl-6">
               <h3 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
                 <span className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mr-3 text-sm font-bold">
-                  5
+                  4
                 </span>
-                Termination of Spell
+                Indemnification
               </h3>
-              <div className="space-y-4 text-gray-600">
-                <div className="bg-orange-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Termination Process
-                  </h4>
-                  <p>
-                    Users may terminate spells by written request to
-                    Oracleosheen2@gmail.com or on the platform where the spell
-                    was opted.
-                  </p>
-                </div>
-                <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Refund Policy
-                  </h4>
-                  <p className="text-red-600 font-semibold">
-                    Money already paid will not be refunded upon termination.
-                  </p>
-                </div>
+              <div className="space-y-4 text-gray-600 leading-relaxed">
+                <p>
+                  In case the client indulges in illegal activities, sends intimidating messages or content or abets or attempts to threaten or assault or use any kind of criminal force against the service provider in order to mentally or physically harass the latter or tries to illegally extort the fee deposited in advance so, the client shall indemnify the service provider against any loss be it tangible or intangible.
+                </p>
+                <p className="bg-red-50 p-4 rounded-lg text-red-900 border-l-4 border-red-400">
+                  The service provider is open to take appropriate legal recourse against such client and the service provider shall in no case be responsible to the client for any legal action taken or loss or injury caused to the client in consequence.
+                </p>
               </div>
             </section>
 
-            {/* Section 6 - Intellectual Property */}
-            <section className="border-l-4 border-indigo-500 pl-6">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
-                <span className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mr-3 text-sm font-bold">
-                  6
-                </span>
-                Intellectual Property Rights (IPRs)
-              </h3>
-              <div className="space-y-4 text-gray-600">
-                <div className="bg-indigo-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Exclusive Properties
-                  </h4>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Displays on social media platforms and website</li>
-                    <li>Appearance of spell sessions</li>
-                    <li>Graphics, designs, colors, patterns</li>
-                    <li>Logo, name, designs, copyrights and trademarks</li>
-                    <li>Terms of Use and package plans</li>
-                  </ul>
-                </div>
-                <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Prohibited Activities
-                  </h4>
-                  <p>
-                    Copying or recording audio/video content, taking
-                    screenshots, or reproducing any Osheen content is strictly
-                    prohibited. Violators will be prosecuted.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* Section 7 - Consent */}
-            <section className="border-l-4 border-pink-500 pl-6">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
-                <span className="w-8 h-8 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mr-3 text-sm font-bold">
-                  7
-                </span>
-                Consent
-              </h3>
-              <div className="space-y-4 text-gray-600">
-                <div className="bg-pink-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Marketing Consent
-                  </h4>
-                  <p>
-                    Users consent to Osheen using mobile numbers and email IDs
-                    for notifications and sharing with third-party ad agencies.
-                  </p>
-                </div>
-                <div className="bg-pink-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Advertisement Policy
-                  </h4>
-                  <p>
-                    Osheen is not responsible for advertisements posted by
-                    third-party agencies on its platforms, though we endeavor to
-                    remove abusive content.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* Section 8 - General Terms */}
+            {/* Section 5 - Arbitration */}
             <section className="border-l-4 border-teal-500 pl-6">
               <h3 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
                 <span className="w-8 h-8 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center mr-3 text-sm font-bold">
-                  8
+                  5
                 </span>
-                General Terms
+                Arbitration & Jurisdiction
               </h3>
-              <div className="grid md:grid-cols-2 gap-4 text-gray-600">
-                <div className="bg-teal-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Age Requirement
-                  </h4>
-                  <p>Users must be 18 years or older to avail services.</p>
-                </div>
-                <div className="bg-teal-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    No Refunds
-                  </h4>
-                  <p>Spell premium once paid shall not be refunded.</p>
-                </div>
-                <div className="bg-teal-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Punctuality
-                  </h4>
-                  <p>Users shall be punctual for allotted timings.</p>
-                </div>
-                <div className="bg-teal-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Legal Action
-                  </h4>
-                  <p>
-                    Offending content or copyright violations will lead to legal
-                    prosecution.
-                  </p>
-                </div>
-                <div className="bg-teal-50 p-4 rounded-lg md:col-span-2">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Arbitration
-                  </h4>
-                  <p>
-                    Disputes shall be referred to sole arbitration in Mohali,
-                    Punjab, India under Arbitration and Conciliation Act 1996.
-                  </p>
-                </div>
-                <div className="bg-teal-50 p-4 rounded-lg md:col-span-2">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    Shipping & Returns
-                  </h4>
-                  <p>
-                    Delivery within 3-5 business days. Return within 7 days of
-                    purchase. All products are non-refundable.
-                  </p>
-                </div>
+              <div className="bg-teal-50 p-6 rounded-lg text-gray-600 space-y-4 leading-relaxed">
+                <p>
+                  Any dispute, controversy, or claim arising out of or in connection with this agreement shall be referred to Arbitration and shall be addressed by single arbitrator duly appointed in accordance with commercial arbitration rules applicable in India.
+                </p>
+                <p>
+                  If any party approaches initiate judicial proceedings in any court so, both the parties shall be bound to submit the dispute to the exclusive jurisdiction of competent court in the territory of <strong>SAS Nagar Mohali</strong>. Indian law shall be applicable between the parties.
+                </p>
               </div>
             </section>
-
-            {/* Acceptance Section */}
-            <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-lg text-center">
-              <h3 className="text-xl font-bold mb-4">Acceptance of Terms</h3>
-              <p className="mb-4">
-                I have gone through and understood the above Terms of Use and
-                Package plan at
-                <a
-                  href="https://osheenoracle.com"
-                  className="underline ml-1 font-semibold"
-                >
-                  https://osheenoracle.com
-                </a>
-              </p>
-              <p className="font-semibold">
-                Thus, being agreed with the same at my free will and volunteered
-                consent, I accept these Terms of Use.
-              </p>
-            </div>
           </div>
 
           {/* Footer Note */}
-          <div className="bg-gray-800 text-white p-6">
+          <div className="bg-gray-800 text-white p-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="mb-4 md:mb-0">
                 <h4 className="font-semibold text-lg mb-2">
                   Contact Information
                 </h4>
-                <p className="text-gray-300">Email: Oracleosheen2@gmail.com</p>
+                <p className="text-gray-300">Email: contact@osheenoracle.com</p>
                 <p className="text-gray-300">
                   Website: https://osheenoracle.com
                 </p>
               </div>
               <div className="text-center md:text-right">
                 <p className="text-gray-300 text-sm">
-                  <strong>Note:</strong> Terms and conditions can be changed
-                  anytime without prior notice.
+                  <strong>Note:</strong> Terms and conditions can be changed anytime without prior notice.
                   <br />
-                  Osheen Oracle reserves the right to refuse service to anyone
-                  deemed unfit.
+                  Osheen Oracle reserves the right to refuse service to anyone deemed unfit.
                 </p>
               </div>
             </div>
-            <div className="mt-4 text-center text-sm text-gray-400">
+            <div className="mt-6 text-center text-sm text-gray-400 border-t border-gray-700 pt-4">
               Last updated:{" "}
               {new Date().toLocaleDateString("en-US", {
                 year: "numeric",

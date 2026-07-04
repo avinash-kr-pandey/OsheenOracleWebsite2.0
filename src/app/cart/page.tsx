@@ -80,11 +80,12 @@ export default function CartPage() {
       alert("Your cart is empty!");
       return;
     }
-    if (loading) {
-      toast.error("Please wait while checking authentication status...");
-      return;
-    }
-    if (!isAuthenticated) {
+    
+    // Check localStorage directly for robust auth state check
+    const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const isUserLoggedIn = isAuthenticated || !!storedToken;
+
+    if (!isUserLoggedIn) {
       toast.error("Please login to proceed with checkout");
       window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
       return;

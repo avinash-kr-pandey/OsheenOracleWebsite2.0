@@ -65,11 +65,11 @@ const Support = () => {
             </p>
           </div>
           <a 
-            href="mailto:oracleosheen1@gmail.com"
+            href="mailto:contact@osheenoracle.com"
             className="bg-pink-600 text-white px-5 py-2.5 rounded-full hover:bg-pink-700 transition font-medium w-full text-center truncate text-sm"
-            title="oracleosheen1@gmail.com"
+            title="contact@osheenoracle.com"
           >
-            oracleosheen1@gmail.com
+            contact@osheenoracle.com
           </a>
         </div>
 

@@ -269,222 +269,70 @@ const PolicyModal = ({
                   <span className="text-2xl">📋</span>
                 </div>
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  Welcome to <strong>Osheen Oracle</strong> - Platform for Online Healing Consultation (OHC) via Tarot, Reiki, Motivation & Counseling.
+                  SERVICE INSTRUCTION: By accepting these service instructions, the client is willing to avail the service(s) provided by the service provider and is confirming to be bound by the terms and conditions.
                 </p>
-                <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4 max-w-2xl mx-auto">
-                  <div className="flex items-center gap-2 text-red-700 mb-2">
-                    <span className="text-xl">⚠️</span>
-                    <h4 className="font-bold">Important Notice</h4>
-                  </div>
-                  <p className="text-red-600 text-sm">
-                    Osheen is <strong>not a medical practitioner</strong> and does not treat physical/mental injuries. Please consult doctors for medical issues.
+              </div>
+
+              {/* Service Terms */}
+              <div className="bg-gradient-to-r from-purple-50 to-white p-6 rounded-xl border border-purple-100">
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Services Terms and Conditions</h3>
+                <p className="text-gray-600 text-sm">
+                  The Service Provider provides services relating to astrology, spirituality, numerology, reiki healing, psychic/tarot card reading, charging crystals and bracelets, energy exchange, performance of spells and pooja.
+                </p>
+              </div>
+
+              {/* Main Terms Sections */}
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Payment */}
+                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                  <h4 className="font-bold text-gray-800 mb-2">1. Payment</h4>
+                  <p className="text-gray-600 text-xs leading-relaxed">
+                    Fee is payable in advance and is non-refundable. Negotiation in fees is not appreciated as the service involves exchange of spiritual energies. If appointment is cancelled, fees remain non-refundable but can be rescheduled.
+                  </p>
+                </div>
+
+                {/* Complaint */}
+                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                  <h4 className="font-bold text-gray-800 mb-2">2. Complaint</h4>
+                  <p className="text-gray-600 text-xs leading-relaxed text-blue-800">
+                    Query or issue affecting interests can be reported to contact@osheenoracle.com. Please ensure patience of 10 days for redressal of grievance.
+                  </p>
+                </div>
+
+                {/* Sacred Union */}
+                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                  <h4 className="font-bold text-gray-800 mb-2">3. Sacred Union & Restrictions</h4>
+                  <p className="text-gray-600 text-xs leading-relaxed">
+                    Cheating, extra marital affairs, or emotional detachment outside sacred marital union leads to failure of spells. Consuming alcohol, smoking, non-veg, or narcotics is strictly prohibited as it obstructs energy.
+                  </p>
+                </div>
+
+                {/* Health & Support */}
+                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                  <h4 className="font-bold text-gray-800 mb-2">4. Medical Notice</h4>
+                  <p className="text-gray-600 text-xs leading-relaxed">
+                    If client is suffering from depression, anxiety, suicidal tendencies, the provider holds no responsibility. Remedies cannot guarantee 100% certainty.
                   </p>
                 </div>
               </div>
 
-              {/* Definitions */}
-              <div className="bg-gradient-to-r from-purple-50 to-white p-6 rounded-xl border border-purple-100">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xl font-bold">
-                    1
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800">Key Definitions</h3>
-                </div>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[
-                    { term: "Spell", desc: "Consultation time-period (audio/video)" },
-                    { term: "User", desc: "Person availing OHC services" },
-                    { term: "Visitor", desc: "Person browsing without OHC" },
-                    { term: "Product", desc: "Items arranged from third parties" },
-                    { term: "Content", desc: "All displayed materials & media" },
-                    { term: "Offending Content", desc: "Abusive, vulgar, hate speech" },
-                  ].map((item, idx) => (
-                    <div key={idx} className="bg-white p-4 rounded-lg shadow-sm">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm font-bold">
-                          {idx + 1}
-                        </div>
-                        <h4 className="font-semibold text-gray-800">{item.term}</h4>
-                      </div>
-                      <p className="text-gray-600 text-sm">{item.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Guarantee Warning */}
-              <div className="bg-gradient-to-r from-red-50 to-white p-6 rounded-xl border border-red-100">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-xl font-bold">
-                    2
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800">Important Limitations</h3>
-                </div>
-                <div className="space-y-4">
-                  <div className="bg-white p-5 rounded-lg shadow-sm">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-red-500 text-2xl">❌</span>
-                      <div>
-                        <h4 className="font-semibold text-gray-800">No Guarantees Provided</h4>
-                        <p className="text-gray-600 text-sm">
-                          OHC may not guarantee 100% success. Consultations are not always helpful.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-white p-5 rounded-lg shadow-sm">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-orange-500 text-2xl">📦</span>
-                      <div>
-                        <h4 className="font-semibold text-gray-800">Third-Party Products</h4>
-                        <p className="text-gray-600 text-sm">
-                          Osheen is <strong>not responsible</strong> for product quality, delivery delays, or damages from third-party suppliers.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                    <div className="flex items-start gap-3">
-                      <span className="text-yellow-600 text-xl">🚫</span>
-                      <div>
-                        <h4 className="font-semibold text-yellow-800 mb-1">Official Notice</h4>
-                        <p className="text-yellow-700 text-sm">
-                          Osheen has <strong>no branches, franchisees, or sister concerns</strong>. Users are responsible if contacting imitations.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Data Collection */}
-              <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-xl border border-blue-100">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl font-bold">
-                    3
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800">Data Collection & Retention</h3>
-                </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="bg-white p-5 rounded-lg shadow-sm">
-                    <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <span className="text-green-500">📋</span>
-                      Collected Information
-                    </h4>
-                    <ul className="space-y-2 text-gray-600 text-sm">
-                      <li className="flex items-center gap-2">✓ Full Name</li>
-                      <li className="flex items-center gap-2">✓ Address Details</li>
-                      <li className="flex items-center gap-2">✓ Mobile Number</li>
-                      <li className="flex items-center gap-2">✓ Email ID</li>
-                      <li className="flex items-center gap-2">✓ UID/Aadhar Number</li>
-                    </ul>
-                  </div>
-                  <div className="bg-white p-5 rounded-lg shadow-sm">
-                    <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <span className="text-red-500">🔒</span>
-                      Data Sharing
-                    </h4>
-                    <p className="text-gray-600 text-sm mb-3">
-                      Data may be shared with:
-                    </p>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                        <span className="text-gray-600 text-sm">Courts & Legal Authorities</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                        <span className="text-gray-600 text-sm">Government Investigation Agencies</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Important Points */}
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Termination */}
-                <div className="bg-gradient-to-r from-orange-50 to-white p-6 rounded-xl border border-orange-100">
-                  <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="text-orange-500 text-xl">⏹️</span>
-                    Termination Policy
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="bg-white p-4 rounded-lg">
-                      <p className="text-gray-700 font-medium mb-1">How to Terminate:</p>
-                      <p className="text-gray-600 text-sm">Email request to Oracleosheen2@gmail.com</p>
-                    </div>
-                    <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                      <div className="flex items-center gap-2 text-red-700">
-                        <span className="text-xl">💰</span>
-                        <p className="font-bold">Important: No Refunds</p>
-                      </div>
-                      <p className="text-red-600 text-sm mt-1">Money already paid will not be refunded upon termination.</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Intellectual Property */}
-                <div className="bg-gradient-to-r from-indigo-50 to-white p-6 rounded-xl border border-indigo-100">
-                  <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="text-indigo-500 text-xl">⚖️</span>
-                    Intellectual Property
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="bg-white p-4 rounded-lg">
-                      <p className="text-gray-700 font-medium mb-2">Protected Content:</p>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs">Logo</span>
-                        <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs">Designs</span>
-                        <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs">Content</span>
-                        <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs">Trademarks</span>
-                      </div>
-                    </div>
-                    <div className="bg-red-50 p-3 rounded-lg">
-                      <p className="text-red-600 text-sm font-medium">
-                        ⚠️ Copying, recording, or reproducing any content is strictly prohibited.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Facts */}
-              <div className="bg-gradient-to-r from-gray-50 to-white p-6 rounded-xl border border-gray-200">
-                <h4 className="font-semibold text-gray-800 mb-6 text-center">📌 Quick Facts</h4>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {[
-                    { icon: "🎂", label: "Age Requirement", value: "18+ Years" },
-                    { icon: "⏰", label: "Punctuality", value: "Mandatory" },
-                    { icon: "⚖️", label: "Arbitration", value: "Mohali, Punjab" },
-                    { icon: "📦", label: "Delivery Time", value: "3-5 Days" },
-                  ].map((item, idx) => (
-                    <div key={idx} className="bg-white p-4 rounded-lg shadow-sm text-center">
-                      <div className="text-2xl mb-2">{item.icon}</div>
-                      <p className="text-gray-600 text-sm mb-1">{item.label}</p>
-                      <p className="font-semibold text-gray-800">{item.value}</p>
-                    </div>
-                  ))}
-                </div>
+              {/* Legal Recourse */}
+              <div className="bg-red-50 border border-red-200 p-6 rounded-xl">
+                <h4 className="font-bold text-red-900 mb-2">5. Indemnification & Arbitration</h4>
+                <p className="text-red-700 text-xs leading-relaxed">
+                  In case the client attempts to threaten, mentally/physically harass, or illegally extort fees, the client shall indemnify the service provider against all losses. Dispute, controversy, or claim shall be referred to Arbitration in SAS Nagar Mohali, India under commercial arbitration rules.
+                </p>
               </div>
 
               {/* Acceptance */}
               <div className="bg-gradient-to-r from-green-50 to-white p-6 rounded-xl border border-green-200 text-center">
-                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl mx-auto mb-3">
                   ✓
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3">Acceptance of Terms</h3>
-                <p className="text-gray-600 mb-4">
-                  I have read and understood the Terms of Use at{" "}
-                  <a href="https://osheenoracle.com" className="text-blue-600 font-semibold hover:underline">
-                    https://osheenoracle.com
-                  </a>
+                <h3 className="text-lg font-bold text-gray-800 mb-2">Acceptance of Terms</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  I accept these Terms & Conditions at my free will and volunteered consent.
                 </p>
-                <div className="bg-white p-4 rounded-lg border max-w-md mx-auto">
-                  <p className="text-gray-700 font-semibold">
-                    I accept these Terms of Use at my free will and volunteered consent.
-                  </p>
-                </div>
               </div>
             </div>
           )}

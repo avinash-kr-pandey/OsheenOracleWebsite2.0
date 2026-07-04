@@ -233,8 +233,7 @@ const Footer = () => {
               </h3>
               <div className="space-y-4">
                 {[
-                  { icon: "✉️", text: "oracleosheen1@gmail.com", type: "email" },
-                  { icon: "✉️", text: "oracleosheen2@gmail.com", type: "email" },
+                  { icon: "✉️", text: "contact@osheenoracle.com", type: "email" },
                   { icon: "📞", text: "+91 81466 68328", type: "tel" },
                   { icon: "📞", text: "+91 98770 97916", type: "tel" },
                   { icon: "📞", text: "+91 81469 77206", type: "tel" },

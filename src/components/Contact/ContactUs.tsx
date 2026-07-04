@@ -109,7 +109,7 @@ const ContactUs: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="font-medium text-gray-800 text-lg">Email</h4>
-                  <p className="text-gray-500 text-sm">oracleosheen1@gmail.com, oracleosheen2@gmail.com</p>
+                  <p className="text-gray-500 text-sm">contact@osheenoracle.com</p>
                 </div>
               </div>
             </div>

@@ -294,7 +294,7 @@ const PrivacyPolicy = () => {
                 </h3>
                 <div className="text-gray-600 space-y-2">
                   <p className="font-semibold">Osheen Oracle</p>
-                  <p>Email: Oracleosheen2@gmail.com</p>
+                  <p>Email: contact@osheenoracle.com</p>
                   <p>Phone: +91 8146668328</p>
                   <p>Phone: +91 99158 10965</p>
                 </div>

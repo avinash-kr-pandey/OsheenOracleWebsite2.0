@@ -736,8 +736,8 @@ const CategoryPage = () => {
                       Need help? Contact our support team
                     </p>
                     <p className="text-sm text-purple-600 text-center font-medium mt-1">
-                      <a href="mailto:oracleosheen1@gmail.com" className="hover:underline">
-                        oracleosheen1@gmail.com
+                      <a href="mailto:contact@osheenoracle.com" className="hover:underline">
+                        contact@osheenoracle.com
                       </a>
                     </p>
                   </div>
