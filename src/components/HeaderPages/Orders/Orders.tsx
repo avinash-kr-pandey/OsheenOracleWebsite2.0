@@ -243,6 +243,8 @@ const Orders = () => {
       case "reached":
       case "delivered":
         return "Successfully reached/delivered to your address.";
+      case "transit":
+        return "Your order is in transit to your destination.";
       case "shipped":
         return "Expected delivery within 3-5 business days.";
       case "cancelled":
@@ -268,6 +270,8 @@ const Orders = () => {
       case "reached":
       case "delivered":
         return <FaCheckCircle className="text-green-500" />;
+      case "transit":
+        return <FaShippingFast className="text-cyan-500" />;
       case "shipped":
         return <FaShippingFast className="text-blue-500" />;
       case "cancelled":
@@ -284,6 +288,8 @@ const Orders = () => {
       case "reached":
       case "delivered":
         return "bg-green-100 text-green-800 border-green-200";
+      case "transit":
+        return "bg-cyan-100 text-cyan-800 border-cyan-200";
       case "shipped":
         return "bg-blue-100 text-blue-800 border-blue-200";
       case "cancelled":

@@ -404,7 +404,7 @@ const ServiceCard = ({
         </div>
       </div>
 
-      <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-purple-700 transition-colors duration-300 line-clamp-1">
+      <h3 className="text-lg font-bold font-subheading text-gray-800 mb-2 group-hover:text-purple-700 transition-colors duration-300 line-clamp-1">
         {service.name}
       </h3>
 
@@ -679,7 +679,7 @@ const CategoryPage = () => {
                       <span>{category.icon || "🔮"}</span>
                     )}
                   </div>
-                  <h1 className="text-2xl font-bold text-white mb-1">
+                  <h1 className="text-2xl font-bold font-heading text-white mb-1">
                     {category.name}
                   </h1>
                   <div className="w-12 h-0.5 bg-white/40 mx-auto"></div>

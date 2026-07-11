@@ -12,11 +12,14 @@ import {
 // const API_BASE_URL = "https://api.osheenoracle.com/api";
 
 // Set to true to connect to local backend for testing, or false for production
-const USE_LOCAL_BACKEND = false;
+const isLocal =
+  typeof window !== "undefined"
+    ? window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    : process.env.NODE_ENV !== "production";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  (USE_LOCAL_BACKEND
+  (isLocal
     ? "http://localhost:5000/api"
     : "https://api.osheenoracle.com/api");
 
@@ -704,7 +707,7 @@ export const getFullImageUrl = (imagePath?: string): string => {
     
     const apiBaseUrl =
       process.env.NEXT_PUBLIC_API_URL ||
-      (USE_LOCAL_BACKEND
+      (isLocal
         ? "http://localhost:5000/api"
         : "https://api.osheenoracle.com/api");
     const baseUrl = apiBaseUrl.replace(/\/api\/?$/, "");
@@ -722,7 +725,7 @@ export const getFullImageUrl = (imagePath?: string): string => {
   
   const apiBaseUrl =
     process.env.NEXT_PUBLIC_API_URL ||
-    (USE_LOCAL_BACKEND
+    (isLocal
       ? "http://localhost:5000/api"
       : "https://api.osheenoracle.com/api");
       

@@ -109,7 +109,7 @@ const OurPackages = () => {
               ✨ Spiritual Services
             </span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-purple-900 to-pink-700 bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl md:text-7xl font-bold font-heading bg-gradient-to-r from-purple-900 to-pink-700 bg-clip-text text-transparent mb-4">
             Our Services
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mb-6 rounded-full"></div>
@@ -167,7 +167,7 @@ const OurPackages = () => {
                 {/* Content */}
                 <div className="p-6 bg-white">
                   <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-2xl font-bold text-purple-900 group-hover:text-purple-600 transition-colors">
+                    <h3 className="text-2xl font-bold font-subheading text-purple-900 group-hover:text-purple-600 transition-colors">
                       {category.name}
                     </h3>
                     <div className="bg-purple-100 rounded-full px-3 py-1">
@@ -222,7 +222,7 @@ const OurPackages = () => {
         {/* Trust Badges Section */}
         <div className="mt-20 text-center">
           <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
-            <h3 className="text-2xl font-bold text-purple-900 mb-6">
+            <h3 className="text-2xl font-bold font-subheading text-purple-900 mb-6">
               Why Choose Us?
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

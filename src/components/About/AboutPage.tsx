@@ -142,20 +142,24 @@ export default function AboutPage() {
           </section>
         ))}
         {/* Stats Section */}
-
-        <div className="flex justify-center items-center py-16">
-          <div className="flex flex-col md:flex-row bg-[#4F4742] rounded-2xl overflow-hidden text-[#F5CDB0] shadow-lg divide-y md:divide-y-0 md:divide-x divide-[#6B615A] w-full max-w-5xl mx-4">
-            {aboutData?.stats?.map((stat, index) => (
+        <div className="flex justify-center items-center py-16 w-full px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-6xl">
+            {[
+              { value: "10+", label: "Years of Experience" },
+              { value: "5000+", label: "Happy Lives" },
+              { value: "1000+", label: "Kundli Analysis Completed" },
+              { value: "95%", label: "Client Satisfaction Rate" }
+            ].map((stat, index) => (
               <div
-                key={stat._id || index}
-                className="flex items-center justify-center gap-3 sm:gap-4 px-8 sm:px-12 py-6 sm:py-10 flex-1"
+                key={index}
+                className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-purple-100 shadow-md transition-all duration-300 hover:scale-105"
               >
-                <h2 className="text-3xl sm:text-4xl font-serif font-medium">
+                <div className="text-3xl md:text-4xl font-bold text-purple-600">
                   {stat.value}
-                </h2>
-                <p className="text-xs sm:text-sm text-gray-200 text-center sm:text-left">
+                </div>
+                <div className="text-gray-600 mt-2 text-xs md:text-sm font-medium">
                   {stat.label}
-                </p>
+                </div>
               </div>
             ))}
           </div>

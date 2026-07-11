@@ -160,8 +160,10 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   };
 
   const handleMouseEnter = () => {
-    if (loadedImages.has(selectedImage)) {
-      setShowZoom(true);
+    if (typeof window !== "undefined" && window.innerWidth >= 1024) {
+      if (loadedImages.has(selectedImage)) {
+        setShowZoom(true);
+      }
     }
   };
 
@@ -368,7 +370,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
               {/* Main Image Container with Amazon-style Zoom */}
               <div className="flex-1 order-1 lg:order-2 relative">
-                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-gradient-to-br from-pink-100 to-blue-50 shadow-inner h-[70vh] w-full">
+                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-gradient-to-br from-pink-100 to-blue-50 shadow-inner h-[45vh] sm:h-[55vh] md:h-[60vh] lg:h-[70vh] w-full">
                   {selectedMedia.type === "video" ? (
                     <div className="w-full h-full bg-black relative flex items-center justify-center">
                       <video

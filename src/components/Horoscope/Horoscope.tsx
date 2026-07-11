@@ -187,7 +187,7 @@ const Horoscope = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1
-            className={`text-4xl md:text-6xl font-bold text-purple-800 mb-4 transition-all duration-1000 ${
+            className={`text-4xl md:text-6xl font-bold font-heading text-purple-800 mb-4 transition-all duration-1000 ${
               isVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
@@ -232,12 +232,12 @@ const Horoscope = () => {
           /* Zodiac Signs Grid */
           <>
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-purple-700 mb-4">
+              <h2 className="text-3xl font-bold font-heading text-purple-700 mb-4">
                 {language === "english"
                   ? "Choose Your Zodiac Sign"
                   : "अपनी राशि चुनें"}
               </h2>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              <p className="text-lg font-subheading text-gray-600 max-w-3xl mx-auto">
                 {language === "english"
                   ? "Select your zodiac sign to discover personalized predictions"
                   : "व्यक्तिगत भविष्यवाणियों की खोज करने के लिए अपनी राशि चुनें"}
@@ -270,7 +270,7 @@ const Horoscope = () => {
                       </div>
 
                       {/* Zodiac Name */}
-                      <h3 className="text-lg font-bold text-center text-gray-800 mb-2">
+                      <h3 className="text-lg font-bold font-subheading text-center text-gray-800 mb-2">
                         {language === "english"
                           ? zodiac.name
                           : zodiac.nameHindi}
@@ -339,7 +339,7 @@ const Horoscope = () => {
                       )}
                     </div>
                     <div>
-                      <h2 className="text-4xl font-bold text-purple-800">
+                      <h2 className="text-4xl font-bold font-heading text-purple-800">
                         {language === "english"
                           ? selectedZodiac.name
                           : selectedZodiac.nameHindi}
@@ -417,7 +417,7 @@ const Horoscope = () => {
                     <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
                       {index + 1}
                     </div>
-                    <h3 className="text-2xl font-bold text-purple-800">
+                    <h3 className="text-2xl font-bold font-heading text-purple-800">
                       {language === "english"
                         ? prediction.rishiName || "Ancient Sage"
                         : prediction.rishiNameHindi || "प्राचीन ऋषि"}
@@ -425,7 +425,7 @@ const Horoscope = () => {
                   </div>
 
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-400">
-                    <p className="text-lg leading-relaxed text-gray-700 whitespace-pre-line text-left">
+                    <p className="text-lg leading-relaxed font-subheading text-gray-700 whitespace-pre-line text-left">
                       {language === "english"
                         ? prediction.prediction
                         : prediction.predictionHindi || prediction.prediction}

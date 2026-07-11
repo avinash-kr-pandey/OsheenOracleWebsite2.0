@@ -322,7 +322,12 @@ const SingleBlogPage = () => {
                   {blog.content &&
                     blog.content
                       .split("\n")
-                      .map((paragraph, idx) => <p key={idx}>{paragraph}</p>)}
+                      .map((paragraph, idx) => (
+                        <p
+                          key={idx}
+                          dangerouslySetInnerHTML={{ __html: paragraph }}
+                        />
+                      ))}
                 </div>
               </div>
 
