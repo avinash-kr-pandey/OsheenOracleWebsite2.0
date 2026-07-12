@@ -114,7 +114,7 @@ const ZodiacDetails = () => {
       }
 
       // If API returned valid data, use it
-      if (item && item.id) {
+      if (item && (item._id || item.id)) {
         console.log("✅ Using API data for item");
         setCatalogueItem(item);
         setUsingStaticData(false);
@@ -175,40 +175,47 @@ const ZodiacDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex items-center justify-center p-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      <div className="flex flex-col min-h-screen bg-[#C4F9FF]">
+        <CommonPageHeader title="Book Your Reading" subtitle="Home - Booking" />
+        <div className="flex justify-center items-center flex-grow">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600 font-medium">Loading details...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error || !catalogueItem) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex items-center justify-center p-4">
-        <div className="text-center max-w-2xl mx-auto">
-          <div className="w-24 h-24 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Sparkles className="w-12 h-12 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Reading Not Found
-          </h2>
-          <p className="text-gray-600 mb-6">
-            The reading you&apos;re looking for doesn&apos;t exist.
-            <br />
-            <span className="text-sm text-gray-400">ID: {id}</span>
-          </p>
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={() => router.back()}
-              className="bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-semibold hover:bg-gray-300 transition"
-            >
-              Go Back
-            </button>
-            <button
-              onClick={() => router.push("/")}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition"
-            >
-              Browse Catalogue
-            </button>
+      <div className="flex flex-col min-h-screen bg-[#C4F9FF]">
+        <CommonPageHeader title="Book Your Reading" subtitle="Home - Booking" />
+        <div className="flex justify-center items-center flex-grow py-12">
+          <div className="text-center p-8 bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-gray-100 max-w-md mx-auto">
+            <div className="text-5xl mb-4">⚠️</div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              Reading Not Found
+            </h2>
+            <p className="text-gray-600 mb-6">
+              The reading you&apos;re looking for doesn&apos;t exist or is currently unavailable.
+              <br />
+              <span className="text-xs text-gray-400 mt-2 block">ID: {id}</span>
+            </p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => router.back()}
+                className="bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-semibold hover:bg-gray-300 transition cursor-pointer"
+              >
+                Go Back
+              </button>
+              <button
+                onClick={() => router.push("/")}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition cursor-pointer"
+              >
+                Browse Catalogue
+              </button>
+            </div>
           </div>
         </div>
       </div>
