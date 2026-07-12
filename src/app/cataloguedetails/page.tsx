@@ -251,7 +251,10 @@ const CatalogueDetails = () => {
                   {item.element && (
                     <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-md border border-purple-100">
                       <Zap className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
-                      <span className="text-[10px] font-bold text-gray-800 uppercase tracking-wider font-heading">
+                      <span 
+                        className="text-[10px] font-bold text-gray-800 uppercase tracking-wider"
+                        style={{ fontFamily: "var(--font-montserrat)" }}
+                      >
                         {item.element}
                       </span>
                     </div>
@@ -267,7 +270,10 @@ const CatalogueDetails = () => {
                   </div>
 
                   {/* Name */}
-                  <h3 className="text-xl font-bold font-heading text-gray-800 mb-3 group-hover:text-purple-700 transition-colors tracking-wide min-h-[56px] flex items-center">
+                  <h3 
+                    className="text-xl font-bold text-gray-800 mb-3 group-hover:text-purple-700 transition-colors tracking-wide min-h-[56px] flex items-center"
+                    style={{ fontFamily: "var(--font-montserrat)" }}
+                  >
                     {item.name}
                   </h3>
 
@@ -279,7 +285,10 @@ const CatalogueDetails = () => {
                         ({item.rating || 4.5})
                       </span>
                     </div>
-                    <div className="text-xl font-extrabold text-purple-700 font-heading">
+                    <div 
+                      className="text-xl font-extrabold text-purple-700"
+                      style={{ fontFamily: "var(--font-montserrat)" }}
+                    >
                       ₹{item.price || 699}
                     </div>
                   </div>
@@ -320,7 +329,8 @@ const CatalogueDetails = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => router.push(`/catalogue/${item._id || item.id}`)}
-                    className="w-full mt-auto bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 text-white font-bold py-3.5 px-6 rounded-2xl hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer text-sm font-heading tracking-wider"
+                    className="w-full mt-auto bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 text-white font-bold py-3.5 px-6 rounded-2xl hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer text-sm tracking-wider"
+                    style={{ fontFamily: "var(--font-montserrat)" }}
                   >
                     <span>Get Your Reading</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1.5" />
