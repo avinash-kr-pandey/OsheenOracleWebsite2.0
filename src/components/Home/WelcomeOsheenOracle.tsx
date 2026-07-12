@@ -307,15 +307,6 @@ const WelcomeOsheenOracle = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-60 group-hover:opacity-0 transition-all duration-700"></div>
           </div>
-
-          <div className="absolute bottom-[-30px] right-[20px] sm:bottom-[-35px] sm:right-[35px] md:bottom-[-40px] md:right-[45px] w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 z-20">
-            <Image
-              src={defaultLogo}
-              alt="Overlay Logo"
-              fill
-              className="object-cover"
-            />
-          </div>
         </div>
       </div>
     </div>
