@@ -346,7 +346,7 @@ const ProductListing: React.FC = () => {
         <div
           className={`${
             showFilters ? "block" : "hidden"
-          } md:block w-full md:w-80 lg:w-96 md:sticky md:top-0 z-10 bg-[#C4F9FF] border-r border-gray-200`}
+          } md:block w-full md:w-72 lg:w-80 md:sticky md:top-0 z-10 bg-[#C4F9FF] border-r border-gray-200`}
         >
           <div className="h-full overflow-y-auto">
             <Filters

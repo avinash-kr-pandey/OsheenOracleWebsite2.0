@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import homeAPI, { CatalogueItem } from "@/utils/api/home.api";
 import { zodiacData } from "@/utils/AstroData";
 
+import { getFullImageUrl } from "@/utils/api/api";
+
 // Define the zodiac data type
 interface ZodiacDataType {
   id: number;
@@ -118,7 +120,7 @@ const SliderRow = ({ rowData }: { rowData: CatalogueItem[] }) => {
       return "/assets/placeholder-image.jpg";
     }
     return item.image && item.image !== ""
-      ? item.image
+      ? getFullImageUrl(item.image)
       : "/assets/placeholder-image.jpg";
   };
 

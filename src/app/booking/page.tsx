@@ -267,7 +267,7 @@ const UserDetailsModal = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 ${isEnergyHealing ? "" : "md:grid-cols-2"} gap-4`}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Phone Number *
@@ -283,24 +283,26 @@ const UserDetailsModal = ({
                   placeholder="Enter your phone number"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Communication Mode *
-                </label>
-                <select
-                  name="communicationMode"
-                  required
-                  value={formData.communicationMode}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-800"
-                >
-                  {isVideoCall ? (
-                    <option value="video_call">📹 Video Call Session</option>
-                  ) : (
-                    <option value="voice_call">📞 Voice Call</option>
-                  )}
-                </select>
-              </div>
+              {!isEnergyHealing && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Communication Mode *
+                  </label>
+                  <select
+                    name="communicationMode"
+                    required
+                    value={formData.communicationMode}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-800"
+                  >
+                    {isVideoCall ? (
+                      <option value="video_call">📹 Video Call Session</option>
+                    ) : (
+                      <option value="voice_call">📞 Voice Call</option>
+                    )}
+                  </select>
+                </div>
+              )}
             </div>
 
             <div>
@@ -333,23 +335,25 @@ const UserDetailsModal = ({
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Preferred Time Slot (Optional)
-                </label>
-                <select
-                  name="preferredTimeSlot"
-                  value={formData.preferredTimeSlot}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-800"
-                >
-                  <option value="">Select time slot</option>
-                  <option value="11:00 AM - 01:00 PM">11:00 AM - 01:00 PM</option>
-                  <option value="02:00 PM - 06:00 PM">02:00 PM - 06:00 PM</option>
-                </select>
+            {!isEnergyHealing && (
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Preferred Time Slot (Optional)
+                  </label>
+                  <select
+                    name="preferredTimeSlot"
+                    value={formData.preferredTimeSlot}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-800"
+                  >
+                    <option value="">Select time slot</option>
+                    <option value="11:00 AM - 01:00 PM">11:00 AM - 01:00 PM</option>
+                    <option value="02:00 PM - 06:00 PM">02:00 PM - 06:00 PM</option>
+                  </select>
+                </div>
               </div>
-            </div>
+            )}
 
             {isEnergyHealing && (
               <div className="flex items-start gap-3 p-4 bg-purple-50 rounded-xl border border-purple-100 select-none">

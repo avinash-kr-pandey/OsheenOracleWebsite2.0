@@ -193,42 +193,27 @@ const WelcomeOsheenOracle = () => {
 
   // Get current active tab data with proper return type
   const getCurrentData = (): CurrentData => {
-    if (!discoverData) {
-      return activeTab === "oracle" ? defaultOracleText : defaultMaaText;
-    }
-
     if (activeTab === "oracle") {
       return {
-        title: discoverData.osheenOracle?.title || defaultOracleText.title,
+        title: discoverData?.osheenOracle?.title || defaultOracleText.title,
         description:
-          discoverData.osheenOracle?.description ||
+          discoverData?.osheenOracle?.description ||
           defaultOracleText.description,
-        link: discoverData.osheenOracle?.link || defaultOracleText.link,
-        image: discoverData.osheenOracle?.image || defaultOracleText.image,
+        link: discoverData?.osheenOracle?.link || defaultOracleText.link,
+        image: discoverData?.osheenOracle?.image || defaultOracleText.image,
       };
     } else {
       return {
-        title: discoverData.osheenMaa?.title || defaultMaaText.title,
+        title: discoverData?.osheenMaa?.title || defaultMaaText.title,
         description:
-          discoverData.osheenMaa?.description || defaultMaaText.description,
-        link: discoverData.osheenMaa?.link || defaultMaaText.link,
-        image: discoverData.osheenMaa?.image || defaultMaaText.image,
+          discoverData?.osheenMaa?.description || defaultMaaText.description,
+        link: discoverData?.osheenMaa?.link || defaultMaaText.link,
+        image: discoverData?.osheenMaa?.image || defaultMaaText.image,
       };
     }
   };
 
   const currentData = getCurrentData();
-
-  if (loading) {
-    return (
-      <div className="relative min-h-screen flex items-center px-4 sm:px-6 lg:px-12 py-12 sm:py-16 md:py-24">
-        <div className="absolute inset-0 opacity-40 bg-[url('/assets/Group.png')] bg-no-repeat bg-left-top bg-contain pointer-events-none"></div>
-        <div className="relative max-w-7xl mx-auto w-full flex justify-center items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3D2E4F]"></div>
-        </div>
-      </div>
-    );
-  }
 
   if (error) {
     return (

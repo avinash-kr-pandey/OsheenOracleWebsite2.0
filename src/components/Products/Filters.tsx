@@ -109,7 +109,7 @@ const Filters: React.FC<FiltersProps> = ({
               </span>
             </div>
 
-            <div className="relative h-10 flex items-center">
+            <div className="relative h-10 flex items-center mx-2">
               {/* Slider Track */}
               <div className="absolute w-full h-1.5 bg-gray-200 rounded-lg"></div>
               

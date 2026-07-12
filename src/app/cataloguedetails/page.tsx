@@ -16,6 +16,8 @@ import CommonPageHeader from "@/components/CommonPages/CommonPageHeader";
 import homeAPI, { CatalogueItem } from "@/utils/api/home.api";
 import { zodiacData } from "@/utils/AstroData";
 
+import { getFullImageUrl } from "@/utils/api/api";
+
 // Map zodiacData to CatalogueItem format
 interface ZodiacDataType {
   id: number;
@@ -148,7 +150,7 @@ const CatalogueDetails = () => {
     if (imageErrors[idKey] || !item.image) {
       return "/images/default.jpg";
     }
-    return item.image;
+    return getFullImageUrl(item.image);
   };
 
   if (loading) {

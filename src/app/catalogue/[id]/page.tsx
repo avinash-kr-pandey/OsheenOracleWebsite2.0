@@ -21,6 +21,8 @@ import CommonPageHeader from "@/components/CommonPages/CommonPageHeader";
 import homeAPI, { CatalogueItem, ExpertGuide } from "@/utils/api/home.api";
 import { zodiacData } from "@/utils/AstroData";
 
+import { getFullImageUrl } from "@/utils/api/api";
+
 // Define the zodiac data type
 interface ZodiacDataType {
   id: number;
@@ -168,7 +170,7 @@ const ZodiacDetails = () => {
     if (imageError || !catalogueItem?.image) {
       return "/images/default.jpg";
     }
-    return catalogueItem.image;
+    return getFullImageUrl(catalogueItem.image);
   };
 
   if (loading) {

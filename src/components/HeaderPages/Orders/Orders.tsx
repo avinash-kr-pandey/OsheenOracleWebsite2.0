@@ -37,6 +37,9 @@ interface OrderApiResponse {
   productId?: string;
   shippingAddress?: string;
   paymentMethod?: string;
+  trackingId?: string;
+  deliveryDate?: string;
+  carrier?: string;
 }
 
 interface Order {
@@ -57,6 +60,7 @@ interface Order {
   orderDate?: string;
   shippingAddress?: string;
   paymentMethod?: string;
+  carrier?: string;
 }
 
 // Define proper API response types
@@ -192,6 +196,7 @@ const Orders = () => {
           orderDate: order.date || order.createdAt,
           shippingAddress: order.shippingAddress,
           paymentMethod: order.paymentMethod,
+          carrier: order.carrier || "",
         };
       });
 
@@ -863,6 +868,12 @@ const Orders = () => {
                       <span className="font-medium">Expected Delivery:</span>{" "}
                       {selectedOrder.deliveryDate || "Not available"}
                     </div>
+                    {selectedOrder.carrier && (
+                      <div>
+                        <span className="font-medium">Carrier:</span>{" "}
+                        {selectedOrder.carrier}
+                      </div>
+                    )}
                     <div>
                       <span className="font-medium">Payment Method:</span>{" "}
                       {selectedOrder.paymentMethod || "Credit Card"}
