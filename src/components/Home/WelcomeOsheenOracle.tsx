@@ -235,9 +235,6 @@ const WelcomeOsheenOracle = () => {
 
   return (
     <div className="relative min-h-screen flex items-center px-4 sm:px-6 lg:px-12 py-12 sm:py-16 md:py-24">
-      {/* Background Zodiac Style */}
-      <div className="absolute inset-0 opacity-40 bg-[url('/assets/Group.png')] bg-no-repeat bg-left-top bg-contain pointer-events-none"></div>
-
       <div className="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
         {/* Left Section */}
         <div className="text-center md:text-left">

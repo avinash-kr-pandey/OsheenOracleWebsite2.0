@@ -198,6 +198,40 @@ const Orders = () => {
     }
   };
 
+  const getServiceTrackingSteps = (status: string) => {
+    const s = status.toLowerCase();
+    
+    if (s === "cancelled") {
+      return [
+        { status: "Booking Submitted", completed: true, active: false },
+        { status: "Cancelled", completed: true, active: true, isError: true }
+      ];
+    }
+
+    return [
+      { 
+        status: "Booking Submitted", 
+        completed: true, 
+        active: s === "pending" 
+      },
+      { 
+        status: "Confirmed", 
+        completed: ["confirmed", "in_progress", "completed"].includes(s), 
+        active: s === "confirmed" 
+      },
+      { 
+        status: "Session in Progress", 
+        completed: ["in_progress", "completed"].includes(s), 
+        active: s === "in_progress" 
+      },
+      { 
+        status: "Completed", 
+        completed: s === "completed", 
+        active: s === "completed" 
+      },
+    ];
+  };
+
   const filteredRequests = requests.filter((req) => {
     if (activeRequestFilter === "all") return true;
     return req.status.toLowerCase() === activeRequestFilter.toLowerCase();
@@ -1119,17 +1153,17 @@ const Orders = () => {
                     </span>
                     <div
                       className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${getStatusColor(
-                        selectedOrder.status
+                        selectedOrder!.status
                       )}`}
                     >
-                      {getStatusIcon(selectedOrder.status)}
+                      {getStatusIcon(selectedOrder!.status)}
                       <span className="font-medium capitalize">
-                        {selectedOrder.status}
+                        {selectedOrder!.status}
                       </span>
                     </div>
                   </div>
                   <p className="text-gray-600 text-sm">
-                    {selectedOrder.reason}
+                    {selectedOrder!.reason}
                   </p>
                 </div>
 
@@ -1263,6 +1297,57 @@ const Orders = () => {
                       </p>
                     </div>
                   )}
+                </div>
+
+                {/* Session Booking Progress */}
+                <div className="bg-white rounded-xl p-5 border border-purple-100 shadow-sm">
+                  <h4 className="font-semibold text-purple-950 mb-4 flex items-center gap-2">
+                    <span>📍</span> Session Booking Progress
+                  </h4>
+                  <div className="relative space-y-4">
+                    {/* Connecting line */}
+                    <div className="absolute left-[11px] top-3 bottom-3 w-[2px] bg-purple-100 z-0" />
+                    
+                    {getServiceTrackingSteps(selectedRequest.status).map((step, idx) => (
+                      <div key={idx} className="relative flex items-center gap-4 z-10">
+                        <div
+                          className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
+                            step.completed
+                              ? step.isError
+                                ? "bg-red-500 text-white"
+                                : "bg-purple-600 text-white"
+                              : "bg-gray-100 text-gray-400 border border-gray-200"
+                          }`}
+                        >
+                          {step.completed ? (
+                            step.isError ? "✕" : "✓"
+                          ) : (
+                            idx + 1
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p
+                            className={`font-semibold text-sm ${
+                              step.completed
+                                ? step.isError
+                                  ? "text-red-600"
+                                  : "text-purple-900"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {step.status}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {step.active 
+                              ? `Current Stage`
+                              : step.completed 
+                                ? "Finished" 
+                                : "Awaiting previous steps"}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Session Details */}
