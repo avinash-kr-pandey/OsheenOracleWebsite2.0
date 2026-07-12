@@ -236,7 +236,7 @@ const SliderRow = ({ rowData }: { rowData: CatalogueItem[] }) => {
 
               <div className="mt-auto pt-3">
                 <button
-                  onClick={() => router.push(`/catalogue/${item.id}`)}
+                  onClick={() => router.push(`/catalogue/${item._id || item.id}`)}
                   className="w-full bg-[#62aec5] text-white text-sm font-medium py-2 px-6 
                                rounded-full hover:bg-[#5A4370] transition-all cursor-pointer"
                   style={{ fontFamily: "var(--font-montserrat)" }}

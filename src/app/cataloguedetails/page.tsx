@@ -319,7 +319,7 @@ const CatalogueDetails = () => {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => router.push(`/catalogue/${item.id}`)}
+                    onClick={() => router.push(`/catalogue/${item._id || item.id}`)}
                     className="w-full mt-auto bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 text-white font-bold py-3.5 px-6 rounded-2xl hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer text-sm font-heading tracking-wider"
                   >
                     <span>Get Your Reading</span>
