@@ -716,6 +716,8 @@ export const getFullImageUrl = (imagePath?: string): string => {
   
   if (
     imagePath.startsWith("/images/") ||
+    imagePath.startsWith("/assets/") ||
+    imagePath.startsWith("/media/") ||
     imagePath.startsWith("http://") ||
     imagePath.startsWith("https://") ||
     imagePath.startsWith("data:")
