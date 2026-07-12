@@ -101,6 +101,7 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import homeAPI, { DiscoverPath } from "@/utils/api/home.api";
+import { getFullImageUrl } from "@/utils/api/api";
 
 const Discover = () => {
   const [discoverPaths, setDiscoverPaths] = useState<DiscoverPath[]>([]);
@@ -217,7 +218,7 @@ const Discover = () => {
               {/* Image */}
               <div className="w-full md:w-1/2">
                 <Image
-                  src={imageUrl}
+                  src={getFullImageUrl(imageUrl)}
                   alt={service.title}
                   className="w-full h-[40vh] rounded-lg object-cover"
                   width={500}

@@ -105,6 +105,7 @@ import { motion } from "framer-motion";
 import homeAPI, {
   MediaSpotlight as MediaSpotlightType,
 } from "@/utils/api/home.api";
+import { getFullImageUrl } from "@/utils/api/api";
 
 const MediaSpotlight = () => {
   const [mediaItems, setMediaItems] = useState<MediaSpotlightType[]>([]);
@@ -253,7 +254,7 @@ const MediaSpotlight = () => {
                   {formattedId}
                 </span>
                 <Image
-                  src={item.logo}
+                  src={getFullImageUrl(item.logo)}
                   alt={item.title} // ← Changed from 'item.name' to 'item.title'
                   className="h-12 object-contain"
                   width={300}
@@ -261,7 +262,7 @@ const MediaSpotlight = () => {
                 />
               </div>
               <Image
-                src={item.image}
+                src={getFullImageUrl(item.image)}
                 alt={item.title} // ← Changed from 'item.name' to 'item.title'
                 className="rounded-md object-cover w-full"
                 width={300}
