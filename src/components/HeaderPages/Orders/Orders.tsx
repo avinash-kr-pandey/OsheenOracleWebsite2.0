@@ -102,7 +102,7 @@ const Orders = () => {
   const [selectedRating, setSelectedRating] = useState<number>(5);
 
   // Get authentication state - WITH TOKEN
-  const { token, isAuthenticated, user } = useAuth();
+  const { token, isAuthenticated, user, loading: authLoading } = useAuth();
   const { addToCart } = useCart();
 
   // Set auth token when component mounts or token changes
@@ -117,6 +117,8 @@ const Orders = () => {
 
   // Fetch orders when authenticated
   useEffect(() => {
+    if (authLoading) return; // Wait until AuthContext initializes
+
     if (isAuthenticated && token) {
       console.log("Fetching orders for user:", user?.email);
       fetchOrders();
@@ -125,7 +127,7 @@ const Orders = () => {
       setLoading(false);
       toast.error("Please login to view orders");
     }
-  }, [isAuthenticated, token, user]);
+  }, [isAuthenticated, token, user, authLoading]);
 
   const fetchOrders = async () => {
     if (!isAuthenticated || !token) {
@@ -465,6 +467,18 @@ const Orders = () => {
 
     return originalPriceNum > priceNum ? originalPriceNum - priceNum : 0;
   };
+
+  // Show loading spinner if auth is loading
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-amber-50 py-8 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Verifying session...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Show login prompt if not authenticated
   if (!isAuthenticated) {
