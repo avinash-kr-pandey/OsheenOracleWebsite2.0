@@ -12,7 +12,7 @@
 
 /* Root variables (light mode defaults) */
 :root {
-  --background: #ffffff;  
+  --background: #C4F9FF;  
   --foreground: #3D2E4F;   
 
   /* Fonts */
@@ -28,7 +28,7 @@
 /* Dark mode (if needed) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #ffffff;
+    --background: #C4F9FF;
     --foreground: #1f1f1f;
   }
 }
