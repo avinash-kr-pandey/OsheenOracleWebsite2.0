@@ -370,6 +370,7 @@ const ProductListing: React.FC = () => {
               availableCategories={filterOptions.categories}
               availableProductCatalogues={availableProductCatalogues}
               availableSubCategories={availableSubCategories}
+              maxPriceLimit={filterOptions.maxPrice || 10000}
             />
           </div>
         </div>

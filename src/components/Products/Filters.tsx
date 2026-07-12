@@ -24,6 +24,7 @@ interface FiltersProps {
   availableCategories?: string[];
   availableProductCatalogues?: string[];
   availableSubCategories?: string[];
+  maxPriceLimit?: number;
 }
 
 const Filters: React.FC<FiltersProps> = ({
@@ -68,10 +69,11 @@ const Filters: React.FC<FiltersProps> = ({
     "Protection",
     "Healing",
   ],
+  maxPriceLimit = 10000,
 }) => {
   const hasActiveFilters =
     minPrice > 0 ||
-    maxPrice < 10000 ||
+    maxPrice < maxPriceLimit ||
     selectedGenders.length > 0 ||
     selectedSizes.length > 0 ||
     selectedCategories.length > 0 ||
@@ -117,8 +119,8 @@ const Filters: React.FC<FiltersProps> = ({
               <div 
                 className="absolute h-1.5 bg-red-500 rounded-lg transition-all duration-200"
                 style={{
-                  left: `${(minPrice / 10000) * 100}%`,
-                  right: `${100 - (maxPrice / 10000) * 100}%`
+                  left: `${(minPrice / maxPriceLimit) * 100}%`,
+                  right: `${100 - (maxPrice / maxPriceLimit) * 100}%`
                 }}
               ></div>
 
@@ -126,7 +128,7 @@ const Filters: React.FC<FiltersProps> = ({
               <input
                 type="range"
                 min={0}
-                max={10000}
+                max={maxPriceLimit}
                 step={50}
                 value={minPrice}
                 onChange={(e) => {
@@ -148,7 +150,7 @@ const Filters: React.FC<FiltersProps> = ({
               <input
                 type="range"
                 min={0}
-                max={10000}
+                max={maxPriceLimit}
                 step={50}
                 value={maxPrice}
                 onChange={(e) => {
@@ -171,8 +173,8 @@ const Filters: React.FC<FiltersProps> = ({
 
             <div className="flex justify-between text-xs text-gray-500 font-medium px-1">
               <span>₹0</span>
-              <span>₹5,000</span>
-              <span>₹10,000</span>
+              <span>₹{Math.round(maxPriceLimit / 2).toLocaleString('en-IN')}</span>
+              <span>₹{maxPriceLimit.toLocaleString('en-IN')}</span>
             </div>
           </div>
         </div>
