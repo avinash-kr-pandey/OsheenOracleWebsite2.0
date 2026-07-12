@@ -168,7 +168,7 @@ const ZodiacDetails = () => {
 
   const getDisplayImage = () => {
     if (imageError || !catalogueItem?.image) {
-      return "/images/default.jpg";
+      return "";
     }
     return getFullImageUrl(catalogueItem.image);
   };
@@ -238,16 +238,22 @@ const ZodiacDetails = () => {
           className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-gray-100"
         >
           <div className="flex flex-col lg:flex-row items-stretch">
-            {/* Image Section */}
+             {/* Image Section */}
             <div className="relative w-full lg:w-1/2 h-[380px] sm:h-[450px] lg:h-auto">
-              <Image
-                src={getDisplayImage()}
-                alt={catalogueItem.name}
-                fill
-                className="object-contain lg:object-cover w-full h-full transition-transform duration-700 group-hover:scale-105 rounded-t-3xl lg:rounded-l-3xl"
-                priority
-                onError={() => setImageError(true)}
-              />
+              {(!catalogueItem?.image || imageError) ? (
+                <div className="w-full h-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center min-h-[380px] rounded-t-3xl lg:rounded-l-3xl">
+                  <Sparkles className="w-16 h-16 text-purple-400" />
+                </div>
+              ) : (
+                <Image
+                  src={getDisplayImage()}
+                  alt={catalogueItem.name}
+                  fill
+                  className="object-contain lg:object-cover w-full h-full transition-transform duration-700 group-hover:scale-105 rounded-t-3xl lg:rounded-l-3xl"
+                  priority
+                  onError={() => setImageError(true)}
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent lg:rounded-l-3xl" />
               <div className="absolute bottom-6 left-6 text-white">
                 <motion.h1

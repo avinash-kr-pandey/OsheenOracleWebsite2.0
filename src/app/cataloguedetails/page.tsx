@@ -148,7 +148,7 @@ const CatalogueDetails = () => {
   const getDisplayImage = (item: CatalogueItem, index: number) => {
     const idKey = item._id || index.toString();
     if (imageErrors[idKey] || !item.image) {
-      return "/images/default.jpg";
+      return "";
     }
     return getFullImageUrl(item.image);
   };
@@ -229,16 +229,22 @@ const CatalogueDetails = () => {
               <div className="bg-white/90 backdrop-blur-md rounded-[23px] overflow-hidden flex flex-col h-full w-full">
                 {/* Image Section */}
                 <div className="relative h-60 w-full bg-gradient-to-br from-purple-50 to-pink-50 overflow-hidden flex-shrink-0 border-b border-gray-100">
-                  <Image
-                    src={getDisplayImage(item, index)}
-                    alt={item.name}
-                    fill
-                    className="object-contain p-4 transition-transform duration-700 group-hover:scale-110"
-                    onError={() => {
-                      const idKey = item._id || index.toString();
-                      setImageErrors((prev) => ({ ...prev, [idKey]: true }));
-                    }}
-                  />
+                  {(!item.image || imageErrors[item._id || index.toString()]) ? (
+                    <div className="w-full h-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                      <Sparkles className="w-12 h-12 text-purple-400" />
+                    </div>
+                  ) : (
+                    <Image
+                      src={getDisplayImage(item, index)}
+                      alt={item.name}
+                      fill
+                      className="object-contain p-4 transition-transform duration-700 group-hover:scale-110"
+                      onError={() => {
+                        const idKey = item._id || index.toString();
+                        setImageErrors((prev) => ({ ...prev, [idKey]: true }));
+                      }}
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent" />
                   
                   {/* Element Badge */}

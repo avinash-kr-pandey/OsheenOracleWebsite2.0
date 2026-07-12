@@ -116,12 +116,9 @@ const SliderRow = ({ rowData }: { rowData: CatalogueItem[] }) => {
   };
 
   const getImageSrc = (item: CatalogueItem, index: number) => {
-    if (imageErrors[item._id || index.toString()]) {
-      return "/assets/placeholder-image.jpg";
-    }
     return item.image && item.image !== ""
       ? getFullImageUrl(item.image)
-      : "/assets/placeholder-image.jpg";
+      : "";
   };
 
   if (!rowData || rowData.length === 0) {
@@ -175,18 +172,24 @@ const SliderRow = ({ rowData }: { rowData: CatalogueItem[] }) => {
                          w-[260px] sm:w-[280px] lg:w-[300px] h-[520px] flex flex-col"
             >
               <div className="relative w-full h-[200px] overflow-hidden flex-shrink-0 bg-gray-100">
-                <Image
-                  src={getImageSrc(item, i)}
-                  alt={item.name || "Product image"}
-                  fill
-                  className="object-cover transform transition-transform duration-500 hover:scale-105"
-                  onError={() => {
-                    setImageErrors((prev) => ({
-                      ...prev,
-                      [item._id || i.toString()]: true,
-                    }));
-                  }}
-                />
+                {(!item.image || imageErrors[item._id || i.toString()]) ? (
+                  <div className="w-full h-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                    <Sparkles className="w-12 h-12 text-purple-400" />
+                  </div>
+                ) : (
+                  <Image
+                    src={getImageSrc(item, i)}
+                    alt={item.name || "Product image"}
+                    fill
+                    className="object-cover transform transition-transform duration-500 hover:scale-105"
+                    onError={() => {
+                      setImageErrors((prev) => ({
+                        ...prev,
+                        [item._id || i.toString()]: true,
+                      }));
+                    }}
+                  />
+                )}
               </div>
 
               <div className="flex flex-col flex-grow p-4">
