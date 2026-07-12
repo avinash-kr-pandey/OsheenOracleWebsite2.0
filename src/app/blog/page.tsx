@@ -69,9 +69,9 @@ const BlogSlider: React.FC = () => {
         className="px-8 py-12 relative"
         style={{ fontFamily: "var(--font-montserrat)" }}
       >
-        <p className="md:text-lg text-md mb-2 text-[#3D2E4F]">BLOG</p>
-        <h2 className="md:text-5xl text-2xl mb-8 text-[#3D2E4F] py-3">
-          Cosmic <span className="italic">Stories</span> from Celestial
+        <p className="md:text-lg text-md mb-2 text-[#3D2E4F] tracking-wider uppercase">BLOG</p>
+        <h2 className="md:text-5xl text-2xl mb-8 text-[#3D2E4F] py-3 leading-tight">
+          Cosmic <span className="italic text-[#62aec5]">Stories</span> from Celestial
         </h2>
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
@@ -91,8 +91,8 @@ const BlogSlider: React.FC = () => {
       <div className="flex justify-between items-end mb-8 w-full gap-4">
         <div>
           <p className="md:text-lg text-sm mb-1 text-[#3D2E4F] font-semibold tracking-wider uppercase">BLOG</p>
-          <h2 className="md:text-5xl text-xl sm:text-2xl text-[#3D2E4F] py-1 font-bold leading-tight">
-            Cosmic <span className="italic font-serif text-[#62aec5]">Stories</span> <span className="hidden sm:inline">from Celestial</span>
+          <h2 className="md:text-5xl text-xl sm:text-2xl text-[#3D2E4F] py-1 leading-tight">
+            Cosmic <span className="italic text-[#62aec5]">Stories</span> <span className="hidden sm:inline">from Celestial</span>
           </h2>
         </div>
 
