@@ -1485,14 +1485,14 @@ const Login = () => {
           />
 
           <div className="relative z-10 lg:block pt-10 md:pt-20">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#636363] mb-3 lg:mb-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#3D2E4F] mb-3 lg:mb-4">
               Let's the
             </h1>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#636363] mb-4 lg:mb-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#3D2E4F] mb-4 lg:mb-6">
               healing begin
             </h1>
 
-            <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 mb-4 lg:mb-6 text-left">
+            <p className="text-gray-900 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 mb-4 lg:mb-6 text-left">
               Join thousands of people who trust our
               spiritual guidance to find clarity in love, career,
               and life. Sign in to access your personal
