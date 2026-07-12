@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import homeAPI, { CatalogueItem } from "@/utils/api/home.api";
@@ -159,94 +159,94 @@ const SliderRow = ({ rowData }: { rowData: CatalogueItem[] }) => {
         </div>
       </div>
 
-      <div 
-        ref={containerRef} 
+      <div
+        ref={containerRef}
         className="flex gap-4 sm:gap-6 py-4 overflow-x-auto snap-x snap-mandatory mt-8 sm:mt-10 scrollbar-hide w-full"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-          {rowData.map((item, i) => (
-            <div
-              key={item._id || i}
-              className="card flex-shrink-0 snap-start rounded-2xl transition-all bg-white overflow-hidden
+        {rowData.map((item, i) => (
+          <div
+            key={item._id || i}
+            className="card flex-shrink-0 snap-start rounded-2xl transition-all bg-white overflow-hidden
                          shadow-md hover:shadow-xl duration-300
                          w-[260px] sm:w-[280px] lg:w-[300px] h-[520px] flex flex-col"
-            >
-              <div className="relative w-full h-[200px] overflow-hidden flex-shrink-0 bg-gray-100">
-                {(!item.image || imageErrors[item._id || i.toString()]) ? (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
-                    <Sparkles className="w-12 h-12 text-purple-400" />
-                  </div>
-                ) : (
-                  <Image
-                    src={getImageSrc(item, i)}
-                    alt={item.name || "Product image"}
-                    fill
-                    className="object-cover transform transition-transform duration-500 hover:scale-105"
-                    onError={() => {
-                      setImageErrors((prev) => ({
-                        ...prev,
-                        [item._id || i.toString()]: true,
-                      }));
-                    }}
-                  />
-                )}
+          >
+            <div className="relative w-full h-[200px] overflow-hidden flex-shrink-0 bg-gray-100">
+              {(!item.image || imageErrors[item._id || i.toString()]) ? (
+                <div className="w-full h-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                  <Sparkles className="w-12 h-12 text-purple-400" />
+                </div>
+              ) : (
+                <Image
+                  src={getImageSrc(item, i)}
+                  alt={item.name || "Product image"}
+                  fill
+                  className="object-cover transform transition-transform duration-500 hover:scale-105"
+                  onError={() => {
+                    setImageErrors((prev) => ({
+                      ...prev,
+                      [item._id || i.toString()]: true,
+                    }));
+                  }}
+                />
+              )}
+            </div>
+
+            <div className="flex flex-col flex-grow p-4">
+              <h3
+                className="text-lg sm:text-xl font-semibold text-[#3D2E4F] mb-1 line-clamp-1"
+                style={{ fontFamily: "var(--font-montserrat)" }}
+              >
+                {item.name}
+              </h3>
+
+              <div className="flex items-center gap-1 mb-2">
+                <div className="flex items-center gap-0.5">
+                  {renderStars(item.rating || 4.5)}
+                </div>
+                <span className="text-xs text-gray-500 ml-1">
+                  ({item.rating || 4.5})
+                </span>
               </div>
 
-              <div className="flex flex-col flex-grow p-4">
-                <h3
-                  className="text-lg sm:text-xl font-semibold text-[#3D2E4F] mb-1 line-clamp-1"
+              <div className="mb-2">
+                <span className="text-xl font-bold text-[#62aec5]">
+                  ₹{item.price || 699}
+                </span>
+              </div>
+
+              <div className="flex-grow">
+                <p className="text-sm text-gray-600 line-clamp-3">
+                  {item.description || "No description available"}
+                </p>
+              </div>
+
+              {item.traits && item.traits.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {item.traits.slice(0, 3).map((trait, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full"
+                    >
+                      {trait}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-auto pt-3">
+                <button
+                  onClick={() => router.push(`/catalogue/${item.id}`)}
+                  className="w-full bg-[#62aec5] text-white text-sm font-medium py-2 px-6 
+                               rounded-full hover:bg-[#5A4370] transition-all cursor-pointer"
                   style={{ fontFamily: "var(--font-montserrat)" }}
                 >
-                  {item.name}
-                </h3>
-
-                <div className="flex items-center gap-1 mb-2">
-                  <div className="flex items-center gap-0.5">
-                    {renderStars(item.rating || 4.5)}
-                  </div>
-                  <span className="text-xs text-gray-500 ml-1">
-                    ({item.rating || 4.5})
-                  </span>
-                </div>
-
-                <div className="mb-2">
-                  <span className="text-xl font-bold text-[#62aec5]">
-                    ₹{item.price || 699}
-                  </span>
-                </div>
-
-                <div className="flex-grow">
-                  <p className="text-sm text-gray-600 line-clamp-3">
-                    {item.description || "No description available"}
-                  </p>
-                </div>
-
-                {item.traits && item.traits.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {item.traits.slice(0, 3).map((trait, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full"
-                      >
-                        {trait}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="mt-auto pt-3">
-                  <button
-                    onClick={() => router.push(`/catalogue/${item.id}`)}
-                    className="w-full bg-[#62aec5] text-white text-sm font-medium py-2 px-6 
-                               rounded-full hover:bg-[#5A4370] transition-all cursor-pointer"
-                    style={{ fontFamily: "var(--font-montserrat)" }}
-                  >
-                    View Details
-                  </button>
-                </div>
+                  View Details
+                </button>
               </div>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
     </div>
   );
