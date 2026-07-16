@@ -12,6 +12,7 @@ import profileApi, {
   ChangePasswordData,
   type ProfileImageResponse,
 } from "@/utils/api/profile.api";
+import { membershipApi } from "@/utils/api/becomeamember.api";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -22,6 +23,11 @@ const ProfilePage = () => {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  
+  // Membership states
+  const [membershipData, setMembershipData] = useState<any>(null);
+  const [membershipPlans, setMembershipPlans] = useState<any[]>([]);
+  const [loadingMembership, setLoadingMembership] = useState(false);
 
   const { user, isAuthenticated, updateUser } = useAuth();
   const router = useRouter();
@@ -91,6 +97,27 @@ const ProfilePage = () => {
       setDataLoaded(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "membership" && isAuthenticated) {
+      fetchMembershipDetails();
+    }
+  }, [activeTab, isAuthenticated]);
+
+  const fetchMembershipDetails = async () => {
+    try {
+      setLoadingMembership(true);
+      const res = await membershipApi.getMyMembership();
+      if (res.success && res.data) {
+        setMembershipData(res.data);
+        setMembershipPlans(res.plans || []);
+      }
+    } catch (err) {
+      console.error("Error fetching membership:", err);
+    } finally {
+      setLoadingMembership(false);
     }
   };
 
@@ -466,7 +493,7 @@ const ProfilePage = () => {
         {/* Tabs */}
         <div className="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden">
           <div className="flex overflow-x-auto border-b border-gray-200">
-            {["profile", "orders", "addresses"].map((tab) => (
+            {["profile", "orders", "addresses", "membership"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => {
@@ -895,6 +922,79 @@ const ProfilePage = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Membership Tab */}
+          {activeTab === "membership" && (
+            <div className="p-4 md:p-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">
+                Membership Management
+              </h2>
+              {loadingMembership ? (
+                <div className="flex justify-center py-10">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
+                </div>
+              ) : membershipData ? (
+                <div className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 border border-purple-100 rounded-3xl p-6 md:p-8 shadow-sm">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-pink-600 px-3 py-1 bg-pink-100/50 rounded-full">
+                        Active Subscription
+                      </span>
+                      <h3 className="text-2xl font-bold text-gray-800 mt-3">
+                        {(() => {
+                          const planObj = membershipPlans.find(p => p._id === membershipData.plan || p.id === membershipData.plan);
+                          return planObj ? planObj.name : "Exclusive Plan";
+                        })()}
+                      </h3>
+                      <p className="text-gray-500 text-sm mt-1">
+                        Status: <span className="capitalize font-semibold text-green-600">{membershipData.status}</span>
+                      </p>
+                    </div>
+                    
+                    <div className="text-left md:text-right bg-white/70 backdrop-blur px-4 py-3 rounded-2xl border border-white/80">
+                      <p className="text-xs text-gray-400 font-medium">Valid Until</p>
+                      <p className="text-lg font-bold text-purple-700 mt-0.5">
+                        {membershipData.subscriptionEndDate ? new Date(membershipData.subscriptionEndDate).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric"
+                        }) : "Never"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-purple-100 pt-6 flex flex-wrap gap-4">
+                    <button
+                      onClick={() => router.push(`/details/${membershipData.plan || membershipData._id}`)}
+                      className="px-6 py-3 bg-gradient-to-r from-pink-500 to-amber-500 hover:shadow-lg text-white font-semibold rounded-xl text-sm transition-all cursor-pointer"
+                    >
+                      Extend Subscription
+                    </button>
+                    <button
+                      onClick={() => router.push("/#become-a-member")}
+                      className="px-6 py-3 bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 font-semibold rounded-xl text-sm transition-all cursor-pointer"
+                    >
+                      Upgrade Subscription
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-gray-50 border border-gray-100 rounded-3xl p-6">
+                  <div className="text-4xl mb-4">✨</div>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2">No Active Membership</h3>
+                  <p className="text-gray-500 max-w-md mx-auto mb-6 text-sm">
+                    You are not a member of the sacred circle yet. Join now to unlock divine guidance, exclusive horoscope predictions, and custom energy alignment.
+                  </p>
+                  <button
+                    onClick={() => router.push("/#become-a-member")}
+                    className="px-6 py-3 bg-gradient-to-r from-pink-500 to-amber-500 text-white font-semibold rounded-xl text-sm hover:shadow-lg transition-all cursor-pointer"
+                  >
+                    Explore Membership Plans
+                  </button>
                 </div>
               )}
             </div>

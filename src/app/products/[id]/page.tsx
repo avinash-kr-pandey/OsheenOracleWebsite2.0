@@ -6,6 +6,8 @@ import ProductReviews from "./ProductReviews";
 import RecommendedProducts from "./RecommendedProducts";
 import { Product } from "@/types/product";
 
+export const dynamic = "force-dynamic";
+
 // ✅ Generate static paths
 export async function generateStaticParams() {
   try {

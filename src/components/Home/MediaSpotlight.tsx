@@ -1,9 +1,11 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import homeAPI from "@/utils/api/home.api";
+import { getFullImageUrl } from "@/utils/api/api";
 
-const mediaData = [
+const DEFAULT_MEDIA_SPOTLIGHT = [
   {
     id: "01",
     name: "ZEE NEWS",
@@ -35,6 +37,25 @@ const mediaData = [
 ];
 
 const MediaSpotlight = () => {
+  const [spotlights, setSpotlights] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchSpotlights = async () => {
+      try {
+        const response = await homeAPI.getMediaSpotlight();
+        if (response && Array.isArray(response) && response.length > 0) {
+          setSpotlights(response);
+        } else {
+          setSpotlights(DEFAULT_MEDIA_SPOTLIGHT);
+        }
+      } catch (err) {
+        console.error("Failed to load spotlights:", err);
+        setSpotlights(DEFAULT_MEDIA_SPOTLIGHT);
+      }
+    };
+    fetchSpotlights();
+  }, []);
+
   return (
     <div
       className="py-12 flex flex-col items-center max-w-6xl mx-auto"
@@ -54,43 +75,46 @@ const MediaSpotlight = () => {
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-        {mediaData.map((item, index) => (
-          <motion.a
-            key={item.id}
-            href={item.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center cursor-pointer transform perspective-1000 hover:shadow-xl transition-shadow"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.2, duration: 0.6 }}
-            whileHover={{
-              rotateY: 10,
-              scale: 1.05,
-              transition: { duration: 0.3 },
-            }}
-          >
-            <div className="flex items-center mb-4">
-              <span className="text-5xl font-bold text-gray-400 mr-2">
-                {item.id}
-              </span>
+        {spotlights.map((item, index) => {
+          const serialNumber = (index + 1).toString().padStart(2, "0");
+          return (
+            <motion.a
+              key={item._id || item.id || index}
+              href={item.link || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center cursor-pointer transform perspective-1000 hover:shadow-xl transition-shadow"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.2, duration: 0.6 }}
+              whileHover={{
+                rotateY: 10,
+                scale: 1.05,
+                transition: { duration: 0.3 },
+              }}
+            >
+              <div className="flex items-center mb-4">
+                <span className="text-5xl font-bold text-gray-400 mr-2">
+                  {serialNumber}
+                </span>
+                <Image
+                  src={getFullImageUrl(item.logo)}
+                  alt={item.name || "Media"}
+                  className="h-12 object-contain"
+                  width={300}
+                  height={300}
+                />
+              </div>
               <Image
-                src={item.logo}
-                alt={item.name}
-                className="h-12 object-contain"
+                src={getFullImageUrl(item.image)}
+                alt={item.name || "Media Highlight"}
+                className="rounded-md object-cover w-full"
                 width={300}
                 height={300}
               />
-            </div>
-            <Image
-              src={item.image}
-              alt={item.name}
-              className="rounded-md object-cover w-full"
-              width={300}
-              height={300}
-            />
-          </motion.a>
-        ))}
+            </motion.a>
+          );
+        })}
       </div>
     </div>
   );

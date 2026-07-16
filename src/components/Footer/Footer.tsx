@@ -84,6 +84,7 @@ const Footer = () => {
     { name: "About Us", link: "/about" },
     { name: "Services", link: "/services/ourpackages" },
     { name: "Horoscope", link: "/horoscope" },
+    { name: "FAQ", link: "/faq" },
     { name: "Contact Us", link: "/contact" },
   ];
 

@@ -130,4 +130,16 @@ export const membershipApi = {
       throw error;
     }
   },
+
+  getMyMembership: async (): Promise<ApiResponse<any> & { plans?: any[] }> => {
+    try {
+      const response = await fetchData<ApiResponse<any> & { plans?: any[] }>(
+        "/becomeamember/my-membership",
+      );
+      return response;
+    } catch (error: unknown) {
+      console.error("Error fetching my membership:", error);
+      throw error;
+    }
+  },
 };
