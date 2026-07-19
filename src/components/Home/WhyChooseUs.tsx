@@ -241,7 +241,7 @@ const WhyChooseUs = () => {
 
         <div className="relative max-w-7xl mx-auto">
           {/* Header */}
-          <h2 className="text-4xl sm:text-5xl font-serif mb-4 text-gray-900">
+          <h2 className="text-4xl sm:text-5xl font-bold font-heading mb-4 text-[#89308A]">
             Why Choose Us
           </h2>
           <p className="text-xl text-gray-700 font-medium">

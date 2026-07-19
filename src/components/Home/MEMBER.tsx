@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 const MEMBER = () => {
@@ -18,15 +19,13 @@ const MEMBER = () => {
       {/* Content */}
       <div className="px-4 sm:px-6 md:px-10 lg:px-20 relative z-10">
         <h1
-          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4 tracking-wide"
-          style={{ fontFamily: "Alegreya, serif", color: "#F4DF4E" }}
+          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold font-heading mb-4 tracking-wide text-[#F4DF4E]"
         >
           BECOME A MEMBER
         </h1>
 
         <p
-          className="text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-8 leading-relaxed text-white"
-          style={{ fontFamily: "Alegreya, serif" }}
+          className="text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-8 leading-relaxed text-white font-body"
         >
           Step into a world of cosmic wisdom. As a member of Osheen Oracle, you
           receive exclusive access to personalized guidance, weekly astrological
@@ -34,13 +33,15 @@ const MEMBER = () => {
           crafted to transform your life with clarity, confidence, and purpose.
         </p>
 
-        <button
-          className="bg-[#F4DF4E] text-[#3d285a] font-semibold py-3 px-12 
-                     cursor-pointer rounded-full hover:bg-[#e9cc42] shadow-lg 
-                     transition-all duration-300 text-base md:text-lg"
-        >
-          Join Now
-        </button>
+        <Link href="/#become-a-member">
+          <button
+            className="bg-[#F4DF4E] text-[#3d285a] font-semibold py-3 px-12 
+                       cursor-pointer rounded-full hover:bg-[#e9cc42] shadow-lg 
+                       transition-all duration-300 text-base md:text-lg"
+          >
+            Join Now
+          </button>
+        </Link>
       </div>
     </div>
   );

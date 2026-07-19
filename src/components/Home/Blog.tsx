@@ -191,7 +191,7 @@ const BlogSlider: React.FC = () => {
                     {cardBlog.date} • {cardBlog.category}
                   </p>
 
-                  <h3 className="text-lg sm:text-xl font-serif mb-2 sm:mb-3 line-clamp-2">
+                  <h3 className="text-lg sm:text-xl font-bold font-subheading mb-2 sm:mb-3 line-clamp-2">
                     {cardBlog.title}
                   </h3>
 

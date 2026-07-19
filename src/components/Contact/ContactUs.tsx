@@ -69,7 +69,7 @@ const ContactUs: React.FC = () => {
 
   return (
     <div>
-      <CommonPageHeader title="Contacts" subtitle="Home - Contact" />
+      <CommonPageHeader title="Contacts" subtitle="Home - Contact Us" />
       <div className="bg-[#C4F9FF] py-12 px-4 md:px-16 lg:px-24">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
           {/* Left Section */}

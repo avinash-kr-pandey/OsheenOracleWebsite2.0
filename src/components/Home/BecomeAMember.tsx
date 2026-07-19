@@ -101,6 +101,7 @@ const BecomeAMember: React.FC = () => {
 
   return (
     <div
+      id="become-a-member"
       className="min-h-screen overflow-hidden relative"
       style={{
         fontFamily: "var(--font-montserrat)",

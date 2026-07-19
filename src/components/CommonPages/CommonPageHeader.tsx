@@ -1,12 +1,6 @@
 "use client";
 
 import React from "react";
-import { Sorts_Mill_Goudy } from "next/font/google";
-
-const sortsMillGoudy = Sorts_Mill_Goudy({
-  subsets: ["latin"],
-  weight: ["400"],
-});
 
 // Define props type
 interface CommonPageHeaderProps {
@@ -22,7 +16,7 @@ const CommonPageHeader: React.FC<CommonPageHeaderProps> = ({
 }) => {
   return (
     <section
-      className={`${sortsMillGoudy.className} relative min-h-[50vh] w-full overflow-hidden flex items-center justify-center py-16 md:py-24`}
+      className="relative min-h-[50vh] w-full overflow-hidden flex items-center justify-center py-16 md:py-24"
       style={{
         background:
           bg ||
@@ -30,9 +24,13 @@ const CommonPageHeader: React.FC<CommonPageHeaderProps> = ({
       }}
     >
       <div className="flex flex-col justify-center text-center pt-20">
-        <h1 className="text-5xl animate-fade-in-up">{title}</h1>
+        <h1 className="text-5xl md:text-6xl font-bold font-heading text-purple-800 animate-fade-in-up">
+          {title}
+        </h1>
         {subtitle && (
-          <p className="text-lg animate-fade-in-up mt-4">{subtitle}</p>
+          <p className="text-lg md:text-xl font-subheading text-[#9C2F50] animate-fade-in-up mt-4">
+            {subtitle}
+          </p>
         )}
       </div>
 

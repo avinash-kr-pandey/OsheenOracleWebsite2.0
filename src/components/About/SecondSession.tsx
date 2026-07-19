@@ -79,7 +79,7 @@ export default function SecondSession() {
         <div className="flex flex-col md:flex-row bg-[#4F4742] rounded-2xl overflow-hidden text-[#F5CDB0] shadow-lg divide-y md:divide-y-0 md:divide-x divide-[#6B615A]">
           {/* Item 1 */}
           <div className="flex items-center justify-center gap-3 sm:gap-4 px-8 sm:px-12 py-6 sm:py-10">
-            <h2 className="text-3xl sm:text-4xl font-serif font-medium">32k</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold font-subheading">32k</h2>
             <p className="text-xs sm:text-sm text-gray-200 text-center sm:text-left">
               Trusted clients
             </p>
@@ -87,7 +87,7 @@ export default function SecondSession() {
 
           {/* Item 2 */}
           <div className="flex items-center justify-center gap-3 sm:gap-4 px-8 sm:px-12 py-6 sm:py-10">
-            <h2 className="text-3xl sm:text-4xl font-serif font-medium">69m</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold font-subheading">69m</h2>
             <p className="text-xs sm:text-sm text-gray-200 text-center sm:text-left">
               Predicted moves
             </p>
@@ -95,7 +95,7 @@ export default function SecondSession() {
 
           {/* Item 3 */}
           <div className="flex items-center justify-center gap-3 sm:gap-4 px-8 sm:px-12 py-6 sm:py-10">
-            <h2 className="text-3xl sm:text-4xl font-serif font-medium">4.8</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold font-subheading">4.8</h2>
             <p className="text-xs sm:text-sm text-gray-200 text-center sm:text-left">
               Top rated users
             </p>

@@ -333,7 +333,7 @@ const PlanDetailsPage = () => {
             The spiritual plan you&rsquo;re looking for doesn&rsquo;t exist.
           </p>
           <Link
-            href="/become-a-member"
+            href="/#become-a-member"
             className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
           >
             Return to Plans
@@ -359,7 +359,7 @@ const PlanDetailsPage = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-5">
               <Link
-                href="/become-a-member"
+                href="/#become-a-member"
                 className="flex items-center text-purple-600 hover:text-purple-700 font-semibold transition-colors duration-300 text-sm sm:text-base cursor-pointer"
               >
                 <span className="mr-2">←</span> Back to All Plans
@@ -383,7 +383,7 @@ const PlanDetailsPage = () => {
                   ⭐ Most Popular Choice ⭐
                 </div>
               )}
-              <h1 className="text-4xl md:text-6xl text-[#3D2E4F] mb-6 leading-tight font-bold font-serif">
+              <h1 className="text-4xl md:text-6xl text-[#3D2E4F] mb-6 leading-tight font-bold font-heading">
                 {activePlan.name}
               </h1>
               <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed whitespace-pre-wrap">
@@ -509,7 +509,7 @@ const PlanDetailsPage = () => {
 
                 {/* Features */}
                 <div className="bg-white/85 backdrop-blur-md rounded-3xl shadow-sm border border-purple-100/50 p-6 sm:p-8">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-[#3D2E4F] mb-6 font-serif">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-[#3D2E4F] mb-6 font-heading">
                     What&rsquo;s Included
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -532,7 +532,7 @@ const PlanDetailsPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {activePlan.benefits && activePlan.benefits.length > 0 && (
                       <div className="bg-white/85 backdrop-blur-md rounded-3xl shadow-sm border border-purple-100/50 p-6 sm:p-8">
-                        <h3 className="text-lg sm:text-xl font-bold text-[#3D2E4F] mb-4 font-serif">
+                        <h3 className="text-lg sm:text-xl font-bold text-[#3D2E4F] mb-4 font-heading">
                           Key Benefits
                         </h3>
                         <ul className="space-y-3">
@@ -548,7 +548,7 @@ const PlanDetailsPage = () => {
 
                     {activePlan.recommendedFor && activePlan.recommendedFor.length > 0 && (
                       <div className="bg-white/85 backdrop-blur-md rounded-3xl shadow-sm border border-purple-100/50 p-6 sm:p-8">
-                        <h3 className="text-lg sm:text-xl font-bold text-[#3D2E4F] mb-4 font-serif">
+                        <h3 className="text-lg sm:text-xl font-bold text-[#3D2E4F] mb-4 font-heading">
                           Perfect For
                         </h3>
                         <ul className="space-y-2.5">
@@ -567,7 +567,7 @@ const PlanDetailsPage = () => {
                 {/* Services Details */}
                 {activePlan.includedServices && activePlan.includedServices.length > 0 && (
                   <div className="bg-white/85 backdrop-blur-md rounded-3xl shadow-sm border border-purple-100/50 p-6 sm:p-8">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-[#3D2E4F] mb-6 font-serif">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-[#3D2E4F] mb-6 font-heading">
                       Service Details
                     </h2>
                     <div className="space-y-6">
@@ -594,7 +594,7 @@ const PlanDetailsPage = () => {
                 {/* FAQs */}
                 {activePlan.faqs && activePlan.faqs.length > 0 && (
                   <div className="bg-white/85 backdrop-blur-md rounded-3xl shadow-sm border border-purple-100/50 p-6 sm:p-8">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-[#3D2E4F] mb-6 font-serif">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-[#3D2E4F] mb-6 font-heading">
                       Frequently Asked Questions
                     </h2>
                     <div className="space-y-6">
@@ -621,7 +621,7 @@ const PlanDetailsPage = () => {
                 {/* Plan Card */}
                 <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-xl border-2 border-purple-300 p-6 sm:p-8 lg:sticky lg:top-36 z-10 relative">
                   <div className="text-center mb-6 pb-6 border-b border-purple-100/60">
-                    <h3 className="text-xl sm:text-2xl font-bold text-[#3D2E4F] mb-2 font-serif">
+                    <h3 className="text-xl sm:text-2xl font-bold text-[#3D2E4F] mb-2 font-heading">
                       {activePlan.name}
                     </h3>
                     <p className="text-purple-600 font-semibold text-xs sm:text-sm mb-4">
@@ -699,7 +699,7 @@ const PlanDetailsPage = () => {
               )}
 
               <div className="text-center mb-8 sm:mb-10">
-                <h2 className="text-2xl sm:text-3xl font-bold text-[#3D2E4F] mb-4 font-serif">
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#3D2E4F] mb-4 font-heading">
                   Begin Your{" "}
                   <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
                     Spiritual Transformation
