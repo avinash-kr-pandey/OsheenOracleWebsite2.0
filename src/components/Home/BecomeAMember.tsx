@@ -8,6 +8,7 @@ import {
   Stat,
   Testimonial,
 } from "@/utils/api/becomeamember.api";
+import { FaQuoteRight } from "react-icons/fa";
 
 const BecomeAMember: React.FC = () => {
   const router = useRouter();
@@ -299,55 +300,76 @@ const BecomeAMember: React.FC = () => {
               testimonials.map((testimonial, index) => (
                 <div
                   key={testimonial._id || index}
-                  className="p-8 rounded-2xl bg-white/90 backdrop-blur-sm border border-white/50 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-slide-up"
+                  className="p-8 rounded-3xl bg-gradient-to-br from-white/60 to-purple-100/20 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full relative"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="text-4xl mb-5 animate-pulse">
-                    {testimonial.avatar}
-                  </div>
-                  <p className="text-gray-700 mb-6 italic text-sm leading-relaxed">
-                    {testimonial.comment}
-                  </p>
                   <div>
-                    <div className="font-bold text-gray-900 text-base">
-                      {testimonial.name}
+                    <div className="text-4xl mb-5">
+                      {testimonial.avatar}
                     </div>
-                    <div className="text-gray-600 text-sm">
-                      {testimonial.zodiac}
+                    <div className="my-4">
+                      <p className="text-gray-700 italic text-base leading-relaxed font-serif">
+                        “{testimonial.comment}”
+                      </p>
                     </div>
-                    <div className="text-gray-600 text-sm">
-                      {testimonial.date}
+                  </div>
+                  <div className="mt-6">
+                    <h4 className="font-bold text-gray-900 text-base">{testimonial.name}</h4>
+                    <div className="text-gray-500 text-xs mt-1">
+                      {testimonial.zodiac} {testimonial.date && `• ${testimonial.date}`}
                     </div>
                   </div>
                 </div>
               ))
             ) : (
               <>
-                <div className="p-8 rounded-2xl bg-white/90 backdrop-blur-sm border border-white/50">
-                  <div className="text-4xl mb-5">🙏</div>
-                  <p className="text-gray-700 mb-6 italic">
-                    Osheen&apos;s guidance transformed my life.
-                  </p>
-                  <div className="font-bold">Priya Sharma</div>
-                  <div className="text-gray-600 text-sm">Basic Aura Member</div>
-                </div>
-                <div className="p-8 rounded-2xl bg-white/90 backdrop-blur-sm border border-white/50">
-                  <div className="text-4xl mb-5">💖</div>
-                  <p className="text-gray-700 mb-6 italic">
-                    The tarot insights helped me make crucial decisions.
-                  </p>
-                  <div className="font-bold">Rahul Verma</div>
-                  <div className="text-gray-600 text-sm">
-                    Tarot Insight Member
+                <div className="p-8 rounded-3xl bg-gradient-to-br from-white/60 to-purple-100/20 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full relative">
+                  <div>
+                    <div className="text-4xl mb-5">🙏</div>
+                    <div className="my-4">
+                      <p className="text-gray-700 italic text-base leading-relaxed font-serif">
+                        “Osheen&apos;s guidance transformed my life.”
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    <h4 className="font-bold text-gray-900 text-base">Priya Sharma</h4>
+                    <div className="text-gray-500 text-xs mt-1">
+                      Basic Aura Member
+                    </div>
                   </div>
                 </div>
-                <div className="p-8 rounded-2xl bg-white/90 backdrop-blur-sm border border-white/50">
-                  <div className="text-4xl mb-5">🌟</div>
-                  <p className="text-gray-700 mb-6 italic">
-                    I manifested my dream job within 3 months!
-                  </p>
-                  <div className="font-bold">Anita Patel</div>
-                  <div className="text-gray-600 text-sm">Premium Member</div>
+                <div className="p-8 rounded-3xl bg-gradient-to-br from-white/60 to-purple-100/20 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full relative">
+                  <div>
+                    <div className="text-4xl mb-5">💖</div>
+                    <div className="my-4">
+                      <p className="text-gray-700 italic text-base leading-relaxed font-serif">
+                        “The tarot insights helped me make crucial decisions.”
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    <h4 className="font-bold text-gray-900 text-base">Rahul Verma</h4>
+                    <div className="text-gray-500 text-xs mt-1">
+                      Tarot Insight Member
+                    </div>
+                  </div>
+                </div>
+                <div className="p-8 rounded-3xl bg-gradient-to-br from-white/60 to-purple-100/20 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full relative">
+                  <div>
+                    <div className="text-4xl mb-5">🌟</div>
+                    <div className="my-4">
+                      <p className="text-gray-700 italic text-base leading-relaxed font-serif">
+                        “I manifested my dream job within 3 months!”
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    <h4 className="font-bold text-gray-900 text-base">Anita Patel</h4>
+                    <div className="text-gray-500 text-xs mt-1">
+                      Premium Member
+                    </div>
+                  </div>
                 </div>
               </>
             )}

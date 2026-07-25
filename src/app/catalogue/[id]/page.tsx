@@ -529,7 +529,7 @@ const ZodiacDetails = () => {
                           alt={guide.name}
                           width={80}
                           height={80}
-                          className="object-cover"
+                          className="w-full h-full object-cover"
                         />
                       ) : (
                         <Users className="w-8 h-8 sm:w-10 sm:h-10" />

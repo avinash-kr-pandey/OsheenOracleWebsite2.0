@@ -44,7 +44,7 @@ export default function OrderConfirmationPage() {
           <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
             <span className="text-gray-500 font-medium">Status</span>
             <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full font-bold text-xs">
-              PAID & PENDING
+              PAID
             </span>
           </div>
           <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">

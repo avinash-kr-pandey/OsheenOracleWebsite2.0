@@ -36,9 +36,10 @@ interface OrderApiResponse {
   size?: string;
   color?: string;
   productId?: string;
-  shippingAddress?: string;
+  shippingAddress?: any;
   paymentMethod?: string;
   carrier?: string;
+  paymentId?: string;
 }
 
 interface Order {
@@ -57,9 +58,10 @@ interface Order {
   color?: string;
   productId?: string;
   orderDate?: string;
-  shippingAddress?: string;
+  shippingAddress?: any;
   paymentMethod?: string;
   carrier?: string;
+  paymentId?: string;
 }
 
 // Define proper API response types
@@ -307,6 +309,7 @@ const Orders = () => {
           shippingAddress: order.shippingAddress,
           paymentMethod: order.paymentMethod,
           carrier: order.carrier || "",
+          paymentId: order.paymentId,
         };
       });
 
@@ -852,7 +855,7 @@ const Orders = () => {
                               </button>
                             )}
 
-                            {["pending", "processing", "packed"].includes(order.status.toLowerCase()) && (
+                            {["pending", "processing", "packed"].includes(order.status.toLowerCase()) && !order.paymentId && (
                               <button
                                 onClick={() => cancelOrder(order.id)}
                                 className="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-200 text-sm"
@@ -1204,9 +1207,17 @@ const Orders = () => {
                     <h4 className="font-medium text-blue-800 mb-2">
                       Shipping Address
                     </h4>
-                    <p className="text-gray-600 text-sm">
-                      {selectedOrder.shippingAddress}
-                    </p>
+                    <div className="text-gray-600 text-sm">
+                      {typeof selectedOrder.shippingAddress === "object" ? (
+                        <div className="space-y-1">
+                          <p className="font-semibold text-gray-800">{selectedOrder.shippingAddress.name}</p>
+                          {selectedOrder.shippingAddress.phone && <p>Phone: {selectedOrder.shippingAddress.phone}</p>}
+                          <p className="whitespace-pre-wrap">{selectedOrder.shippingAddress.address}</p>
+                        </div>
+                      ) : (
+                        <p className="whitespace-pre-wrap">{selectedOrder.shippingAddress}</p>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -1218,7 +1229,7 @@ const Orders = () => {
                   >
                     Close
                   </button>
-                  {selectedOrder.status.toLowerCase() === "processing" && (
+                  {selectedOrder.status.toLowerCase() === "processing" && !selectedOrder.paymentId && (
                     <button
                       onClick={() => {
                         cancelOrder(selectedOrder.id);
