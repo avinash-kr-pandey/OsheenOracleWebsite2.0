@@ -42,6 +42,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast, Toaster } from "react-hot-toast";
 import { servicePackageAPI } from "@/utils/api/service.package.api";
+import homeAPI, { CatalogueItem } from "@/utils/api/home.api";
 import { FiX } from "react-icons/fi";
 
 import { servicesData, astrologers, serviceCategories, expertiseCategories } from "@/utils/AstroData";
@@ -156,7 +157,11 @@ const UserDetailsModal = ({
   ) => {
     const { name, value } = e.target;
     if (name === "phone") {
-      const cleaned = value.replace(/\D/g, "").slice(0, 10);
+      let cleaned = value.replace(/[^\d+]/g, "");
+      if (cleaned.includes("+")) {
+        cleaned = "+" + cleaned.replace(/\+/g, "");
+      }
+      cleaned = cleaned.slice(0, 15);
       setFormData((prev) => ({
         ...prev,
         [name]: cleaned,
@@ -183,9 +188,9 @@ const UserDetailsModal = ({
       return;
     }
 
-    const phoneDigits = formData.phone.replace(/\D/g, "");
-    if (phoneDigits.length !== 10) {
-      toast.error("Phone number must be exactly 10 digits");
+    const phoneRegex = /^\+\d{1,4}\d{7,10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      toast.error("Phone number must include country code (e.g., +919876543210)");
       return;
     }
 
@@ -270,7 +275,7 @@ const UserDetailsModal = ({
             <div className={`grid grid-cols-1 ${isEnergyHealing ? "" : "md:grid-cols-2"} gap-4`}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone Number *
+                  Phone Number (with Country Code) *
                 </label>
                 <input
                   type="tel"
@@ -278,9 +283,9 @@ const UserDetailsModal = ({
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  maxLength={10}
+                  maxLength={15}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800"
-                  placeholder="Enter your phone number"
+                  placeholder="e.g. +919876543210"
                 />
               </div>
               {!isEnergyHealing && (
@@ -406,20 +411,30 @@ const BookingPage = () => {
   const [showFormModal, setShowFormModal] = useState(false);
   const [bookingModalService, setBookingModalService] = useState<any | null>(null);
 
+  const [catalogueItems, setCatalogueItems] = useState<CatalogueItem[]>([]);
+
   useEffect(() => {
-    const loadCategories = async () => {
+    const loadData = async () => {
       try {
-        const response = await servicePackageAPI.getAllCategories();
-        if (response && response.success && response.data) {
-          setDbCategories(response.data);
+        const [catResponse, catalogueResponse] = await Promise.all([
+          servicePackageAPI.getAllCategories(),
+          homeAPI.getCatalogue()
+        ]);
+        
+        if (catResponse && catResponse.success && catResponse.data) {
+          setDbCategories(catResponse.data);
+        }
+        
+        if (catalogueResponse && catalogueResponse.length > 0) {
+          setCatalogueItems(catalogueResponse);
         }
       } catch (err) {
-        console.error("Error loading categories:", err);
+        console.error("Error loading booking page data:", err);
       } finally {
         setLoadingDb(false);
       }
     };
-    loadCategories();
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -445,7 +460,29 @@ const BookingPage = () => {
     }
   }, [isAuthenticated]);
 
-  const displayedServices = showAllServices ? servicesData : servicesData.slice(0, 6);
+  // Use catalogueItems if available, otherwise fallback to static servicesData
+  const servicesToDisplay = catalogueItems.length > 0
+    ? catalogueItems.map(item => ({
+        id: item.id || 0,
+        _id: item._id,
+        name: item.name,
+        price: item.price.startsWith("₹") ? item.price : `₹${item.price}`,
+        originalPrice: undefined as string | undefined, // CatalogueItem doesn't have originalPrice in the backend db model
+        rating: item.rating || 4.8,
+        duration: "45 mins",
+        image: item.image || "/images/services/default.jpg",
+        description: item.description,
+        features: item.traits || [],
+        category: "Spiritual Services",
+        benefits: item.benefits || [],
+        includes: item.readingIncludes || [],
+        popularity: "popular",
+        sessionsCompleted: "150+",
+        satisfactionRate: "98%"
+      }))
+    : servicesData;
+
+  const displayedServices = showAllServices ? servicesToDisplay : servicesToDisplay.slice(0, 6);
 
   const handleWhatsAppBooking = (astrologer: (typeof astrologers)[0], serviceName?: string) => {
     const message = serviceName
@@ -482,7 +519,7 @@ const BookingPage = () => {
     router.push("/header/payment-methods");
   };
 
-  const handleServiceBooking = (service: typeof servicesData[0]) => {
+  const handleServiceBooking = (service: typeof servicesToDisplay[number]) => {
     const match = getDbMapping(service.name, dbCategories);
     const serviceDataForLater = {
       _id: match?.subcategoryId || service.id.toString(),
@@ -634,20 +671,22 @@ const BookingPage = () => {
                   {/* Service Header */}
                   <div className="relative p-6 bg-gradient-to-br from-purple-50 to-pink-50">
                     <div className="flex justify-between items-start mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                      <div className="flex items-start gap-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shrink-0">
                           {getServiceIcon(service.name)}
                         </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900">{service.name}</h3>
-                          <div className="flex items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-xl font-bold text-gray-900 line-clamp-2 h-14" title={service.name}>
+                            {service.name}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1">
                             <Timer className="w-4 h-4 text-gray-500" />
                             <span className="text-sm text-gray-600">{service.duration}</span>
                           </div>
                         </div>
                       </div>
                       {service.popularity === "bestseller" && (
-                        <div className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold">
+                        <div className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold shrink-0">
                           Bestseller
                         </div>
                       )}
@@ -669,40 +708,44 @@ const BookingPage = () => {
                   </div>
 
                   {/* Service Details */}
-                  <div className="p-6 flex-grow">
-                    <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
+                  <div className="p-6 flex-grow flex flex-col justify-between">
+                    <div>
+                      <p className="text-gray-600 mb-6 leading-relaxed line-clamp-3 min-h-[4.5rem] text-sm">
+                        {service.description}
+                      </p>
 
-                    <div className="space-y-4 mb-6">
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                          <Sparkle className="w-4 h-4 text-purple-500" />
-                          Key Features
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {service.features.slice(0, 4).map((feature, idx) => (
-                            <span
-                              key={idx}
-                              className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-xs font-medium"
-                            >
-                              {feature}
-                            </span>
-                          ))}
+                      <div className="space-y-6 mb-6">
+                        <div className="min-h-[5.5rem]">
+                          <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                            <Sparkle className="w-4 h-4 text-purple-500" />
+                            Key Features
+                          </h4>
+                          <div className="flex flex-wrap gap-1.5">
+                            {service.features.slice(0, 4).map((feature, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2.5 py-1 bg-purple-50 text-purple-700 rounded-lg text-xs font-medium"
+                              >
+                                {feature}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
 
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                          Benefits
-                        </h4>
-                        <ul className="space-y-2">
-                          {service.benefits.slice(0, 3).map((benefit, idx) => (
-                            <li key={idx} className="flex items-start gap-2">
-                              <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                              <span className="text-sm text-gray-600">{benefit}</span>
-                            </li>
-                          ))}
-                        </ul>
+                        <div className="min-h-[6rem]">
+                          <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            Benefits
+                          </h4>
+                          <ul className="space-y-1.5">
+                            {service.benefits.slice(0, 3).map((benefit, idx) => (
+                              <li key={idx} className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                                <span className="text-xs text-gray-600 line-clamp-2 leading-tight">{benefit}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
                     </div>
 
