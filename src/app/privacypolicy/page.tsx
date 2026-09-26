@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | Osheen Oracle Data Protection",
+  description:
+    "Read the Privacy Policy of Osheen Oracle. Learn how we collect, safeguard, and process your personal information securely.",
+  alternates: {
+    canonical: "/privacypolicy",
+  },
+};
 
 const PrivacyPolicy = () => {
   return (
@@ -325,3 +335,4 @@ const PrivacyPolicy = () => {
 };
 
 export default PrivacyPolicy;
+

@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "Cancellation & Refund Policy | Osheen Oracle",
+  description:
+    "Review the Cancellation and Refund Policy for session bookings, tarot readings, and spiritual consultations at Osheen Oracle.",
+  alternates: {
+    canonical: "/refundpolicy",
+  },
+};
 
 const RefundPolicy = () => {
   return (
@@ -119,3 +129,4 @@ const RefundPolicy = () => {
 };
 
 export default RefundPolicy;
+

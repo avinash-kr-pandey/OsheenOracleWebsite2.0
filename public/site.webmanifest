@@ -1,0 +1,21 @@
+{
+  "name": "Osheen Oracle",
+  "short_name": "OsheenOracle",
+  "description": "Tarot Reading, Astrology & Spiritual Healing Guidance",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7e22ce",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

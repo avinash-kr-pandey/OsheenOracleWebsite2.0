@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions | Service Policy & Guidelines",
+  description:
+    "Review the Terms and Conditions of Osheen Oracle for spiritual services, tarot consultations, payment rules, and service guidelines.",
+  alternates: {
+    canonical: "/termsofservice",
+  },
+};
 
 const TermsOfUse = () => {
   return (
@@ -176,3 +186,4 @@ const TermsOfUse = () => {
 };
 
 export default TermsOfUse;
+
