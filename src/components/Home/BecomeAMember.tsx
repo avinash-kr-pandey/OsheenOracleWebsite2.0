@@ -92,7 +92,7 @@ const BecomeAMember: React.FC = () => {
   useEffect(() => {
     if (typeof window !== "undefined" && (window.location.hash === "#become-a-member" || window.location.hash === "#membership-plans")) {
       setTimeout(() => {
-        const el = document.getElementById("membership-plans") || document.getElementById("become-a-member");
+        const el = document.getElementById("become-a-member") || document.getElementById("membership-plans");
         if (el) {
           el.scrollIntoView({ behavior: "smooth" });
         }

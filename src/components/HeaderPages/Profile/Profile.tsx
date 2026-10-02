@@ -1039,13 +1039,13 @@ const ProfilePage = () => {
 
                   <div className="border-t border-purple-100 pt-6 flex flex-wrap gap-4">
                     <button
-                      onClick={() => router.push("/#membership-plans")}
+                      onClick={() => router.push("/#become-a-member")}
                       className="px-6 py-3 bg-gradient-to-r from-pink-500 to-amber-500 hover:shadow-lg text-white font-semibold rounded-xl text-sm transition-all cursor-pointer"
                     >
                       Extend / Renew Subscription
                     </button>
                     <button
-                      onClick={() => router.push("/#membership-plans")}
+                      onClick={() => router.push("/#become-a-member")}
                       className="px-6 py-3 bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 font-semibold rounded-xl text-sm transition-all cursor-pointer"
                     >
                       Upgrade Subscription
@@ -1060,7 +1060,7 @@ const ProfilePage = () => {
                     You are not a member of the sacred circle yet. Join now to unlock divine guidance, exclusive horoscope predictions, and custom energy alignment.
                   </p>
                   <button
-                    onClick={() => router.push("/#membership-plans")}
+                    onClick={() => router.push("/#become-a-member")}
                     className="px-6 py-3 bg-gradient-to-r from-pink-500 to-amber-500 text-white font-semibold rounded-xl text-sm hover:shadow-lg transition-all cursor-pointer"
                   >
                     Explore Membership Plans
