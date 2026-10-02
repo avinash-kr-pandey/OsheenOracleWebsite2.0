@@ -109,32 +109,8 @@ export default function HeroSection() {
 
       {/* Animation styles */}
       <style jsx>{`
-        @keyframes fade-in-up {
-          0% {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
         .animate-fade-in-up {
-          animation: fade-in-up 1s ease-out forwards;
-          opacity: 0;
-        }
-
-        .animation-delay-200 {
-          animation-delay: 0.2s;
-        }
-
-        .animation-delay-400 {
-          animation-delay: 0.4s;
-        }
-
-        .animation-delay-600 {
-          animation-delay: 0.6s;
+          opacity: 1;
         }
       `}</style>
     </div>

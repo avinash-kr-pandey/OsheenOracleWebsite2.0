@@ -51,7 +51,6 @@ export default function HeroHeader() {
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
-  const [forceUpdate, setForceUpdate] = useState(0);
 
   // ✅ Dynamic Services State
   const [categories, setCategories] = useState<Category[]>([]);
@@ -122,22 +121,9 @@ export default function HeroHeader() {
     fetchAnnouncement();
   }, []);
 
-  // Force re-render when auth state changes
-  useEffect(() => {
-    console.log("Header - Auth State Changed:", {
-      isAuthenticated,
-      user: user?.name || user?.email,
-      loading,
-      forceUpdate,
-    });
-    setForceUpdate((prev) => prev + 1);
-  }, [isAuthenticated, user, loading]);
-
   // Listen for storage changes
   useEffect(() => {
     const handleStorageChange = () => {
-      console.log("Storage changed in Header, forcing update");
-      setForceUpdate((prev) => prev + 1);
       checkAuth?.();
     };
 
@@ -213,7 +199,6 @@ export default function HeroHeader() {
       setMenuOpen(false);
       toast.success("Logged out successfully!");
       setTimeout(() => {
-        setForceUpdate((prev) => prev + 1);
         router.push("/");
       }, 100);
     } catch (error) {
@@ -375,46 +360,13 @@ export default function HeroHeader() {
     },
   ];
 
-  if (loading) {
-    return (
-      <header className="fixed top-0 left-0 w-full z-50 bg-[#FBB5E7]">
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 h-[36px] w-full flex items-center px-4">
-          <div className="h-4 w-3/4 max-w-lg bg-white/20 rounded animate-pulse"></div>
-        </div>
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="cursor-pointer flex-shrink-0">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              width={100}
-              height={100}
-              className="rounded-full"
-              style={{ marginBottom: "-30px" }}
-            />
-          </div>
-          <div className="hidden md:flex items-center gap-4">
-            <div className="w-24 h-8 bg-purple-200 rounded-full animate-pulse"></div>
-            <div className="w-24 h-10 bg-yellow-300 rounded-lg animate-pulse"></div>
-            <div className="w-10 h-10 bg-purple-200 rounded-full animate-pulse"></div>
-            <div className="w-10 h-10 bg-purple-200 rounded-full animate-pulse"></div>
-            <div className="w-32 h-10 bg-purple-200 rounded-2xl animate-pulse"></div>
-          </div>
-          <div className="md:hidden flex items-center gap-4">
-            <div className="w-10 h-10 bg-purple-200 rounded-full animate-pulse"></div>
-            <div className="w-10 h-10 bg-purple-200 rounded-full animate-pulse"></div>
-            <div className="w-10 h-10 bg-purple-200 rounded-full animate-pulse"></div>
-          </div>
-        </div>
-      </header>
-    );
-  }
+
 
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         scrolled ? "bg-[#FBB5E7]" : "bg-[#FBB5E7]"
       }`}
-      key={`header-${forceUpdate}`}
     >
       <Toaster
         position="top-right"

@@ -18,6 +18,7 @@ const BecomeAMember: React.FC = () => {
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [stats, setStats] = useState<Stat[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [userMembership, setUserMembership] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [contentError, setContentError] = useState<string>("");
 
@@ -42,6 +43,18 @@ const BecomeAMember: React.FC = () => {
         } else {
           setContentError(response.message || "Failed to load content");
         }
+
+        // Fetch user membership if logged in
+        if (typeof window !== "undefined" && localStorage.getItem("token")) {
+          try {
+            const memRes = await membershipApi.getMyMembership();
+            if (memRes.success && memRes.data) {
+              setUserMembership(memRes.data);
+            }
+          } catch (e) {
+            console.log("No active user membership found:", e);
+          }
+        }
       } catch (error: unknown) {
         console.error("Error fetching content:", error);
         setContentError("Failed to load content. Please refresh the page.");
@@ -52,6 +65,29 @@ const BecomeAMember: React.FC = () => {
 
     fetchContent();
   }, []);
+
+  const isPlanActive = (plan: MembershipPlan): boolean => {
+    if (!userMembership || userMembership.status !== "active") return false;
+
+    if (userMembership.subscriptionEndDate) {
+      if (new Date(userMembership.subscriptionEndDate) < new Date()) {
+        return false;
+      }
+    }
+
+    const activePlan = String(userMembership.plan || "").toLowerCase();
+    const pId = String(plan._id || "").toLowerCase();
+    const pCustomId = String(plan.id || "").toLowerCase();
+    const pName = String(plan.name || "").toLowerCase();
+
+    return Boolean(
+      (pId && activePlan === pId) ||
+      (pCustomId && activePlan === pCustomId) ||
+      (pName && activePlan === pName) ||
+      (pName && activePlan && pName.includes(activePlan)) ||
+      (pName && activePlan && activePlan.includes(pName.split(" ")[0]))
+    );
+  };
 
   const handlePlanDetails = (planId: string): void => {
     router.push(`/details/${planId}`);
@@ -109,12 +145,12 @@ const BecomeAMember: React.FC = () => {
         background: "linear-gradient(135deg, #fce7f3 0%, #e0f2fe 100%)",
       }}
     >
-      {/* Animated Background Elements */}
-      <div className="fixed top-0 left-0 right-0 bottom-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-bounce-slow"></div>
-        <div className="absolute top-1/2 left-1/4 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-15 animate-spin-slow"></div>
-        <div className="absolute top-1/3 right-1/3 w-48 h-48 bg-indigo-200 rounded-full mix-blend-multiply filter blur-2xl opacity-25 animate-ping-slow"></div>
+      {/* Background Elements scoped to section */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+        <div className="absolute top-1/2 left-1/4 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-15"></div>
+        <div className="absolute top-1/3 right-1/3 w-48 h-48 bg-indigo-200 rounded-full mix-blend-multiply filter blur-2xl opacity-25"></div>
       </div>
 
       {/* Hero Section */}
@@ -214,64 +250,82 @@ const BecomeAMember: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
             {membershipPlans.length > 0 ? (
-              membershipPlans.map((plan, index) => (
-                <div
-                  key={plan._id || plan.id}
-                  className={`animate-slide-up`}
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
+              membershipPlans.map((plan, index) => {
+                const active = isPlanActive(plan);
+                return (
                   <div
-                    className="p-6 border-2 rounded-2xl border-white/50 bg-white/80 backdrop-blur-sm hover:border-purple-300 transition-all duration-300 h-full flex flex-col transform hover:-translate-y-2 hover:shadow-xl"
+                    key={plan._id || plan.id}
+                    className={`animate-slide-up`}
+                    style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <div className="text-center mb-6">
-                      <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight">
-                        {plan.name}
-                      </h3>
-                      <div className="flex items-baseline justify-center mb-2">
-                        <span className="text-3xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-                          {plan.price}
-                        </span>
-                        <span className="text-gray-600 ml-2 text-lg">
-                          /{plan.period}
-                        </span>
+                    <div
+                      className={`p-6 border-2 rounded-2xl bg-white/80 backdrop-blur-sm transition-all duration-300 h-full flex flex-col transform ${
+                        active
+                          ? "border-emerald-500 bg-emerald-50/40 shadow-md"
+                          : "border-white/50 hover:border-purple-300 hover:-translate-y-2 hover:shadow-xl"
+                      }`}
+                    >
+                      {active && (
+                        <div className="mb-2 text-center">
+                          <span className="inline-block bg-emerald-600 text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-sm tracking-wide">
+                            ✓ Active Plan
+                          </span>
+                        </div>
+                      )}
+                      <div className="text-center mb-6">
+                        <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight">
+                          {plan.name}
+                        </h3>
+                        <div className="flex items-baseline justify-center mb-2">
+                          <span className="text-3xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                            {plan.price}
+                          </span>
+                          <span className="text-gray-600 ml-2 text-lg">
+                            /{plan.period}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex-grow mb-6">
+                        <ul className="space-y-3">
+                          {plan.features.slice(0, 4).map((feature, idx) => (
+                            <li key={idx} className="flex items-start text-left">
+                              <span className="text-purple-500 mr-3 mt-0.5 flex-shrink-0">
+                                ✨
+                              </span>
+                              <span className="text-gray-700 text-sm leading-relaxed">
+                                {feature}
+                              </span>
+                            </li>
+                          ))}
+                          {plan.features.length > 4 && (
+                            <li className="text-sm text-purple-500 ml-6">
+                              +{plan.features.length - 4} more features
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+
+                      <div className="space-y-3 mt-auto">
+                        <button
+                          type="button"
+                          disabled={active}
+                          onClick={() => handlePlanDetails(plan._id || plan.id)}
+                          className={`w-full py-3 px-4 rounded-xl font-semibold text-base transition-all duration-300 ${
+                            active
+                              ? "bg-emerald-600 text-white cursor-not-allowed opacity-90 shadow-none"
+                              : plan.popular
+                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 shadow-lg transform hover:scale-[1.02]"
+                              : "bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 shadow-md transform hover:scale-[1.02]"
+                          }`}
+                        >
+                          {active ? "Active Plan" : "Select Plan"}
+                        </button>
                       </div>
                     </div>
-
-                    <div className="flex-grow mb-6">
-                      <ul className="space-y-3">
-                        {plan.features.slice(0, 4).map((feature, idx) => (
-                          <li key={idx} className="flex items-start text-left">
-                            <span className="text-purple-500 mr-3 mt-0.5 flex-shrink-0">
-                              ✨
-                            </span>
-                            <span className="text-gray-700 text-sm leading-relaxed">
-                              {feature}
-                            </span>
-                          </li>
-                        ))}
-                        {plan.features.length > 4 && (
-                          <li className="text-sm text-purple-500 ml-6">
-                            +{plan.features.length - 4} more features
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-
-                    <div className="space-y-3 mt-auto">
-                      <button
-                        type="button"
-                        onClick={() => handlePlanDetails(plan._id || plan.id)}
-                        className={`w-full py-3 px-4 rounded-xl font-semibold text-base transition-all duration-300 transform hover:scale-[1.02] ${plan.popular
-                          ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 shadow-lg"
-                          : "bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 shadow-md"
-                          }`}
-                      >
-                        Select Plan
-                      </button>
-                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="col-span-4 text-center py-12 text-gray-500">
                 No membership plans available. Please check back later.

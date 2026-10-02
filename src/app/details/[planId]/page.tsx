@@ -19,6 +19,7 @@ const PlanDetailsPage = () => {
   const planId = params.planId as string;
 
   const [activePlan, setActivePlan] = useState<any>(null);
+  const [userMembership, setUserMembership] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Subscription configuration states
@@ -40,6 +41,35 @@ const PlanDetailsPage = () => {
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
+
+  useEffect(() => {
+    const fetchUserMembership = async () => {
+      if (typeof window !== "undefined" && localStorage.getItem("token")) {
+        try {
+          const memRes = await membershipApi.getMyMembership();
+          if (memRes.success && memRes.data) {
+            setUserMembership(memRes.data);
+          }
+        } catch (e) {
+          console.log("Error fetching user membership:", e);
+        }
+      }
+    };
+    fetchUserMembership();
+  }, []);
+
+  const isPlanAlreadyActive = Boolean(
+    userMembership &&
+    userMembership.status === "active" &&
+    (!userMembership.subscriptionEndDate || new Date(userMembership.subscriptionEndDate) > new Date()) &&
+    activePlan &&
+    (
+      String(userMembership.plan || "").toLowerCase() === String(activePlan._id || "").toLowerCase() ||
+      String(userMembership.plan || "").toLowerCase() === String(activePlan.id || "").toLowerCase() ||
+      String(userMembership.plan || "").toLowerCase() === String(activePlan.name || "").toLowerCase() ||
+      (activePlan.name && String(userMembership.plan || "").toLowerCase().includes(String(activePlan.name).toLowerCase().split(" ")[0]))
+    )
+  );
 
   // Fetch plan content on mount (dynamic + static fallback)
   useEffect(() => {
@@ -687,6 +717,22 @@ const PlanDetailsPage = () => {
                 </div>
               )}
 
+              {isPlanAlreadyActive && (
+                <div className="mb-8 p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl animate-fade-in shadow-sm">
+                  <div className="flex items-center">
+                    <div className="text-2xl mr-3">✅</div>
+                    <div>
+                      <h4 className="font-bold text-emerald-800">Active Membership Plan</h4>
+                      <p className="text-emerald-700 text-sm font-medium">
+                        You already have an active subscription for <strong>{activePlan?.name}</strong>
+                        {userMembership?.subscriptionEndDate && ` (Valid until ${new Date(userMembership.subscriptionEndDate).toLocaleDateString()})`}.
+                        Re-purchasing this active plan is disabled.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {submitError && (
                 <div className="mb-8 p-4 bg-gradient-to-r from-red-100 to-rose-100 border border-red-200 rounded-2xl animate-fade-in">
                   <div className="flex items-center">
@@ -834,10 +880,18 @@ const PlanDetailsPage = () => {
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="w-full flex justify-center items-center bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 px-8 rounded-xl font-bold text-base sm:text-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-md cursor-pointer"
+                  disabled={isSubmitting || isPlanAlreadyActive}
+                  className={`w-full flex justify-center items-center py-4 px-8 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-md ${
+                    isPlanAlreadyActive
+                      ? "bg-emerald-600 text-white cursor-not-allowed opacity-90 shadow-none"
+                      : "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 hover:shadow-lg transform hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-md cursor-pointer"
+                  }`}
                 >
-                  {isSubmitting ? (
+                  {isPlanAlreadyActive ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span>✓</span> Plan Already Active
+                    </span>
+                  ) : isSubmitting ? (
                     <span className="flex items-center justify-center text-sm font-medium">
                       <svg
                         className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
