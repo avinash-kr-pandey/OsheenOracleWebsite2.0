@@ -90,15 +90,23 @@ const BecomeAMember: React.FC = () => {
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined" && (window.location.hash === "#become-a-member" || window.location.hash === "#membership-plans")) {
+    if (!loading && typeof window !== "undefined" && (window.location.hash === "#become-a-member" || window.location.hash === "#membership-plans")) {
       setTimeout(() => {
-        const el = document.getElementById("become-a-member") || document.getElementById("membership-plans");
+        const targetId = window.location.hash === "#membership-plans" ? "membership-plans" : "become-a-member";
+        const el = document.getElementById(targetId) || document.getElementById("become-a-member");
         if (el) {
-          el.scrollIntoView({ behavior: "smooth" });
+          const headerOffset = 90;
+          const elementPosition = el.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth",
+          });
         }
-      }, 400);
+      }, 300);
     }
-  }, []);
+  }, [loading]);
 
   const handlePlanDetails = (planId: string): void => {
     router.push(`/details/${planId}`);
