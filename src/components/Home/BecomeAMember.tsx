@@ -89,6 +89,17 @@ const BecomeAMember: React.FC = () => {
     );
   };
 
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window.location.hash === "#become-a-member" || window.location.hash === "#membership-plans")) {
+      setTimeout(() => {
+        const el = document.getElementById("membership-plans") || document.getElementById("become-a-member");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 400);
+    }
+  }, []);
+
   const handlePlanDetails = (planId: string): void => {
     router.push(`/details/${planId}`);
   };
@@ -233,7 +244,7 @@ const BecomeAMember: React.FC = () => {
       </section>
 
       {/* Membership Plans Section */}
-      <section className="py-20 relative">
+      <section id="membership-plans" className="py-20 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-3xl md:text-5xl text-gray-900 mb-4">
