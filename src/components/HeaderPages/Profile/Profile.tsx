@@ -939,13 +939,45 @@ const ProfilePage = () => {
                 </div>
               ) : membershipData ? (
                 <div className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 border border-purple-100 rounded-3xl p-6 md:p-8 shadow-sm">
+                  {/* Expiring Soon Banner Alert (<= 5 Days) */}
+                  {membershipData.isExpiringSoon && (
+                    <div className="mb-6 p-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl shadow-md flex items-center justify-between flex-wrap gap-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">⚠️</span>
+                        <div>
+                          <p className="font-bold text-sm sm:text-base">Membership Expiring Soon!</p>
+                          <p className="text-xs sm:text-sm text-amber-100">
+                            Your active plan has only <strong>{membershipData.daysRemaining} days left</strong>. Renew now to avoid losing sacred circle benefits.
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => router.push(`/#become-a-member`)}
+                        className="px-4 py-2 bg-white text-amber-600 font-bold rounded-xl text-xs sm:text-sm hover:bg-amber-50 transition shadow cursor-pointer"
+                      >
+                        Renew Now
+                      </button>
+                    </div>
+                  )}
+
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                     <div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-pink-600 px-3 py-1 bg-pink-100/50 rounded-full">
-                        Active Subscription
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-pink-600 px-3 py-1 bg-pink-100/50 rounded-full">
+                          Active Subscription
+                        </span>
+                        {membershipData.daysRemaining !== null && (
+                          <span className={`text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full ${
+                            membershipData.isExpiringSoon
+                              ? "bg-amber-100 text-amber-700 animate-pulse"
+                              : "bg-emerald-100 text-emerald-700"
+                          }`}>
+                            {membershipData.daysRemaining} Days Left
+                          </span>
+                        )}
+                      </div>
                       <h3 className="text-2xl font-bold text-gray-800 mt-3">
-                        {(() => {
+                        {membershipData.planName || (() => {
                           const planObj = membershipPlans.find(p => p._id === membershipData.plan || p.id === membershipData.plan);
                           return planObj ? planObj.name : "Exclusive Plan";
                         })()}
@@ -955,24 +987,62 @@ const ProfilePage = () => {
                       </p>
                     </div>
                     
-                    <div className="text-left md:text-right bg-white/70 backdrop-blur px-4 py-3 rounded-2xl border border-white/80">
-                      <p className="text-xs text-gray-400 font-medium">Valid Until</p>
-                      <p className="text-lg font-bold text-purple-700 mt-0.5">
-                        {membershipData.subscriptionEndDate ? new Date(membershipData.subscriptionEndDate).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric"
-                        }) : "Never"}
-                      </p>
+                    <div className="flex flex-wrap md:flex-nowrap gap-4">
+                      <div className="text-left md:text-right bg-white/70 backdrop-blur px-4 py-3 rounded-2xl border border-white/80">
+                        <p className="text-xs text-gray-400 font-medium">Amount Paid</p>
+                        <p className="text-lg font-bold text-emerald-600 mt-0.5">
+                          {membershipData.amountPaid ? `₹${membershipData.amountPaid.toLocaleString("en-IN")}` : (
+                            (() => {
+                              const planObj = membershipPlans.find(p => p._id === membershipData.plan || p.id === membershipData.plan);
+                              return planObj ? planObj.price : "Paid";
+                            })()
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="text-left md:text-right bg-white/70 backdrop-blur px-4 py-3 rounded-2xl border border-white/80">
+                        <p className="text-xs text-gray-400 font-medium">Valid Until</p>
+                        <p className="text-lg font-bold text-purple-700 mt-0.5">
+                          {membershipData.subscriptionEndDate ? new Date(membershipData.subscriptionEndDate).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric"
+                          }) : "Never"}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
+                  {/* Days Left Progress Bar */}
+                  {membershipData.daysRemaining !== null && (
+                    <div className="mb-6 bg-white/60 p-4 rounded-2xl border border-purple-100/60">
+                      <div className="flex justify-between text-xs font-semibold text-gray-600 mb-2">
+                        <span>Subscription Validity</span>
+                        <span className={membershipData.isExpiringSoon ? "text-amber-600 font-bold" : "text-purple-600"}>
+                          {membershipData.daysRemaining} Days Remaining
+                        </span>
+                      </div>
+                      <div className="w-full bg-purple-100 rounded-full h-3 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            membershipData.isExpiringSoon
+                              ? "bg-gradient-to-r from-amber-500 to-orange-500"
+                              : "bg-gradient-to-r from-purple-500 to-pink-500"
+                          }`}
+                          style={{
+                            width: `${Math.min(100, Math.max(5, (membershipData.daysRemaining / 30) * 100))}%`,
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="border-t border-purple-100 pt-6 flex flex-wrap gap-4">
                     <button
-                      onClick={() => router.push(`/details/${membershipData.plan || membershipData._id}`)}
+                      onClick={() => router.push(`/#become-a-member`)}
                       className="px-6 py-3 bg-gradient-to-r from-pink-500 to-amber-500 hover:shadow-lg text-white font-semibold rounded-xl text-sm transition-all cursor-pointer"
                     >
-                      Extend Subscription
+                      Extend / Renew Subscription
                     </button>
                     <button
                       onClick={() => router.push("/#become-a-member")}

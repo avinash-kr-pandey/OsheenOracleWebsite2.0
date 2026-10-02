@@ -11,6 +11,8 @@ import { WishlistProvider } from "@/contexts/WishlistContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
 
+import MembershipExpiryModal from "@/components/Modals/MembershipExpiryModal";
+
 export default function LayoutWrapper({
   children,
 }: {
@@ -46,6 +48,7 @@ export default function LayoutWrapper({
               {!hideHeaderFooter && (
                 <>
                   <HeroHeader />
+                  <MembershipExpiryModal />
                 </>
               )}
 
