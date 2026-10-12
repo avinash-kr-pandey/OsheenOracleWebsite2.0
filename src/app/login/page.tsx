@@ -1486,7 +1486,7 @@ const Login = () => {
 
           <div className="relative z-10 lg:block pt-10 md:pt-20">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#3D2E4F] mb-3 lg:mb-4">
-              Let's the
+              Let the
             </h1>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#3D2E4F] mb-4 lg:mb-6">
               healing begin
